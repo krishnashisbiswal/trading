@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terms and Conditions - Arthavidya Trading Community</title>
+    <link rel="stylesheet" href="{% static 'css/style.css'%}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Additional CSS for Terms & Conditions page */
+        .terms-header {
+            background: linear-gradient(135deg, var(--primary-blue-dark), var(--primary-blue));
+            padding: 40px 0;
+            text-align: center;
+            color: var(--text-light);
+            margin-bottom: 30px;
+        }
+        
+        .terms-header h1 {
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+        
+        .terms-header p {
+            font-size: 18px;
+            opacity: 0.9;
+        }
+        
+        .terms-container {
+            background-color: var(--bg-white);
+            border-radius: var(--border-radius);
+            padding: 40px;
+            box-shadow: var(--box-shadow-md);
+            margin-bottom: 40px;
+        }
+        
+        .terms-section {
+            margin-bottom: 30px;
+        }
+        
+        .terms-section h2 {
+            color: var(--primary-blue);
+            font-size: 24px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--primary-blue-lighter);
+        }
+        
+        .terms-section h3 {
+            color: var(--primary-blue-dark);
+            font-size: 20px;
+            margin: 20px 0 15px;
+        }
+        
+        .terms-section p {
+            margin-bottom: 15px;
+            line-height: 1.8;
+        }
+        
+        .terms-section ul {
+            margin-bottom: 20px;
+            padding-left: 20px;
+        }
+        
+        .terms-section ul li {
+            margin-bottom: 10px;
+            position: relative;
+            padding-left: 15px;
+            list-style-type: none;
+        }
+        
+        .terms-section ul li::before {
+            content: "•";
+            color: var(--accent-red);
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+        }
+        
+        .last-updated {
+            text-align: right;
+            font-style: italic;
+            color: var(--text-muted);
+            margin-top: 20px;
+        }
+        
+        .acceptance-box {
+            background-color: var(--primary-blue-lighter);
+            padding: 20px;
+            border-radius: var(--border-radius);
+            margin: 30px 0;
+            border-left: 4px solid var(--primary-blue);
+        }
+        
+        .contact-section {
+            background-color: var(--bg-light);
+            padding: 30px;
+            border-radius: var(--border-radius);
+            margin-top: 40px;
+        }
+        
+        .contact-section h3 {
+            color: var(--primary-blue);
+            margin-bottom: 15px;
+        }
+        
+        @media screen and (max-width: 768px) {
+            .terms-container {
+                padding: 20px;
+            }
+            
+            .terms-header h1 {
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Section -->
+    <header class="main-header">
+        <div class="container">
+            <div class="header-inner">
+                <div class="logo">
+                    <img src="{% static 'images/logo.png' %}" alt="Arthavidya Trading Community">
+                    <div class="logo-text">
+                        <h1>Arthavidya Trading Community</h1>
+                        <p>Building A Wealthy Nation</p>
+                    </div>
+                </div>
+                <nav class="main-nav">
+                    <ul>
+                        <li><a href="{% url "home" %}" class="active">Home</a></li>
+                        <li><a href="{% url "about" %}">About Us</a></li>
+                        <li><a href="{% url "programs" %}">Our Programs</a></li>
+                        <li><a href="{% url "Community"%#}">Community</a></li>
+                        <li><a href="{% url "blog" %#}">Blog</a></li>
+                        <li><a href="{% url "student_form" %}" class="register-btn">Register</a></li>
+                        <li><a href="{% url "login" %}" class="login-btn">Login</a></li>
+                    </ul>
+                </nav>
+                <div class="mobile-menu-toggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Terms Header -->
+    <section class="terms-header">
+        <div class="container">
+            <h1>Terms and Conditions</h1>
+            <p>Please read these terms carefully before using our services</p>
+        </div>
+    </section>
+
+    <!-- Terms Content -->
+    <div class="container">
+        <div class="terms-container">
+            <div class="acceptance-box">
+                <p><strong>By accessing and using the website and services of Arthavidya Trading Community, you acknowledge that you have read, understood, and agree to be bound by the following Terms and Conditions.</strong> If you do not agree with these terms, please do not use our website or services.</p>
+            </div>
+            
+            <div class="terms-section">
+                <h2>1. Introduction</h2>
+                <p>Welcome to Arthavidya Trading Community Pvt Ltd. These Terms and Conditions govern your use of our website, educational programs, and services. By accessing our website or enrolling in our programs, you agree to these terms in full.</p>
+                <p>Arthavidya Trading Community is a financial education institution that provides training and educational resources related to trading and investing. We are not a registered investment advisory service, portfolio management service, or stock tip provider.</p>
+            </div>
+            
+            <div class="terms-section">
+                <h2>2. Educational Purposes Only</h2>
+                <p>All information, content, materials, programs, and services provided by Arthavidya Trading Community are strictly for educational purposes only. We do not:</p>
+                <ul>
+                    <li>Provide investment advice or stock tips</li>
+                    <li>Offer portfolio management services</li>
+                    <li>Guarantee profits or financial returns</li>
+                    <li>Claim to predict market movements with absolute certainty</li>
+                </ul>
+                <p>Our programs are designed to teach concepts, strategies, and methodologies that may be used by individuals for their own trading and investment decisions. All decisions made by you based on information provided in our programs are your sole responsibility.</p>
+            </div>
+            
+            <div class="terms-section">
+                <h2>3. Registration and Enrollment</h2>
+                <h3>3.1 Eligibility</h3>
+                <p>To enroll in our programs, you must be at least 18 years of age and possess the legal capacity to enter into binding contracts.</p>
+                
+                <h3>3.2 Registration Process</h3>
+                <p>When registering for our programs or creating an account on our website, you agree to provide accurate, current, and complete information. You are responsible for maintaining the confidentiality of your account credentials and for all activities that occur under your account.</p>
+                
+                <h3>3.3 Right to Refuse</h3>
+                <p>Arthavidya Trading Community reserves the right to refuse admission to any individual, even after payment of fees, without specifying reasons. In such cases, any fees paid will be refunded as per our refund policy.</p>
+            </div>
+            
+            <div class="terms-section">
+                <h2>4. Payment and Fees</h2>
+                <h3>4.1 Program Fees</h3>
+                <p>All fees for our programs are clearly stated on our website or in our promotional materials. Prices are subject to change without prior notice, but changes will not affect registrations already confirmed and paid for.</p>
+                
+                <h3>4.2 Payment Methods</h3>
+                <p>We accept payments through various methods as specified on our website. All payments must be made in advance unless otherwise arranged and confirmed in writing.</p>
+                
+                <h3>4.3 Taxes</h3>
+                <p>All fees are inclusive of applicable taxes unless stated otherwise.</p>
+            </div>
+            
+            <div class="terms-section" id="refund-policy">
+                <h2>5. Refund Policy</h2>
+                <p>Our refund policy is as follows:</p>
+                <ul>
+                    <li>Refund requests must be submitted in writing within 7 days of enrollment.</li>
+                    <li>Refunds may be subject to a processing fee of up to 15% of the program cost.</li>
+                    <li>No refunds will be provided after 7 days of enrollment or if you have accessed more than 25% of the course materials.</li>
+                    <li>In case of dispute, the decision of Arthavidya Trading Community management will be final and binding.</li>
+                </ul>
+                <p>For detailed information about our refund process, please refer to our separate Refund Policy document.</p>
+            </div>
+            
+            <div class="terms-section">
+                <h2>6. Intellectual Property</h2>
+                <p>All content provided by Arthavidya Trading Community, including but not limited to videos, presentations, documents, worksheets, and methodologies, is protected by copyright laws and belongs to Arthavidya Trading Community Pvt Ltd.</p>
+                <p>You may not reproduce, distribute, modify, create derivative works of, publicly display, publicly perform, republish, download, store, or transmit any of our materials without our express written consent.</p>
+                <p>Any unauthorized use of our materials may violate copyright, trademark, and other applicable laws and could result in legal action.</p>
+            </div>
+            
+            <div class="terms-section">
+                <h2>7. User Conduct</h2>
+                <p>When using our website or participating in our programs, you agree not to:</p>
+                <ul>
+                    <li>Violate any applicable laws or regulations</li>
+                    <li>Infringe upon the rights of others</li>
+                    <li>Share your account credentials with others</li>
+                    <li>Record, reproduce, or share program content without permission</li>
+                    <li>Engage in any behavior that disrupts the learning environment</li>
+                    <li>Use our platform to promote your own products or services without permission</li>
+                    <li>Harass, abuse, or harm other users or our staff</li>
+                </ul>
+                <p>Violation of these rules may result in termination of your access to our services without refund.</p>
+            </div>
+            
+            <div class="terms-section">
+                <h2>8. Limitation of Liability</h2>
+                <p>Arthavidya Trading Community and its owners, affiliates, employees, and partners shall not be liable for any losses, damages, or injuries arising from:</p>
+                <ul>
+                    <li>The use of information provided in our programs</li>
+                    <li>Investment or trading decisions made based on our educational content</li>
+                    <li>Market fluctuations or economic changes</li>
+                    <li>Any inaccuracies or errors in our content</li>
+                    <li>Any action taken upon the information provided</li>
+                </ul>
+                <p>Trading and investing involve risk, and past performance is not indicative of future results. You acknowledge that all trading decisions are your own responsibility.</p>
+            </div>
+            
+            <div class="terms-section" id="privacy-policy">
+                <h2>9. Privacy Policy</h2>
+                <p>Our Privacy Policy describes how we collect, use, and protect your personal information. By using our services, you consent to the data practices described in our Privacy Policy.</p>
+            </div>
+            
+            <div class="terms-section">
+                <h2>10. Modifications to Terms</h2>
+                <p>Arthavidya Trading Community reserves the right to modify these Terms and Conditions at any time without prior notice. Changes will be effective immediately upon posting on our website. Your continued use of our services after such changes constitutes your acceptance of the modified terms.</p>
+            </div>
+            
+            <div class="terms-section">
+                <h2>11. Governing Law</h2>
+                <p>These Terms and Conditions shall be governed by and construed in accordance with the laws of India. Any disputes arising under these terms shall be subject to the exclusive jurisdiction of the courts in India.</p>
+            </div>
+            
+            <div class="terms-section">
+                <h2>12. Severability</h2>
+                <p>If any provision of these Terms and Conditions is found to be unenforceable or invalid, that provision shall be limited or eliminated to the minimum extent necessary so that the remaining provisions remain in full force and effect.</p>
+            </div>
+            
+            <div class="terms-section">
+                <h2>13. Contact Information</h2>
+                <p>If you have any questions regarding these Terms and Conditions, please contact us at:</p>
+                <div class="contact-section">
+                    <h3>Arthavidya Trading Community Pvt Ltd</h3>
+                    <p>Email: arthavidyacommunity@gmail.com</p>
+                    <p>Phone: +91 7854933728</p>
+                </div>
+            </div>
+            
+            <div class="last-updated">
+                <p>Last Updated: April 15, 2025</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer Section -->
+    <footer class="main-footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="contact-info">
+                    <a href="mailto:arthavidyacommunity@gmail.com" class="contact-item">
+                        <i class="fas fa-envelope"></i>
+                        <span>arthavidyacommunity@gmail.com</span>
+                    </a>
+                    <a href="tel:+917854933728" class="contact-item">
+                        <i class="fas fa-phone"></i>
+                        <span>+91 7854933728</span>
+                    </a>
+                </div>
+                
+                <div class="social-links">
+                    <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-youtube"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+            
+            <div class="footer-links">
+                <a href="{% url "terms_and_condition" %}">Shipping policy</a>
+                <a href="{% url "terms_and_condition" %}">Return Policy</a>
+                <a href="{% url "terms_and_condition" %}">Refund Policy</a>
+            </div>
+            
+            <div class="copyright">
+                <p>Arthavidya Trading Community Pvt Ltd © All Rights Reserved - 2025</p>
+                <p>Design and Developed by Arthavidya Trading Community</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Script -->
+    <script src="{% static 'js/main.js'%}"></script>
+</body>
+</html>

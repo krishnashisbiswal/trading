@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Programs - Arthavidya Trading Community</title>
+    <link rel="stylesheet" href="{% static "css/style.css" %}">
+    <link rel="stylesheet" href="{% static "css/dashboard.css" %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Custom styles for My Programs page */
+        .program-card {
+            margin-bottom: 25px;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--box-shadow-sm);
+            background-color: var(--bg-white);
+            transition: var(--transition);
+        }
+        
+        .program-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--box-shadow-md);
+        }
+        
+        .program-header {
+            padding: 15px 20px;
+            background-color: var(--primary-blue);
+            color: var(--text-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .program-title {
+            font-size: 18px;
+            margin: 0;
+            font-weight: 600;
+        }
+        
+        .program-status {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .program-status.active {
+            background-color: var(--success-color);
+        }
+        
+        .program-status.completed {
+            background-color: var(--info-color);
+        }
+        
+        .program-status.upcoming {
+            background-color: var(--warning-color);
+        }
+        
+        .program-body {
+            padding: 20px;
+        }
+        
+        .program-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .info-item {
+            border-left: 3px solid var(--primary-blue);
+            padding-left: 10px;
+        }
+        
+        .info-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 5px;
+        }
+        
+        .info-value {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-dark);
+        }
+        
+        .course-progress {
+            margin-bottom: 20px;
+        }
+        
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        
+        .progress-percentage {
+            font-weight: 600;
+            color: var(--primary-blue);
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background-color: var(--border-light);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background-color: var(--primary-blue);
+            border-radius: 4px;
+        }
+        
+        .program-description {
+            margin-bottom: 20px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        
+        .program-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .modules-list {
+            margin-top: 20px;
+        }
+        
+        .modules-header {
+            margin-bottom: 15px;
+            font-size: 16px;
+            color: var(--text-dark);
+            font-weight: 600;
+        }
+        
+        .module-item {
+            background-color: var(--bg-light);
+            padding: 12px 15px;
+            border-radius: var(--border-radius);
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: var(--transition);
+        }
+        
+        .module-item:hover {
+            background-color: var(--primary-blue-lighter);
+        }
+        
+        .module-info {
+            display: flex;
+            align-items: center;
+        }
+        
+        .module-icon {
+            width: 30px;
+            height: 30px;
+            background-color: var(--primary-blue);
+            color: var(--text-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            margin-right: 10px;
+            font-size: 14px;
+        }
+        
+        .module-title {
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .module-status {
+            font-size: 12px;
+            padding: 3px 8px;
+            border-radius: 20px;
+        }
+        
+        .status-completed {
+            background-color: var(--success-light);
+            color: var(--success-color);
+        }
+        
+        .status-in-progress {
+            background-color: var(--warning-light);
+            color: var(--warning-color);
+        }
+        
+        .status-locked {
+            background-color: var(--border-light);
+            color: var(--text-muted);
+        }
+        
+        .certificate-section {
+            margin-top: 20px;
+            background-color: var(--primary-blue-lighter);
+            padding: 20px;
+            border-radius: var(--border-radius);
+            text-align: center;
+        }
+        
+        .certificate-icon {
+            font-size: 50px;
+            color: var(--gold);
+            margin-bottom: 15px;
+        }
+        
+        .certificate-text {
+            margin-bottom: 15px;
+        }
+        
+        .certificate-text h3 {
+            font-size: 18px;
+            margin-bottom: 5px;
+            color: var(--primary-blue);
+        }
+        
+        .certificate-text p {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+<body class="dashboard-body">
+    <!-- Dashboard Header -->
+    <header class="dashboard-header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo-area">
+                    <img src="{% static "images/logo.png" %}" alt="Arthavidya Trading Community">
+                    <div class="welcome-text">
+                        <h4>Welcome</h4>
+                        <h2>Kanheyalal Jena</h2>
+                    </div>
+                </div>
+                <div class="user-actions">
+                    <div class="notifications">
+                        <button class="notification-btn">
+                            <i class="fas fa-bell"></i>
+                            <span class="badge">3</span>
+                        </button>
+                    </div>
+                    <div class="user-profile">
+                        <button class="profile-btn">
+                            <img src="{% static "images/user-avatar.jpg" %}" alt="User Profile">
+                            <span>Kanheyalal Jena</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="dropdown-menu">
+                            <a href="#"><i class="fas fa-user"></i> My Profile</a>
+                            <a href="#"><i class="fas fa-cog"></i> Settings</a>
+                            <a href="../../index.html"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+      <!-- Dashboard Main Content -->
+      <div class="dashboard-container">
+        <!-- Sidebar Navigation -->
+        <aside class="dashboard-sidebar">
+            <nav class="sidebar-nav">
+                <ul>
+                    <li>
+                        <a href="{% url "dashboard" %}">
+                            <i class="fas fa-home"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="active">
+                        <a href="{% url "my_programs" %}">
+                            <i class="fas fa-graduation-cap"></i>
+                            <span>My Programs</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url "library" %}">
+                            <i class="fas fa-book"></i>
+                            <span>Library</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url "assessment" %}">
+                            <i class="fas fa-tasks"></i>
+                            <span>Assessment</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url "refer_earn" %}">
+                            <i class="fas fa-user-plus"></i>
+                            <span>Refer & Earn</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="{% static "home" %}" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="dashboard-main">
+            <section>
+                <div class="section-header">
+                    <h2><i class="fas fa-graduation-cap"></i> My Programs</h2>
+                </div>
+                <!-- Active Program -->
+                <div class="program-card">
+                    <div class="program-header">
+                        <h3 class="program-title">Complete Trading Program (CTP)</h3>
+                        <span class="program-status active">Active</span>
+                    </div>
+                    <div class="program-body">
+                        <div class="program-info-grid">
+                            <div class="info-item">
+                                <div class="info-label">Enrollment Date</div>
+                                <div class="info-value">01.04.2025</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Batch Duration</div>
+                                <div class="info-value">01.04.2025 to 30.06.2025</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Instructor</div>
+                                <div class="info-value">Andaz Aaron</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Expiry Date</div>
+                                <div class="info-value">30.06.2025</div>
+                            </div>
+                        </div>
+                        
+                        <div class="course-progress">
+                            <div class="progress-label">
+                                <span>Course Progress</span>
+                                <span class="progress-percentage">70%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 70%"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="program-description">
+                            <p>This comprehensive program covers all aspects of trading, including technical analysis, candlestick patterns, market structure, price action trading, and risk management. Get personalized mentorship and gain practical experience in real market conditions.</p>
+                        </div>
+                        
+                        <div class="program-actions">
+                            <a href="#" class="btn btn-primary"><i class="fas fa-play-circle"></i> Continue Learning</a>
+                            <a href="#" class="btn btn-outline"><i class="fas fa-download"></i> Resources</a>
+                        </div>
+                        
+                        <div class="modules-list">
+                            <h4 class="modules-header">Program Modules</h4>
+                            
+                            <div class="module-item">
+                                <div class="module-info">
+                                    <div class="module-icon"><i class="fas fa-check"></i></div>
+                                    <div class="module-title">Module 1: Basics of Financial Markets</div>
+                                </div>
+                                <span class="module-status status-completed">Completed</span>
+                            </div>
+                            
+                            <div class="module-item">
+                                <div class="module-info">
+                                    <div class="module-icon"><i class="fas fa-check"></i></div>
+                                    <div class="module-title">Module 2: Candle Anatomy</div>
+                                </div>
+                                <span class="module-status status-completed">Completed</span>
+                            </div>
+                            
+                            <div class="module-item">
+                                <div class="module-info">
+                                    <div class="module-icon"><i class="fas fa-check"></i></div>
+                                    <div class="module-title">Module 3: Market Structure</div>
+                                </div>
+                                <span class="module-status status-completed">Completed</span>
+                            </div>
+                            
+                            <div class="module-item">
+                                <div class="module-info">
+                                    <div class="module-icon"><i class="fas fa-play"></i></div>
+                                    <div class="module-title">Module 4: Trading Tools</div>
+                                </div>
+                                <span class="module-status status-in-progress">In Progress</span>
+                            </div>
+                            
+                            <div class="module-item">
+                                <div class="module-info">
+                                    <div class="module-icon"><i class="fas fa-lock"></i></div>
+                                    <div class="module-title">Module 5: Support, Resistance & POI</div>
+                                </div>
+                                <span class="module-status status-locked">Locked</span>
+                            </div>
+                            
+                            <div class="module-item">
+                                <div class="module-info">
+                                    <div class="module-icon"><i class="fas fa-lock"></i></div>
+                                    <div class="module-title">Module 6: Price Action Trading</div>
+                                </div>
+                                <span class="module-status status-locked">Locked</span>
+                            </div>
+                            
+                            <div class="module-item">
+                                <div class="module-info">
+                                    <div class="module-icon"><i class="fas fa-lock"></i></div>
+                                    <div class="module-title">Module 7: Risk Management</div>
+                                </div>
+                                <span class="module-status status-locked">Locked</span>
+                            </div>
+                            
+                            <div class="module-item">
+                                <div class="module-info">
+                                    <div class="module-icon"><i class="fas fa-lock"></i></div>
+                                    <div class="module-title">Module 8: Trading Psychology</div>
+                                </div>
+                                <span class="module-status status-locked">Locked</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Completed Program -->
+                <div class="program-card">
+                    <div class="program-header">
+                        <h3 class="program-title">Options Trading Masterclass</h3>
+                        <span class="program-status completed">Completed</span>
+                    </div>
+                    <div class="program-body">
+                        <div class="program-info-grid">
+                            <div class="info-item">
+                                <div class="info-label">Enrollment Date</div>
+                                <div class="info-value">10.12.2024</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Batch Duration</div>
+                                <div class="info-value">10.12.2024 to 09.02.2025</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Instructor</div>
+                                <div class="info-value">Prashanta Kumar Palei</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Completion Date</div>
+                                <div class="info-value">09.02.2025</div>
+                            </div>
+                        </div>
+                        
+                        <div class="course-progress">
+                            <div class="progress-label">
+                                <span>Course Progress</span>
+                                <span class="progress-percentage">100%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 100%"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="program-description">
+                            <p>This specialized course covers options trading strategies, including covered calls, protective puts, spreads, and advanced strategies like iron condors and butterflies. Learn risk management specific to options trading.</p>
+                        </div>
+                        
+                        <div class="certificate-section">
+                            <div class="certificate-icon">
+                                <i class="fas fa-certificate"></i>
+                            </div>
+                            <div class="certificate-text">
+                                <h3>Congratulations!</h3>
+                                <p>You have successfully completed the Options Trading Masterclass. Your certificate has been issued and is available for download.</p>
+                            </div>
+                            <a href="#" class="btn btn-primary"><i class="fas fa-download"></i> Download Certificate</a>
+                        </div>
+                        
+                        <div class="program-actions" style="margin-top: 20px;">
+                            <a href="#" class="btn btn-outline"><i class="fas fa-redo"></i> Review Course</a>
+                            <a href="#" class="btn btn-outline"><i class="fas fa-download"></i> Resources</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Upcoming Program -->
+                <div class="program-card">
+                    <div class="program-header">
+                        <h3 class="program-title">Advanced Futures Trading</h3>
+                        <span class="program-status upcoming">Coming Soon</span>
+                    </div>
+                    <div class="program-body">
+                        <div class="program-info-grid">
+                            <div class="info-item">
+                                <div class="info-label">Pre-registration Date</div>
+                                <div class="info-value">28.03.2025</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Start Date</div>
+                                <div class="info-value">15.07.2025</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Duration</div>
+                                <div class="info-value">3 Months</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Status</div>
+                                <div class="info-value">Batch Allocation Pending</div>
+                            </div>
+                        </div>
+                        
+                        <div class="program-description">
+                            <p>This advanced program focuses on futures trading strategies, risk management techniques, and market analysis specifically for futures markets. Program starts on July 15th, 2025 after the completion of your current CTP program.</p>
+                        </div>
+                        
+                        <div class="program-actions">
+                            <a href="#" class="btn btn-outline"><i class="fas fa-eye"></i> View Program Details</a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="dashboard-footer">
+        <div class="container">
+            <div class="footer-content">
+                <p>Management reserves the right to deny or revoke admission to any participant, even after the fee has been paid</p>
+                <div class="footer-links">
+                    <a href="#">Terms and Conditions</a>
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Refund Policy</a>
+                </div>
+                <p class="copyright">Arthavidya Trading Community Pvt Ltd © All Rights Reserved - 2025</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="../../assets/js/main.js"></script>
+    <script src="../../assets/js/dashboard.js"></script>
+</body>
+</html>

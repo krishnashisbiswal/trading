@@ -1,0 +1,767 @@
+{% extends "base.html"%}
+{% load static %}
+{% block title %}Classes{% endblock %}
+
+{% block content %}
+    <style>
+        /* Additional styles specific to classes page */
+        .class-status {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--text-muted);
+        }
+        
+        .status-indicator.completed {
+            background-color: var(--success-color);
+        }
+        
+        .status-indicator.upcoming {
+            background-color: var(--warning-color);
+        }
+        
+        .status-indicator.ongoing {
+            background-color: var(--accent-red);
+            animation: pulse 1.5s infinite;
+        }
+        
+        .status-indicator.cancelled {
+            background-color: var(--danger-color);
+        }
+        
+        .class-actions-cell {
+            min-width: 120px;
+        }
+        
+        .calendar-view-section {
+            margin-top: 30px;
+            padding: 30px;
+            background-color: var(--bg-white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow-sm);
+        }
+        
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .calendar-title {
+            font-size: 18px;
+            color: var(--dark-blue);
+            font-weight: 600;
+        }
+        
+        .calendar-navigation {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .calendar-month {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+        
+        .nav-btn {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .nav-btn:hover {
+            background-color: var(--primary-blue-lighter);
+            color: var(--primary-blue);
+        }
+        
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+        }
+        
+        .calendar-day-header {
+            text-align: center;
+            font-weight: 600;
+            color: var(--text-dark);
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border-light);
+        }
+        
+        .calendar-day {
+            min-height: 100px;
+            border: 1px solid var(--border-light);
+            border-radius: 5px;
+            padding: 8px;
+            position: relative;
+        }
+        
+        .calendar-day.inactive {
+            background-color: var(--bg-light);
+            opacity: 0.6;
+        }
+        
+        .day-number {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--text-dark);
+        }
+        
+        .today .day-number {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            background-color: var(--primary-blue);
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 24px;
+        }
+        
+        .day-events {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .day-event {
+            padding: 5px 8px;
+            font-size: 12px;
+            border-radius: 3px;
+            color: white;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            cursor: pointer;
+        }
+        
+        .event-ctp {
+            background-color: var(--primary-blue);
+        }
+        
+        .event-amp {
+            background-color: var(--accent-red);
+        }
+        
+        .event-gmp {
+            background-color: var(--warning-color);
+        }
+        
+        .event-sip {
+            background-color: var(--success-color);
+        }
+        
+        @keyframes pulse {
+            0% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+    </style>
+<body class="admin-body">
+        <!-- Main Content Area -->
+        <main class="admin-main">
+            <!-- Page Header -->
+            <section class="page-header">
+                <div class="header-content">
+                    <div class="page-title">
+                        <h1>Classes</h1>
+                        <p>Manage all live classes and recordings</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Classes Table Section -->
+            <section class="table-container">
+                <!-- Table Header with Search and Actions -->
+                <div class="table-header">
+                    <h2 class="table-title">All Classes</h2>
+                    <div class="table-actions">
+                        <div class="search-container">
+                            <i class="fas fa-search search-icon"></i>
+                            <input type="text" class="search-input" placeholder="Search classes...">
+                        </div>
+                        <div class="filter-container">
+                            <button class="filter-btn" id="filter-btn">
+                                <i class="fas fa-filter"></i>
+                                <span>Filter</span>
+                            </button>
+                            <div class="filter-dropdown" id="filter-dropdown">
+                                <div class="filter-group">
+                                    <label class="filter-label">Program</label>
+                                    <select class="filter-select">
+                                        <option value="">All Programs</option>
+                                        <option value="ctp">Complete Trading Program (CTP)</option>
+                                        <option value="amp">Arthavidya Mentorship Program (AMP)</option>
+                                        <option value="gmp">Growth Mindset Program (GMP)</option>
+                                        <option value="sip">Smart Income Program (SIP)</option>
+                                    </select>
+                                </div>
+                                <div class="filter-group">
+                                    <label class="filter-label">Trainer</label>
+                                    <select class="filter-select">
+                                        <option value="">All Trainers</option>
+                                        <option value="andaz">Andaz Aaron</option>
+                                        <option value="prashanta">Prashanta Kumar Palei</option>
+                                        <option value="mayank">Mayank Sharma</option>
+                                        <option value="anita">Anita Desai</option>
+                                    </select>
+                                </div>
+                                <div class="filter-group">
+                                    <label class="filter-label">Status</label>
+                                    <select class="filter-select">
+                                        <option value="">All Status</option>
+                                        <option value="completed">Completed</option>
+                                        <option value="upcoming">Upcoming</option>
+                                        <option value="ongoing">Ongoing</option>
+                                        <option value="cancelled">Cancelled</option>
+                                    </select>
+                                </div>
+                                <div class="filter-actions">
+                                    <button class="btn-reset">Reset</button>
+                                    <button class="btn-apply">Apply Filters</button>
+                                </div>
+                            </div>
+                        </div>
+                        <a href="admin-class-add.html" class="btn-add">
+                            <i class="fas fa-plus"></i>
+                            <span>Schedule Class</span>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Classes Table -->
+                <div class="table-responsive">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th class="checkbox-cell">
+                                    <label class="custom-checkbox">
+                                        <input type="checkbox" id="select-all">
+                                        <span class="checkmark"></span>
+                                    </label>
+                                </th>
+                                <th>Class Title</th>
+                                <th>Program & Batch</th>
+                                <th>Trainer</th>
+                                <th>Date & Time</th>
+                                <th>Status</th>
+                                <th>Attendance</th>
+                                <th>Recording</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="checkbox-cell">
+                                    <label class="custom-checkbox">
+                                        <input type="checkbox" class="row-checkbox">
+                                        <span class="checkmark"></span>
+                                    </label>
+                                </td>
+                                <td>CTP Class 13 - Price Action Trading</td>
+                                <td>
+                                    <div>
+                                        <strong>Complete Trading Program (CTP)</strong>
+                                        <p>February 2025 Batch</p>
+                                    </div>
+                                </td>
+                                <td>Andaz Aaron</td>
+                                <td>April 9, 2025 | 05:00 PM - 07:00 PM</td>
+                                <td>
+                                    <div class="class-status">
+                                        <span class="status-indicator ongoing"></span>
+                                        <span>Ongoing</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: 85%"></div>
+                                    </div>
+                                    <p>85% (68/80)</p>
+                                </td>
+                                <td><span class="status-badge status-warning">Not Available</span></td>
+                                <td class="class-actions-cell">
+                                    <div class="row-actions">
+                                        <button class="action-btn view" title="View Details">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="action-btn edit" title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="action-btn delete" title="Cancel">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="checkbox-cell">
+                                    <label class="custom-checkbox">
+                                        <input type="checkbox" class="row-checkbox">
+                                        <span class="checkmark"></span>
+                                    </label>
+                                </td>
+                                <td>GMP Class 5 - Emotional Intelligence in Trading</td>
+                                <td>
+                                    <div>
+                                        <strong>Growth Mindset Program (GMP)</strong>
+                                        <p>April 2025 Batch</p>
+                                    </div>
+                                </td>
+                                <td>Prashanta Kumar Palei</td>
+                                <td>April 9, 2025 | 10:00 AM - 12:00 PM</td>
+                                <td>
+                                    <div class="class-status">
+                                        <span class="status-indicator completed"></span>
+                                        <span>Completed</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: 78%"></div>
+                                    </div>
+                                    <p>78% (39/50)</p>
+                                </td>
+                                <td><span class="status-badge status-success">Available</span></td>
+                                <td class="class-actions-cell">
+                                    <div class="row-actions">
+                                        <button class="action-btn view" title="View Details">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="action-btn edit" title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="action-btn delete" title="Delete">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="checkbox-cell">
+                                    <label class="custom-checkbox">
+                                        <input type="checkbox" class="row-checkbox">
+                                        <span class="checkmark"></span>
+                                    </label>
+                                </td>
+                                <td>SIP Class 3 - Asset Allocation Strategies</td>
+                                <td>
+                                    <div>
+                                        <strong>Smart Income Program (SIP)</strong>
+                                        <p>March 2025 Batch</p>
+                                    </div>
+                                </td>
+                                <td>Andaz Aaron</td>
+                                <td>April 9, 2025 | 02:00 PM - 03:30 PM</td>
+                                <td>
+                                    <div class="class-status">
+                                        <span class="status-indicator completed"></span>
+                                        <span>Completed</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: 82%"></div>
+                                    </div>
+                                    <p>82% (53/65)</p>
+                                </td>
+                                <td><span class="status-badge status-success">Available</span></td>
+                                <td class="class-actions-cell">
+                                    <div class="row-actions">
+                                        <button class="action-btn view" title="View Details">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="action-btn edit" title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="action-btn delete" title="Delete">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="checkbox-cell">
+                                    <label class="custom-checkbox">
+                                        <input type="checkbox" class="row-checkbox">
+                                        <span class="checkmark"></span>
+                                    </label>
+                                </td>
+                                <td>AMP Class 6 - Advanced Risk Management</td>
+                                <td>
+                                    <div>
+                                        <strong>Arthavidya Mentorship Program (AMP)</strong>
+                                        <p>April 2025 Batch</p>
+                                    </div>
+                                </td>
+                                <td>Prashanta Kumar Palei</td>
+                                <td>April 9, 2025 | 08:00 PM - 10:00 PM</td>
+                                <td>
+                                    <div class="class-status">
+                                        <span class="status-indicator upcoming"></span>
+                                        <span>Upcoming</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: 0%"></div>
+                                    </div>
+                                    <p>0% (0/20)</p>
+                                </td>
+                                <td><span class="status-badge status-warning">Not Available</span></td>
+                                <td class="class-actions-cell">
+                                    <div class="row-actions">
+                                        <button class="action-btn view" title="View Details">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="action-btn edit" title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="action-btn delete" title="Cancel">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="checkbox-cell">
+                                    <label class="custom-checkbox">
+                                        <input type="checkbox" class="row-checkbox">
+                                        <span class="checkmark"></span>
+                                    </label>
+                                </td>
+                                <td>CTP Class 14 - Market Session Analysis</td>
+                                <td>
+                                    <div>
+                                        <strong>Complete Trading Program (CTP)</strong>
+                                        <p>February 2025 Batch</p>
+                                    </div>
+                                </td>
+                                <td>Andaz Aaron</td>
+                                <td>April 11, 2025 | 05:00 PM - 07:00 PM</td>
+                                <td>
+                                    <div class="class-status">
+                                        <span class="status-indicator upcoming"></span>
+                                        <span>Upcoming</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: 0%"></div>
+                                    </div>
+                                    <p>0% (0/80)</p>
+                                </td>
+                                <td><span class="status-badge status-warning">Not Available</span></td>
+                                <td class="class-actions-cell">
+                                    <div class="row-actions">
+                                        <button class="action-btn view" title="View Details">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="action-btn edit" title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="action-btn delete" title="Cancel">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Table Footer with Pagination -->
+                <div class="table-footer">
+                    <div class="page-info">
+                        Showing 1 to 5 of 24 entries
+                    </div>
+                    <div class="pagination">
+                        <button class="page-btn disabled">
+                            <i class="fas fa-angle-double-left"></i>
+                        </button>
+                        <button class="page-btn disabled">
+                            <i class="fas fa-angle-left"></i>
+                        </button>
+                        <button class="page-btn active">1</button>
+                        <button class="page-btn">2</button>
+                        <button class="page-btn">3</button>
+                        <button class="page-btn">4</button>
+                        <button class="page-btn">5</button>
+                        <button class="page-btn">
+                            <i class="fas fa-angle-right"></i>
+                        </button>
+                        <button class="page-btn">
+                            <i class="fas fa-angle-double-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Calendar View -->
+            <section class="calendar-view-section">
+                <div class="calendar-header">
+                    <h3 class="calendar-title">Class Schedule - April 2025</h3>
+                    <div class="calendar-navigation">
+                        <button class="nav-btn">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <span class="calendar-month">April 2025</span>
+                        <button class="nav-btn">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="calendar-grid">
+                    <!-- Days of Week -->
+                    <div class="calendar-day-header">Sun</div>
+                    <div class="calendar-day-header">Mon</div>
+                    <div class="calendar-day-header">Tue</div>
+                    <div class="calendar-day-header">Wed</div>
+                    <div class="calendar-day-header">Thu</div>
+                    <div class="calendar-day-header">Fri</div>
+                    <div class="calendar-day-header">Sat</div>
+                    
+                    <!-- Calendar Days -->
+                    <div class="calendar-day inactive">
+                        <div class="day-number">30</div>
+                    </div>
+                    <div class="calendar-day inactive">
+                        <div class="day-number">31</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">1</div>
+                        <div class="day-events">
+                            <div class="day-event event-ctp">CTP Class 11 (5PM)</div>
+                        </div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">2</div>
+                        <div class="day-events">
+                            <div class="day-event event-amp">AMP Class 5 (8PM)</div>
+                        </div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">3</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">4</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">5</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">6</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">7</div>
+                        <div class="day-events">
+                            <div class="day-event event-sip">SIP Class 2 (2PM)</div>
+                            <div class="day-event event-ctp">CTP Class 12 (5PM)</div>
+                        </div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">8</div>
+                    </div>
+                    <div class="calendar-day today">
+                        <div class="day-number">9</div>
+                        <div class="day-events">
+                            <div class="day-event event-gmp">GMP Class 5 (10AM)</div>
+                            <div class="day-event event-sip">SIP Class 3 (2PM)</div>
+                            <div class="day-event event-ctp">CTP Class 13 (5PM)</div>
+                            <div class="day-event event-amp">AMP Class 6 (8PM)</div>
+                        </div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">10</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">11</div>
+                        <div class="day-events">
+                            <div class="day-event event-ctp">CTP Class 14 (5PM)</div>
+                        </div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">12</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">13</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">14</div>
+                        <div class="day-events">
+                            <div class="day-event event-sip">SIP Class 4 (2PM)</div>
+                            <div class="day-event event-ctp">CTP Class 15 (5PM)</div>
+                        </div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">15</div>
+                        <div class="day-events">
+                            <div class="day-event event-gmp">GMP Class 6 (10AM)</div>
+                        </div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">16</div>
+                        <div class="day-events">
+                            <div class="day-event event-amp">AMP Class 7 (8PM)</div>
+                        </div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">17</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">18</div>
+                        <div class="day-events">
+                            <div class="day-event event-ctp">CTP Class 16 (5PM)</div>
+                        </div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">19</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">20</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">21</div>
+                        <div class="day-events">
+                            <div class="day-event event-sip">SIP Class 5 (2PM)</div>
+                            <div class="day-event event-ctp">CTP Class 17 (5PM)</div>
+                        </div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">22</div>
+                        <div class="day-events">
+                            <div class="day-event event-gmp">GMP Class 7 (10AM)</div>
+                        </div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">23</div>
+                        <div class="day-events">
+                            <div class="day-event event-amp">AMP Class 8 (8PM)</div>
+                        </div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">24</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">25</div>
+                        <div class="day-events">
+                            <div class="day-event event-ctp">CTP Class 18 (5PM)</div>
+                        </div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">26</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">27</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">28</div>
+                        <div class="day-events">
+                            <div class="day-event event-sip">SIP Class 6 (2PM)</div>
+                            <div class="day-event event-ctp">CTP Class 19 (5PM)</div>
+                        </div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">29</div>
+                        <div class="day-events">
+                            <div class="day-event event-gmp">GMP Class 8 (10AM)</div>
+                        </div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">30</div>
+                        <div class="day-events">
+                            <div class="day-event event-amp">AMP Class 9 (8PM)</div>
+                        </div>
+                    </div>
+                    <div class="calendar-day inactive">
+                        <div class="day-number">1</div>
+                    </div>
+                    <div class="calendar-day inactive">
+                        <div class="day-number">2</div>
+                    </div>
+                    <div class="calendar-day inactive">
+                        <div class="day-number">3</div>
+                    </div>
+                    <div class="calendar-day inactive">
+                        <div class="day-number">4</div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <!-- Scripts -->
+     
+    <script src="{% static 'js/admin.js' %}"></script>
+    <script>
+        // Filter dropdown toggle
+        const filterBtn = document.getElementById('filter-btn');
+        const filterDropdown = document.getElementById('filter-dropdown');
+        
+        filterBtn.addEventListener('click', function() {
+            filterDropdown.classList.toggle('show');
+        });
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            if (!filterBtn.contains(event.target) && !filterDropdown.contains(event.target)) {
+                filterDropdown.classList.remove('show');
+            }
+        });
+        
+        // Select all checkbox functionality
+        const selectAllCheckbox = document.getElementById('select-all');
+        const rowCheckboxes = document.querySelectorAll('.row-checkbox');
+        
+        selectAllCheckbox.addEventListener('change', function() {
+            rowCheckboxes.forEach(checkbox => {
+                checkbox.checked = this.checked;
+            });
+        });
+        
+        rowCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                // Update select all checkbox
+                if (!this.checked) {
+                    selectAllCheckbox.checked = false;
+                } else {
+                    const allChecked = Array.from(rowCheckboxes).every(c => c.checked);
+                    selectAllCheckbox.checked = allChecked;
+                }
+            });
+        });
+        
+        // Calendar event click
+        const dayEvents = document.querySelectorAll('.day-event');
+        
+        dayEvents.forEach(event => {
+            event.addEventListener('click', function() {
+                alert('Event details: ' + this.textContent);
+                // In a real application, you might open a modal with event details
+            });
+        });
+    </script>
+{% endblock %}

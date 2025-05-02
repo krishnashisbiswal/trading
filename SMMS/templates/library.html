@@ -1,0 +1,1288 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library - Arthavidya Trading Community</title>
+    <link rel="stylesheet" href="{% static "css/style.css" %}">
+    <link rel="stylesheet" href="{% static "css/dashboard.css" %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Additional styles for library page */
+        .library-search {
+            margin-bottom: 30px;
+        }
+        
+        .search-form {
+            display: flex;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .search-input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            border-right: none;
+            border-radius: var(--border-radius) 0 0 var(--border-radius);
+            font-size: 16px;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+        }
+        
+        .search-btn {
+            background: var(--primary-blue);
+            color: white;
+            border: none;
+            padding: 0 20px;
+            border-radius: 0 var(--border-radius) var(--border-radius) 0;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .search-btn:hover {
+            background: var(--primary-blue-dark);
+        }
+        
+        .library-filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 30px;
+            justify-content: center;
+        }
+        
+        .filter-btn {
+            padding: 8px 15px;
+            background: var(--bg-light);
+            border: 1px solid var(--border-color);
+            border-radius: 30px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .filter-btn:hover, .filter-btn.active {
+            background: var(--primary-blue-lighter);
+            color: var(--primary-blue);
+            border-color: var(--primary-blue);
+        }
+        
+        .resource-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+        }
+        
+        .resource-card {
+            background: var(--bg-white);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--box-shadow-sm);
+            transition: var(--transition);
+            border: 1px solid var(--border-light);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .resource-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--box-shadow-md);
+        }
+        
+        .resource-image {
+            width: 100%;
+            height: 160px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .resource-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: var(--transition);
+        }
+        
+        .resource-card:hover .resource-image img {
+            transform: scale(1.05);
+        }
+        
+        .resource-type {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: white;
+        }
+        
+        .resource-type.pdf {
+            background: var(--accent-red);
+        }
+        
+        .resource-type.video {
+            background: var(--primary-blue);
+        }
+        
+        .resource-type.quiz {
+            background: var(--success-color);
+        }
+        
+        .resource-type.assignment {
+            background: var(--warning-color);
+        }
+        
+        .resource-info {
+            padding: 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .resource-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--dark-blue);
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+        
+        .resource-description {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 15px;
+            line-height: 1.6;
+            flex: 1;
+        }
+        
+        .resource-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: auto;
+        }
+        
+        .resource-date {
+            display: flex;
+            align-items: center;
+        }
+        
+        .resource-date i {
+            margin-right: 5px;
+            color: var(--primary-blue);
+        }
+        
+        .resource-size {
+            display: flex;
+            align-items: center;
+        }
+        
+        .resource-size i {
+            margin-right: 5px;
+            color: var(--primary-blue);
+        }
+        
+        .resource-actions {
+            padding: 15px 20px;
+            border-top: 1px solid var(--border-light);
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .action-btn {
+            padding: 8px 15px;
+            font-size: 14px;
+            border-radius: 30px;
+            transition: var(--transition);
+            text-align: center;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        
+        .view-btn {
+            background: var(--bg-light);
+            color: var(--text-dark);
+            flex: 1;
+        }
+        
+        .view-btn:hover {
+            background: var(--bg-light);
+            color: var(--primary-blue);
+        }
+        
+        .download-btn {
+            background: var(--primary-blue-lighter);
+            color: var(--primary-blue);
+            margin-left: 10px;
+            width: 40px;
+            height: 40px;
+            padding: 0;
+            border-radius: 50%;
+        }
+        
+        .download-btn:hover {
+            background: var(--primary-blue);
+            color: white;
+        }
+        
+        /* Tab Navigation */
+        .library-tabs {
+            margin-bottom: 30px;
+            border-bottom: 1px solid var(--border-light);
+        }
+        
+        .tab-navigation {
+            display: flex;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none; /* Firefox */
+        }
+        
+        .tab-navigation::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Edge */
+        }
+        
+        .tab-item {
+            padding: 15px 25px;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            font-weight: 500;
+            color: var(--text-muted);
+        }
+        
+        .tab-item:hover {
+            color: var(--primary-blue);
+        }
+        
+        .tab-item.active {
+            color: var(--primary-blue);
+            font-weight: 600;
+        }
+        
+        .tab-item::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--primary-blue);
+            transform: scaleX(0);
+            transition: var(--transition);
+        }
+        
+        .tab-item.active::after {
+            transform: scaleX(1);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Resource list view for Video Library */
+        .resource-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .resource-list-item {
+            display: flex;
+            background: var(--bg-white);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--box-shadow-sm);
+            transition: var(--transition);
+            border: 1px solid var(--border-light);
+        }
+        
+        .resource-list-item:hover {
+            transform: translateX(5px);
+            box-shadow: var(--box-shadow-md);
+        }
+        
+        .resource-list-image {
+            width: 180px;
+            min-width: 180px;
+            height: 120px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .resource-list-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: var(--transition);
+        }
+        
+        .resource-list-item:hover .resource-list-image img {
+            transform: scale(1.05);
+        }
+        
+        .resource-list-info {
+            flex: 1;
+            padding: 15px 20px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .resource-list-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--dark-blue);
+            margin-bottom: 10px;
+        }
+        
+        .resource-list-description {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 15px;
+            flex: 1;
+        }
+        
+        .resource-list-meta {
+            display: flex;
+            gap: 20px;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        
+        .resource-list-meta > div {
+            display: flex;
+            align-items: center;
+        }
+        
+        .resource-list-meta i {
+            margin-right: 5px;
+            color: var(--primary-blue);
+        }
+        
+        .resource-list-actions {
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            gap: 10px;
+        }
+        
+        .play-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary-blue);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+        
+        .play-btn:hover {
+            transform: scale(1.1);
+            background: var(--primary-blue-dark);
+        }
+        
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 40px;
+            gap: 5px;
+        }
+        
+        .pagination-item {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: var(--bg-white);
+            color: var(--text-dark);
+            font-weight: 500;
+            transition: var(--transition);
+            cursor: pointer;
+            border: 1px solid var(--border-light);
+        }
+        
+        .pagination-item:hover, .pagination-item.active {
+            background: var(--primary-blue);
+            color: white;
+            border-color: var(--primary-blue);
+        }
+        
+        .pagination-item.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        /* Responsive styles */
+        @media (max-width: 992px) {
+            .resource-list-item {
+                flex-direction: column;
+            }
+            
+            .resource-list-image {
+                width: 100%;
+                height: 180px;
+            }
+            
+            .resource-list-actions {
+                padding: 15px 20px;
+                border-top: 1px solid var(--border-light);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .resource-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+            
+            .search-form {
+                flex-direction: column;
+            }
+            
+            .search-input {
+                border-radius: var(--border-radius) var(--border-radius) 0 0;
+                border-right: 1px solid var(--border-color);
+            }
+            
+            .search-btn {
+                border-radius: 0 0 var(--border-radius) var(--border-radius);
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body class="dashboard-body">
+    <!-- Dashboard Header -->
+    <header class="dashboard-header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo-area">
+                    <img src="{% static "" %}../../assets/images/logo.png" alt="Arthavidya Trading Community">
+                    <div class="welcome-text">
+                        <h4>Welcome</h4>
+                        <h2>Kanheyalal Jena</h2>
+                    </div>
+                </div>
+                <div class="user-actions">
+                    <div class="notifications">
+                        <button class="notification-btn">
+                            <i class="fas fa-bell"></i>
+                            <span class="badge">3</span>
+                        </button>
+                    </div>
+                    <div class="user-profile">
+                        <button class="profile-btn">
+                            <img src="{% static "" %}../../assets/images/user-avatar.jpg" alt="User Profile">
+                            <span>Kanheyalal Jena</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="dropdown-menu">
+                            <a href="#{% static "" %}"><i class="fas fa-user"></i> My Profile</a>
+                            <a href="#{% static "" %}"><i class="fas fa-cog"></i> Settings</a>
+                            <a href="{% static "home" %}"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+       <!-- Dashboard Main Content -->
+       <div class="dashboard-container">
+        <!-- Sidebar Navigation -->
+        <aside class="dashboard-sidebar">
+            <nav class="sidebar-nav">
+                <ul>
+                    <li>
+                        <a href="{% url "dashboard" %}">
+                            <i class="fas fa-home"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url "my_programs" %}">
+                            <i class="fas fa-graduation-cap"></i>
+                            <span>My Programs</span>
+                        </a>
+                    </li>
+                    <li>
+                        <li class="active">
+                        <a href="{% url "library" %}">
+                            <i class="fas fa-book"></i>
+                            <span>Library</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url "assessment" %}">
+                            <i class="fas fa-tasks"></i>
+                            <span>Assessment</span>
+                        </a>
+                        <li>
+                            <a href="{% url "refer_earn" %}">
+                                <i class="fas fa-user-plus"></i>
+                                <span>Refer & Earn</span>
+                            </a>
+                        </li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="{% static "home" %}" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </aside>
+        <!-- Main Content Area -->
+        <main class="dashboard-main">
+            <section class="page-header">
+                <h1>Resource Library</h1>
+                <p>Access all your study materials, recorded classes, and resources</p>
+            </section>
+            
+            <!-- Library Search -->
+            <section class="library-search">
+                <form class="search-form">
+                    <input type="text" class="search-input" placeholder="Search for resources...">
+                    <button type="submit" class="search-btn">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </form>
+            </section>
+            
+            <!-- Library Tabs -->
+            <section class="library-tabs">
+                <div class="tab-navigation">
+                    <div class="tab-item active" data-tab="documents">Document Library</div>
+                    <div class="tab-item" data-tab="videos">Video Library</div>
+                    <div class="tab-item" data-tab="assignments">Assignments</div>
+                    <div class="tab-item" data-tab="quizzes">Quizzes</div>
+                    <div class="tab-item" data-tab="resources">Additional Resources</div>
+                </div>
+            </section>
+            
+            <!-- Library Filters -->
+            <section class="library-filters">
+                <button class="filter-btn active">All</button>
+                <button class="filter-btn">Basics of Financial Market</button>
+                <button class="filter-btn">Technical Analysis</button>
+                <button class="filter-btn">Chart Patterns</button>
+                <button class="filter-btn">Risk Management</button>
+                <button class="filter-btn">Trading Psychology</button>
+            </section>
+            
+            <!-- Document Library Tab -->
+            <div class="tab-content active" id="documents">
+                <div class="resource-grid">
+                    <!-- PDF Resource Card 1 -->
+                    <div class="resource-card">
+                        <div class="resource-image">
+                            <img src="{% static "images/resources/pdf-basics.jpg" %}" alt="Basics of Financial Market">
+                            <span class="resource-type pdf">PDF</span>
+                        </div>
+                        <div class="resource-info">
+                            <h3 class="resource-title">Basics of Financial Market</h3>
+                            <p class="resource-description">Comprehensive guide on financial market fundamentals, market participants, and types of markets. Perfect for beginners.</p>
+                            <div class="resource-meta">
+                                <div class="resource-date">
+                                    <i class="far fa-calendar-alt"></i>
+                                    <span>01.04.2025</span>
+                                </div>
+                                <div class="resource-size">
+                                    <i class="fas fa-file-pdf"></i>
+                                    <span>2.5 MB</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="resource-actions">
+                            <a href="#{% static "" %}" class="action-btn view-btn">View Document</a>
+                            <a href="#{% static "" %}" class="action-btn download-btn">
+                                <i class="fas fa-download"></i>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- PDF Resource Card 2 -->
+                    <div class="resource-card">
+                        <div class="resource-image">
+                            <img src="{% static "images/resources/pdf-advance.jpg" %}" alt="Advanced Price Action">
+                            <span class="resource-type pdf">PDF</span>
+                        </div>
+                        <div class="resource-info">
+                            <h3 class="resource-title">Advanced Price Action</h3>
+                            <p class="resource-description">Learn advanced price action techniques including candlestick patterns, support/resistance, and order flow analysis.</p>
+                            <div class="resource-meta">
+                                <div class="resource-date">
+                                    <i class="far fa-calendar-alt"></i>
+                                    <span>10.04.2025</span>
+                                </div>
+                                <div class="resource-size">
+                                    <i class="fas fa-file-pdf"></i>
+                                    <span>3.8 MB</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="resource-actions">
+                            <a href="#{% static "" %}" class="action-btn view-btn">View Document</a>
+                            <a href="#{% static "" %}" class="action-btn download-btn">
+                                <i class="fas fa-download"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <!-- PDF Resource Card 3 -->
+                    <div class="resource-card">
+                        <div class="resource-image">
+                            <img src="{% static "images/resources/pdf-market.jpg" %}" alt="Advanced Market Concepts">
+                            <span class="resource-type pdf">PDF</span>
+                        </div>
+                        <div class="resource-info">
+                            <h3 class="resource-title">Advanced Market Concepts</h3>
+                            <p class="resource-description">Explore complex market mechanisms, institutional trading behaviors, and macro-economic influences on markets.</p>
+                            <div class="resource-meta">
+                                <div class="resource-date">
+                                    <i class="far fa-calendar-alt"></i>
+                                    <span>15.04.2025</span>
+                                </div>
+                                <div class="resource-size">
+                                    <i class="fas fa-file-pdf"></i>
+                                    <span>4.2 MB</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="resource-actions">
+                            <a href="#{% static "" %}" class="action-btn view-btn">View Document</a>
+                            <a href="#{% static "" %}" class="action-btn download-btn">
+                                <i class="fas fa-download"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <!-- PDF Resource Card 4 -->
+                    <div class="resource-card">
+                        <div class="resource-image">
+                            <img src="{% static "" %}../../assets/images/resources/pdf-technical.jpg" alt="Technical Analysis">
+                            <span class="resource-type pdf">PDF</span>
+                        </div>
+                        <div class="resource-info">
+                            <h3 class="resource-title">Technical Analysis</h3>
+                            <p class="resource-description">Comprehensive guide to technical analysis tools and indicators including RSI, MACD, Bollinger Bands, and more.</p>
+                            <div class="resource-meta">
+                                <div class="resource-date">
+                                    <i class="far fa-calendar-alt"></i>
+                                    <span>20.04.2025</span>
+                                </div>
+                                <div class="resource-size">
+                                    <i class="fas fa-file-pdf"></i>
+                                    <span>5.1 MB</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="resource-actions">
+                            <a href="#{% static "" %}" class="action-btn view-btn">View Document</a>
+                            <a href="#{% static "" %}" class="action-btn download-btn">
+                                <i class="fas fa-download"></i>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- PDF Resource Card 5 -->
+                    <div class="resource-card">
+                        <div class="resource-image">
+                            <img src="{% static "images/resources/pdf-setup.jpg" %}" alt="CTP Trading Setups">
+                            <span class="resource-type pdf">PDF</span>
+                        </div>
+                        <div class="resource-info">
+                            <h3 class="resource-title">CTP Trading Setups</h3>
+                            <p class="resource-description">Detailed explanation of high-probability trading setups with entry, exit, and risk management rules.</p>
+                            <div class="resource-meta">
+                                <div class="resource-date">
+                                    <i class="far fa-calendar-alt"></i>
+                                    <span>25.04.2025</span>
+                                </div>
+                                <div class="resource-size">
+                                    <i class="fas fa-file-pdf"></i>
+                                    <span>3.7 MB</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="resource-actions">
+                            <a href="#{% static "" %}" class="action-btn view-btn">View Document</a>
+                            <a href="#{% static "" %}" class="action-btn download-btn">
+                                <i class="fas fa-download"></i>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- PDF Resource Card 6 -->
+                    <div class="resource-card">
+                        <div class="resource-image">
+                            <img src="{% static "images/resources/pdf-psychology.jpg" %}" alt="Trading Psychology">
+                            <span class="resource-type pdf">PDF</span>
+                        </div>
+                        <div class="resource-info">
+                            <h3 class="resource-title">Trading Psychology</h3>
+                            <p class="resource-description">Understanding the psychological aspects of trading, overcoming emotional biases, and building mental resilience.</p>
+                            <div class="resource-meta">
+                                <div class="resource-date">
+                                    <i class="far fa-calendar-alt"></i>
+                                    <span>01.05.2025</span>
+                                </div>
+                                <div class="resource-size">
+                                    <i class="fas fa-file-pdf"></i>
+                                    <span>2.9 MB</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="resource-actions">
+                            <a href="#{% static "" %}" class="action-btn view-btn">View Document</a>
+                            <a href="#{% static "" %}" class="action-btn download-btn">
+                                <i class="fas fa-download"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Pagination -->
+                <div class="pagination">
+                    <div class="pagination-item disabled">
+                        <i class="fas fa-chevron-left"></i>
+                    </div>
+                    <div class="pagination-item active">1</div>
+                    <div class="pagination-item">2</div>
+                    <div class="pagination-item">3</div>
+                    <div class="pagination-item">
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Video Library Tab -->
+            <div class="tab-content" id="videos">
+                <div class="resource-list">
+                    <!-- Video Resource 1 -->
+                    <div class="resource-list-item">
+                        <div class="resource-list-image">
+                            <img src="{% static "images/resources/video-class1.jpg" %}" alt="CTP Class 1">
+                        </div>
+                        <div class="resource-list-info">
+                            <h3 class="resource-list-title">CTP CLASS 1 - BASICS OF FINANCIAL MARKET BY ANDAZ AARON</h3>
+                            <p class="resource-list-description">Introduction to financial markets, types of markets, and understanding market participants. Foundation for all trading concepts.</p>
+                            <div class="resource-list-meta">
+                                <div class="resource-date">
+                                    <i class="far fa-calendar-alt"></i>
+                                    <span>01.04.2025</span>
+                                </div>
+                                <div class="resource-duration">
+                                    <i class="far fa-clock"></i>
+                                    <span>1h 59m</span>
+                                </div>
+                                <div class="resource-watched">
+                                    <i class="fas fa-eye"></i>
+                                    <span>Watched</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="resource-list-actions">
+                            <a href="#{% static "" %}" class="play-btn">
+                                <i class="fas fa-play"></i>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- Video Resource 2 -->
+                    <div class="resource-list-item">
+                        <div class="resource-list-image">
+                            <img src="{% static "images/resources/video-class2.jpg" %}" alt="CTP Class 2">
+                        </div>
+                        <div class="resource-list-info">
+                            <h3 class="resource-list-title">CTP CLASS 2 - MARKET STRUCTURE BY ANDAZ AARON</h3>
+                            <p class="resource-list-description">Understanding market structure, trends, trading ranges, support and resistance levels, and price action patterns.</p>
+                            <div class="resource-list-meta">
+                                <div class="resource-date">
+                                    <i class="far fa-calendar-alt"></i>
+                                    <span>05.04.2025</span>
+                                </div>
+                                <div class="resource-duration">
+                                    <i class="far fa-clock"></i>
+                                    <span>2h 12m</span>
+                                </div>
+                                <div class="resource-watched">
+                                    <i class="fas fa-eye"></i>
+                                    <span>Watched</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="resource-list-actions">
+                            <a href="#{% static "" %}" class="play-btn">
+                                <i class="fas fa-play"></i>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- Video Resource 3 -->
+                    <div class="resource-list-item">
+                        <div class="resource-list-image">
+                            <img src="{% static "images/resources/video-class3.jpg" %}" alt="CTP Class 3">
+                        </div>
+                        <div class="resource-list-info">
+                            <h3 class="resource-list-title">CTP CLASS 3 - CANDLESTICK PATTERNS BY ANDAZ AARON</h3>
+                            <p class="resource-list-description">Comprehensive guide to candlestick patterns, their interpretations, and practical applications in identifying market reversals and continuations.</p>
+                            <div class="resource-list-meta">
+                                <div class="resource-date">
+                                    <i class="far fa-calendar-alt"></i>
+                                    <span>10.04.2025</span>
+                                </div>
+                                <div class="resource-duration">
+                                    <i class="far fa-clock"></i>
+                                    <span>1h 45m</span>
+                                </div>
+                                <div class="resource-watched">
+                                    <i class="fas fa-eye"></i>
+                                    <span>Watched</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="resource-list-actions">
+                            <a href="#{% static "" %}" class="play-btn">
+                                <i class="fas fa-play"></i>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- Video Resource 4 -->
+                    <div class="resource-list-item">
+                        <div class="resource-list-image">
+                            <img src="{% static "images/resources/video-class4.jpg" %}" alt="CTP Class 4">
+                        </div>
+                        <div class="resource-list-info">
+                            <h3 class="resource-list-title">CTP CLASS 4 - SUPPORT, RESISTANCE & POI BY ANDAZ AARON</h3>
+                            <p class="resource-list-description">Detailed explanation of support and resistance levels, points of interest (POI), and how to use them effectively in trading.</p>
+                            <div class="resource-list-meta">
+                                <div class="resource-date">
+                                    <i class="far fa-calendar-alt"></i>
+                                    <span>15.04.2025</span>
+                                </div>
+                                <div class="resource-duration">
+                                    <i class="far fa-clock"></i>
+                                    <span>2h 05m</span>
+                                </div>
+                                <div class="resource-watched">
+                                    <i class="fas fa-eye"></i>
+                                    <span>Watched</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="resource-list-actions">
+                            <a href="#{% static "" %}" class="play-btn">
+                                <i class="fas fa-play"></i>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- Video Resource 5 -->
+                    <div class="resource-list-item">
+                        <div class="resource-list-image">
+                            <img src="{% static "images/resources/video-class5.jpg" %}" alt="CTP Class 5">
+                        </div>
+                        <div class="resource-list-info">
+                            <h3 class="resource-list-title">CTP CLASS 5 - CHART PATTERNS BY ANDAZ AARON</h3>
+                            <p class="resource-list-description">Comprehensive guide to chart patterns including head and shoulders, double tops/bottoms, triangles, flags, and pennants.</p>
+                            <div class="resource-list-meta">
+                                <div class="resource-date">
+                                    <i class="far fa-calendar-alt"></i>
+                                    <span>20.04.2025</span>
+                                </div>
+                                <div class="resource-duration">
+                                    <i class="far fa-clock"></i>
+                                    <span>1h 58m</span>
+                                </div>
+                                <div class="resource-watched">
+                                    <i class="fas fa-eye"></i>
+                                    <span>Not Watched</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="resource-list-actions">
+                            <a href="#{% static "" %}" class="play-btn">
+                                <i class="fas fa-play"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Pagination -->
+                <div class="pagination">
+                    <div class="pagination-item disabled">
+                        <i class="fas fa-chevron-left"></i>
+                    </div>
+                    <div class="pagination-item active">1</div>
+                    <div class="pagination-item">2</div>
+                    <div class="pagination-item">3</div>
+                    <div class="pagination-item">
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Assignments Tab -->
+            <div class="tab-content" id="assignments">
+                <div class="resource-grid">
+                    <!-- Assignment Card 1 -->
+                    <div class="resource-card">
+                        <div class="resource-image">
+                            <img src="{% static "images/resources/assignment1.jpg" %}" alt="Candle Anatomy">
+                            <span class="resource-type assignment">Assignment</span>
+                        </div>
+                        <div class="resource-info">
+                            <h3 class="resource-title">Assignment 1: Candle Anatomy</h3>
+                            <p class="resource-description">Analyze different candlestick formations and their implications. Identify 10 different patterns in real market charts.</p>
+                            <div class="resource-meta">
+                                <div class="resource-date">
+                                    <i class="far fa-calendar-alt"></i>
+                                    <span>Due: 10.04.2025</span>
+                                </div>
+                                <div class="resource-status">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>Completed</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="resource-actions">
+                            <a href="#{% static "" %}" class="action-btn view-btn">View Assignment</a>
+                            <a href="#{% static "" %}" class="action-btn download-btn">
+                                <i class="fas fa-download"></i>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- Assignment Card 2 -->
+                    <div class="resource-card">
+                        <div class="resource-image">
+                            <img src="{% static "images/resources/assignment2.jpg" %}" alt="Market Structure">
+                            <span class="resource-type assignment">Assignment</span>
+                        </div>
+                        <div class="resource-info">
+                            <h3 class="resource-title">Assignment 2: Market Structure</h3>
+                            <p class="resource-description">Identify market structure elements in different timeframes. Analyze trends, ranges, and transitional phases.</p>
+                            <div class="resource-meta">
+                                <div class="resource-date">
+                                    <i class="far fa-calendar-alt"></i>
+                                    <span>Due: 15.04.2025</span>
+                                </div>
+                                <div class="resource-status">
+                                    <i class="fas fa-times-circle"></i>
+                                    <span>Failed</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="resource-actions">
+                            <a href="#{% static "" %}" class="action-btn view-btn">View Assignment</a>
+                            <a href="#{% static "" %}" class="action-btn download-btn">
+                                <i class="fas fa-download"></i>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- Assignment Card 3 -->
+                    <div class="resource-card">
+                        <div class="resource-image">
+                            <img src="{% static "images/resources/assignment3.jpg" %}" alt="Fibonacci Retracement">
+                            <span class="resource-type assignment">Assignment</span>
+                        </div>
+                        <div class="resource-info">
+                            <h3 class="resource-title">Assignment 3: Fibonacci Retracement Tool</h3>
+                            <p class="resource-description">Apply Fibonacci retracement tools to identify potential reversal zones. Practice on historical chart data for accuracy.</p>
+                            <div class="resource-meta">
+                                <div class="resource-date">
+                                    <i class="far fa-calendar-alt"></i>
+                                    <span>Due: 20.04.2025</span>
+                                </div>
+                                <div class="resource-status">
+                                    <i class="fas fa-hourglass-half"></i>
+                                    <span>Pending</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="resource-actions">
+                            <a href="#{% static "" %}" class="action-btn view-btn">Start Assignment</a>
+                            <a href="#{% static "" %}" class="action-btn download-btn">
+                                <i class="fas fa-download"></i>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- Assignment Card 4 -->
+                    <div class="resource-card">
+                        <div class="resource-image">
+                            <img src="{% static "images/resources/assignment4.jpg" %}" alt="Trendline">
+                            <span class="resource-type assignment">Assignment</span>
+                        </div>
+                        <div class="resource-info">
+                            <h3 class="resource-title">Assignment 4: Trendline</h3>
+                            <p class="resource-description">Practice drawing trendlines on various charts. Identify support, resistance, and trend direction using trendlines.</p>
+                            <div class="resource-meta">
+                                <div class="resource-date">
+                                    <i class="far fa-calendar-alt"></i>
+                                    <span>Due: 25.04.2025</span>
+                                </div>
+                                <div class="resource-status">
+                                    <i class="fas fa-hourglass-half"></i>
+                                    <span>Pending</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="resource-actions">
+                            <a href="#{% static "" %}" class="action-btn view-btn">Start Assignment</a>
+                            <a href="#{% static "" %}" class="action-btn download-btn">
+                                <i class="fas fa-download"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Pagination -->
+                <div class="pagination">
+                    <div class="pagination-item disabled">
+                        <i class="fas fa-chevron-left"></i>
+                    </div>
+                    <div class="pagination-item active">1</div>
+                    <div class="pagination-item">2</div>
+                    <div class="pagination-item">3</div>
+                    <div class="pagination-item">
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Quizzes Tab -->
+            <div class="tab-content" id="quizzes">
+                <div class="resource-grid">
+                    <!-- Quiz Card 1 -->
+                    <div class="resource-card">
+                        <div class="resource-image">
+                            <img src="{% static "images/resources/quiz1.jpg" %}" alt="Quiz 1">
+                            <span class="resource-type quiz">Quiz</span>
+                        </div>
+                        <div class="resource-info">
+                            <h3 class="resource-title">Quiz 1: Financial Markets Basics</h3>
+                            <p class="resource-description">Test your knowledge of financial market fundamentals, market participants, and market types.</p>
+                            <div class="resource-meta">
+                                <div class="resource-date">
+                                    <i class="far fa-calendar-alt"></i>
+                                    <span>Due: 08.04.2025</span>
+                                </div>
+                                <div class="resource-status">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>Completed: 92%</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="resource-actions">
+                            <a href="#{% static "" %}" class="action-btn view-btn">View Results</a>
+                        </div>
+                    </div>
+                    
+                    <!-- Quiz Card 2 -->
+                    <div class="resource-card">
+                        <div class="resource-image">
+                            <img src="{% static "images/resources/quiz2.jpg" %}" alt="Quiz 2">
+                            <span class="resource-type quiz">Quiz</span>
+                        </div>
+                        <div class="resource-info">
+                            <h3 class="resource-title">Quiz 2: Technical Analysis</h3>
+                            <p class="resource-description">Test your understanding of technical analysis tools, indicators, and their applications in trading.</p>
+                            <div class="resource-meta">
+                                <div class="resource-date">
+                                    <i class="far fa-calendar-alt"></i>
+                                    <span>Due: 15.04.2025</span>
+                                </div>
+                                <div class="resource-status">
+                                    <i class="fas fa-times-circle"></i>
+                                    <span>Failed: 65%</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="resource-actions">
+                            <a href="#{% static "" %}" class="action-btn view-btn">Retake Quiz</a>
+                        </div>
+                    </div>
+                    
+                    <!-- Quiz Card 3 -->
+                    <div class="resource-card">
+                        <div class="resource-image">
+                            <img src="{% static "images/resources/quiz3.jpg" %}" alt="Quiz 3">
+                            <span class="resource-type quiz">Quiz</span>
+                        </div>
+                        <div class="resource-info">
+                            <h3 class="resource-title">Quiz 3: Candlestick Patterns</h3>
+                            <p class="resource-description">Test your ability to identify various candlestick patterns and interpret their market implications.</p>
+                            <div class="resource-meta">
+                                <div class="resource-date">
+                                    <i class="far fa-calendar-alt"></i>
+                                    <span>Due: 22.04.2025</span>
+                                </div>
+                                <div class="resource-status">
+                                    <i class="fas fa-hourglass-half"></i>
+                                    <span>Not Attempted</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="resource-actions">
+                            <a href="#{% static "" %}" class="action-btn view-btn">Start Quiz</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Pagination -->
+                <div class="pagination">
+                    <div class="pagination-item disabled">
+                        <i class="fas fa-chevron-left"></i>
+                    </div>
+                    <div class="pagination-item active">1</div>
+                    <div class="pagination-item">
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Additional Resources Tab -->
+            <div class="tab-content" id="resources">
+                <div class="resource-grid">
+                    <!-- Additional Resource 1 -->
+                    <div class="resource-card">
+                        <div class="resource-image">
+                            <img src="{% static "images/resources/tradingview.jpg" %}" alt="TradingView Setup">
+                            <span class="resource-type pdf">PDF</span>
+                        </div>
+                        <div class="resource-info">
+                            <h3 class="resource-title">TradingView Setup Guide</h3>
+                            <p class="resource-description">Step-by-step instructions for setting up your TradingView account and customizing it for optimal trading.</p>
+                            <div class="resource-meta">
+                                <div class="resource-date">
+                                    <i class="far fa-calendar-alt"></i>
+                                    <span>Added: 01.04.2025</span>
+                                </div>
+                                <div class="resource-size">
+                                    <i class="fas fa-file-pdf"></i>
+                                    <span>1.8 MB</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="resource-actions">
+                            <a href="#{% static "" %}" class="action-btn view-btn">View Document</a>
+                            <a href="#{% static "" %}" class="action-btn download-btn">
+                                <i class="fas fa-download"></i>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- Additional Resource 2 -->
+                    <div class="resource-card">
+                        <div class="resource-image">
+                            <img src="{% static "images/resources/risk-calculator.jpg" %}" alt="Risk Calculator">
+                            <span class="resource-type pdf">Tool</span>
+                        </div>
+                        <div class="resource-info">
+                            <h3 class="resource-title">Position Size Calculator</h3>
+                            <p class="resource-description">Excel-based tool to calculate optimal position sizes based on your risk tolerance, account size, and stop loss placement.</p>
+                            <div class="resource-meta">
+                                <div class="resource-date">
+                                    <i class="far fa-calendar-alt"></i>
+                                    <span>Added: 10.04.2025</span>
+                                </div>
+                                <div class="resource-size">
+                                    <i class="fas fa-file-excel"></i>
+                                    <span>225 KB</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="resource-actions">
+                            <a href="#{% static "" %}" class="action-btn view-btn">Open Tool</a>
+                            <a href="#{% static "" %}" class="action-btn download-btn">
+                                <i class="fas fa-download"></i>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- Additional Resource 3 -->
+                    <div class="resource-card">
+                        <div class="resource-image">
+                            <img src="{% static "images/resources/trading-journal.jpg" %}" alt="Trading Journal">
+                            <span class="resource-type pdf">Template</span>
+                        </div>
+                        <div class="resource-info">
+                            <h3 class="resource-title">Trading Journal Template</h3>
+                            <p class="resource-description">Customizable trading journal template to track your trades, analyze performance, and identify improvement areas.</p>
+                            <div class="resource-meta">
+                                <div class="resource-date">
+                                    <i class="far fa-calendar-alt"></i>
+                                    <span>Added: 15.04.2025</span>
+                                </div>
+                                <div class="resource-size">
+                                    <i class="fas fa-file-excel"></i>
+                                    <span>350 KB</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="resource-actions">
+                            <a href="#{% static "" %}" class="action-btn view-btn">View Template</a>
+                            <a href="#{% static "" %}" class="action-btn download-btn">
+                                <i class="fas fa-download"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="dashboard-footer">
+        <div class="container">
+            <div class="footer-content">
+                <p>Management reserves the right to deny or revoke admission to any participant, even after the fee has been paid</p>
+                <div class="footer-links">
+                    <a href="#{% static "" %}">Terms and Conditions</a>
+                    <a href="#{% static "" %}">Privacy Policy</a>
+                    <a href="#{% static "" %}">Refund Policy</a>
+                </div>
+                <p class="copyright">Arthavidya Trading Community Pvt Ltd © All Rights Reserved - 2025</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="{% static "js/main.js" %}"></script>
+    <script src="{% static "js/dashboard.js" %}"></script>
+   

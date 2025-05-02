@@ -1,0 +1,651 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Admin Announcement{% endblock title %}
+{% block content %}
+    <style>
+        /* Modal Form Styles */
+        .modal-form {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-form.active {
+            display: flex;
+        }
+        
+        .form-container {
+            background-color: var(--bg-white);
+            border-radius: var(--border-radius);
+            width: 90%;
+            max-width: 700px;
+            box-shadow: var(--box-shadow-lg);
+            overflow: hidden;
+        }
+        
+        .form-header {
+            padding: 20px;
+            background-color: var(--primary-blue-lighter);
+            color: var(--primary-blue);
+            font-weight: 600;
+            font-size: 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-light);
+        }
+        
+        .form-header .close-btn {
+            cursor: pointer;
+            font-size: 20px;
+            color: var(--text-muted);
+            transition: var(--transition);
+        }
+        
+        .form-header .close-btn:hover {
+            color: var(--danger-color);
+            transform: rotate(90deg);
+        }
+        
+        .form-body {
+            padding: 20px;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+        
+        .form-row {
+            margin-bottom: 20px;
+        }
+        
+        .form-row label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-dark);
+        }
+        
+        .form-row input, 
+        .form-row select, 
+        .form-row textarea {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid var(--border-medium);
+            border-radius: var(--border-radius);
+            font-size: 14px;
+            transition: var(--transition);
+        }
+        
+        .form-row input:focus, 
+        .form-row select:focus, 
+        .form-row textarea:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(11, 87, 164, 0.1);
+            outline: none;
+        }
+        
+        .form-row textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+        
+        .form-footer {
+            padding: 20px;
+            border-top: 1px solid var(--border-light);
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+        }
+        
+        .cancel-btn {
+            padding: 10px 20px;
+            border: 1px solid var(--border-medium);
+            border-radius: var(--border-radius);
+            background-color: var(--bg-white);
+            color: var(--text-medium);
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .cancel-btn:hover {
+            background-color: var(--bg-light);
+        }
+        
+        .submit-btn {
+            padding: 10px 25px;
+            border-radius: var(--border-radius);
+            background-color: var(--primary-blue);
+            color: var(--text-light);
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: var(--transition);
+        }
+        
+        .submit-btn:hover {
+            background-color: var(--primary-blue-dark);
+        }
+        
+        /* Announcement Cards */
+        .announcement-card {
+            background-color: var(--bg-white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow-sm);
+            padding: 20px;
+            margin-bottom: 20px;
+            position: relative;
+            transition: var(--transition);
+        }
+        
+        .announcement-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--box-shadow-md);
+        }
+        
+        .announcement-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+        
+        .announcement-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--dark-blue);
+            margin-bottom: 8px;
+        }
+        
+        .announcement-meta {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 15px;
+        }
+        
+        .announcement-meta span {
+            display: inline-block;
+            margin-right: 15px;
+        }
+        
+        .announcement-meta i {
+            margin-right: 5px;
+        }
+        
+        .announcement-content {
+            color: var(--text-medium);
+            line-height: 1.6;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+        
+        .announcement-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 15px;
+            border-top: 1px solid var(--border-light);
+        }
+        
+        .announcement-reach {
+            display: flex;
+            gap: 15px;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+        
+        .announcement-reach span {
+            display: flex;
+            align-items: center;
+        }
+        
+        .announcement-reach i {
+            margin-right: 5px;
+            color: var(--primary-blue);
+        }
+        
+        .announcement-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .announcement-badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .announcement-badge.important {
+            background-color: var(--danger-light);
+            color: var(--danger-color);
+        }
+        
+        .action-btn {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .action-btn:hover {
+            background-color: var(--primary-blue-lighter);
+            color: var(--primary-blue);
+        }
+        
+        .action-btn.edit:hover {
+            background-color: var(--primary-blue);
+            color: white;
+        }
+        
+        .action-btn.delete:hover {
+            background-color: var(--danger-color);
+            color: white;
+        }
+        
+        /* Switch for Important */
+        .switch-container {
+            display: flex;
+            align-items: center;
+        }
+        
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+            margin-right: 10px;
+        }
+        
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--border-medium);
+            transition: var(--transition);
+            border-radius: 24px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: var(--bg-white);
+            transition: var(--transition);
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: var(--danger-color);
+        }
+        
+        input:focus + .slider {
+            box-shadow: 0 0 1px var(--danger-color);
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .announcement-header {
+                flex-direction: column;
+            }
+            
+            .announcement-meta span {
+                display: block;
+                margin-bottom: 5px;
+            }
+        }
+    </style>
+</head>
+<body class="admin-body">
+    <!-- Admin Container -->
+    <div class="admin-container">
+        <!-- Main Content Area -->
+        <main class="admin-main">
+            <!-- Page Header -->
+            <section class="page-header">
+                <div class="header-content">
+                    <div class="page-title">
+                        <h1>Announcements</h1>
+                        <p>Create and manage announcements for students and batches</p>
+                    </div>
+                    <div class="header-actions">
+                        <button class="btn-add" id="addAnnouncementBtn">
+                            <i class="fas fa-plus"></i> Create Announcement
+                        </button>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Announcements Section -->
+            <section>
+                <div class="announcement-card">
+                    <span class="announcement-badge important">Important</span>
+                    <div class="announcement-header">
+                        <div>
+                            <h3 class="announcement-title">System Maintenance Scheduled</h3>
+                            <div class="announcement-meta">
+                                <span><i class="fas fa-user"></i> Published by: Andaz Aaron</span>
+                                <span><i class="fas fa-calendar"></i> Date: Apr 5, 2025</span>
+                                <span><i class="fas fa-clock"></i> Expires: Apr 10, 2025</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="announcement-content">
+                        <p>Dear students,</p>
+                        <p>We will be performing system maintenance on Saturday, April 12th, 2025 from 2:00 AM to 6:00 AM IST. During this time, the learning platform will be unavailable. Please plan your study schedule accordingly.</p>
+                        <p>We apologize for any inconvenience this may cause.</p>
+                        <p>Thank you for your understanding.</p>
+                    </div>
+                    <div class="announcement-footer">
+                        <div class="announcement-reach">
+                            <span><i class="fas fa-users"></i> All Students</span>
+                            <span><i class="fas fa-eye"></i> 1,245 views</span>
+                        </div>
+                        <div class="announcement-actions">
+                            <button class="action-btn edit" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="action-btn delete" title="Delete">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="announcement-card">
+                    <div class="announcement-header">
+                        <div>
+                            <h3 class="announcement-title">New Resource Added: Advanced Price Action Guide</h3>
+                            <div class="announcement-meta">
+                                <span><i class="fas fa-user"></i> Published by: Prashanta Kumar Palei</span>
+                                <span><i class="fas fa-calendar"></i> Date: Apr 3, 2025</span>
+                                <span><i class="fas fa-clock"></i> Expires: Apr 17, 2025</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="announcement-content">
+                        <p>Hello CTP students,</p>
+                        <p>We've added a new resource to the Technical Analysis module - "Advanced Price Action Guide". This comprehensive guide covers advanced price action techniques including candlestick patterns, support/resistance identification, and order flow analysis.</p>
+                        <p>You can find it under the Resources section in your dashboard.</p>
+                        <p>Happy learning!</p>
+                    </div>
+                    <div class="announcement-footer">
+                        <div class="announcement-reach">
+                            <span><i class="fas fa-graduation-cap"></i> CTP Program</span>
+                            <span><i class="fas fa-eye"></i> 856 views</span>
+                        </div>
+                        <div class="announcement-actions">
+                            <button class="action-btn edit" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="action-btn delete" title="Delete">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="announcement-card">
+                    <div class="announcement-header">
+                        <div>
+                            <h3 class="announcement-title">Live Q&A Session with Market Expert</h3>
+                            <div class="announcement-meta">
+                                <span><i class="fas fa-user"></i> Published by: Kanheyalal Jena</span>
+                                <span><i class="fas fa-calendar"></i> Date: Mar 28, 2025</span>
+                                <span><i class="fas fa-clock"></i> Expires: Apr 15, 2025</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="announcement-content">
+                        <p>Dear AMP students,</p>
+                        <p>We're excited to announce a special live Q&A session with market expert Mr. Rajiv Kapoor on April 15th, 2025 at 7:00 PM IST. This is an exclusive opportunity for AMP students to interact with one of India's leading traders.</p>
+                        <p>Topics to be covered:</p>
+                        <ul>
+                            <li>Market analysis in volatile conditions</li>
+                            <li>Risk management strategies</li>
+                            <li>Building a sustainable trading career</li>
+                        </ul>
+                        <p>The session will be hosted on Zoom. Meeting details will be shared closer to the date.</p>
+                    </div>
+                    <div class="announcement-footer">
+                        <div class="announcement-reach">
+                            <span><i class="fas fa-graduation-cap"></i> AMP Program</span>
+                            <span><i class="fas fa-eye"></i> 124 views</span>
+                        </div>
+                        <div class="announcement-actions">
+                            <button class="action-btn edit" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="action-btn delete" title="Delete">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    
+    <!-- Modal Form for Adding/Editing Announcement -->
+    <div class="modal-form" id="announcementForm">
+        <div class="form-container">
+            <div class="form-header">
+                <span id="formTitle">Create Announcement</span>
+                <i class="fas fa-times close-btn" id="closeForm"></i>
+            </div>
+            <form id="announcementDataForm">
+                <div class="form-body">
+                    <input type="hidden" id="announcementId" name="announcementId">
+                    <input type="hidden" id="formAction" name="formAction" value="add">
+                    
+                    <div class="form-row">
+                        <label for="title">Announcement Title <span class="required">*</span></label>
+                        <input type="text" id="title" name="title" required>
+                    </div>
+                    
+                    <div class="form-row">
+                        <label for="message">Announcement Message <span class="required">*</span></label>
+                        <textarea id="message" name="message" required></textarea>
+                    </div>
+                    
+                    <div class="form-grid">
+                        <div class="form-row">
+                            <label for="audience">Target Audience <span class="required">*</span></label>
+                            <select id="audience" name="audience" required>
+                                <option value="all">All Students</option>
+                                <option value="program">Specific Program</option>
+                                <option value="batch">Specific Batch</option>
+                            </select>
+                        </div>
+                        <div class="form-row" id="programSelectRow" style="display: none;">
+                            <label for="program">Select Program</label>
+                            <select id="program" name="program">
+                                <option value="">Select Program</option>
+                                <option value="CTP">Complete Trading Program</option>
+                                <option value="AMP">Arthavidya Mentorship Program</option>
+                                <option value="GMP">Growth Mindset Program</option>
+                                <option value="SIP">Smart Income Program</option>
+                            </select>
+                        </div>
+                        <div class="form-row" id="batchSelectRow" style="display: none;">
+                            <label for="batch">Select Batch</label>
+                            <select id="batch" name="batch">
+                                <option value="">Select Batch</option>
+                                <option value="CTP-APR-2025">CTP April 2025</option>
+                                <option value="CTP-JUL-2025">CTP July 2025</option>
+                                <option value="AMP-APR-2025">AMP April 2025</option>
+                                <option value="GMP-MAY-2025">GMP May 2025</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-grid">
+                        <div class="form-row">
+                            <label for="expiryDate">Expiry Date</label>
+                            <input type="date" id="expiryDate" name="expiryDate">
+                            <small>Leave blank for no expiry</small>
+                        </div>
+                        <div class="form-row">
+                            <div class="switch-container">
+                                <label class="switch">
+                                    <input type="checkbox" id="isImportant" name="isImportant">
+                                    <span class="slider"></span>
+                                </label>
+                                <span>Mark as Important</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-footer">
+                    <button type="button" class="cancel-btn" id="cancelForm">Cancel</button>
+                    <button type="submit" class="submit-btn">Publish Announcement</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Include the common form handling JavaScript -->
+    <script src="{% static 'js/admin.js' %}"></script>
+    <script src="{% static 'js/admin-forms.js'%}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Form open/close functionality
+            const addAnnouncementBtn = document.getElementById('addAnnouncementBtn');
+            const announcementForm = document.getElementById('announcementForm');
+            const closeForm = document.getElementById('closeForm');
+            const cancelForm = document.getElementById('cancelForm');
+            const announcementDataForm = document.getElementById('announcementDataForm');
+            
+            // Open form when Add button is clicked
+            addAnnouncementBtn.addEventListener('click', function() {
+                document.getElementById('formTitle').textContent = 'Create Announcement';
+                announcementDataForm.reset();
+                announcementForm.classList.add('active');
+            });
+            
+            // Close form when X button is clicked
+            closeForm.addEventListener('click', function() {
+                announcementForm.classList.remove('active');
+            });
+            
+            // Close form when Cancel button is clicked
+            cancelForm.addEventListener('click', function() {
+                announcementForm.classList.remove('active');
+            });
+            
+            // Submit form handler
+            announcementDataForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Here you would typically send the data to your backend
+                alert('Announcement created successfully! In a real application, this would be saved to the database and published to students.');
+                
+                // Close the form
+                announcementForm.classList.remove('active');
+            });
+            
+            // Audience selection change handler
+            const audienceSelect = document.getElementById('audience');
+            const programSelectRow = document.getElementById('programSelectRow');
+            const batchSelectRow = document.getElementById('batchSelectRow');
+            
+            audienceSelect.addEventListener('change', function() {
+                // Hide both select rows first
+                programSelectRow.style.display = 'none';
+                batchSelectRow.style.display = 'none';
+                
+                // Show relevant select row based on audience selection
+                if (this.value === 'program') {
+                    programSelectRow.style.display = 'block';
+                } else if (this.value === 'batch') {
+                    batchSelectRow.style.display = 'block';
+                }
+            });
+            
+            // Edit announcement handlers
+            const editButtons = document.querySelectorAll('.action-btn.edit');
+            editButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const card = this.closest('.announcement-card');
+                    const title = card.querySelector('.announcement-title').textContent;
+                    const content = card.querySelector('.announcement-content').innerHTML;
+                    const isImportant = card.querySelector('.announcement-badge.important') !== null;
+                    
+                    // Fill the form with the announcement data
+                    document.getElementById('formTitle').textContent = 'Edit Announcement';
+                    document.getElementById('title').value = title;
+                    document.getElementById('message').value = content;
+                    document.getElementById('isImportant').checked = isImportant;
+                    
+                    // Open the form
+                    announcementForm.classList.add('active');
+                });
+            });
+            
+            // Delete announcement handlers
+            const deleteButtons = document.querySelectorAll('.action-btn.delete');
+            deleteButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const card = this.closest('.announcement-card');
+                    const title = card.querySelector('.announcement-title').textContent;
+                    
+                    if (confirm(`Are you sure you want to delete the announcement "${title}"?`)) {
+                        // Here you would typically send a delete request to your backend
+                        card.remove();
+                        alert(`Announcement "${title}" deleted successfully!`);
+                    }
+                });
+            });
+            
+            // Set default expiry date (14 days from today)
+            const expiryDateInput = document.getElementById('expiryDate');
+            const today = new Date();
+            const futureDate = new Date(today);
+            futureDate.setDate(today.getDate() + 14);
+            expiryDateInput.value = futureDate.toISOString().split('T')[0];
+        });
+    </script>
+{% endblock %}

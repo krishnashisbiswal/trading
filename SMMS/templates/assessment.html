@@ -1,0 +1,960 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assessment - Arthavidya Trading Community</title>
+    <link rel="stylesheet" href="{% static "css/style.css" %}">
+    <link rel="stylesheet" href="{% static "css/dashboard.css" %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Custom styles for Assessment page */
+        .assessment-tabs {
+            display: flex;
+            background-color: var(--bg-white);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            margin-bottom: 30px;
+            box-shadow: var(--box-shadow-sm);
+        }
+        
+        .assessment-tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 500;
+            transition: var(--transition);
+            border-bottom: 3px solid transparent;
+        }
+        
+        .assessment-tab.active {
+            background-color: var(--primary-blue-lighter);
+            color: var(--primary-blue);
+            border-bottom-color: var(--primary-blue);
+        }
+        
+        .assessment-tab:hover:not(.active) {
+            background-color: var(--bg-light);
+        }
+        
+        .assessment-tab i {
+            margin-right: 8px;
+        }
+        
+        .assessment-content {
+            display: none;
+        }
+        
+        .assessment-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .assessment-card {
+            background-color: var(--bg-white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow-sm);
+            margin-bottom: 20px;
+            overflow: hidden;
+            transition: var(--transition);
+            border: 1px solid var(--border-light);
+        }
+        
+        .assessment-card:hover {
+            box-shadow: var(--box-shadow-md);
+            transform: translateY(-3px);
+        }
+        
+        .assessment-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .assessment-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--dark-blue);
+            margin: 0;
+        }
+        
+        .assessment-status {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .status-completed {
+            background-color: var(--success-light);
+            color: var(--success-color);
+        }
+        
+        .status-pending {
+            background-color: var(--warning-light);
+            color: var(--warning-color);
+        }
+        
+        .status-missed {
+            background-color: var(--danger-light);
+            color: var(--danger-color);
+        }
+        
+        .status-upcoming {
+            background-color: var(--primary-blue-lighter);
+            color: var(--primary-blue);
+        }
+        
+        .assessment-body {
+            padding: 20px;
+        }
+        
+        .assessment-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .info-item {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .info-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 5px;
+        }
+        
+        .info-value {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--dark-blue);
+        }
+        
+        .assessment-score {
+            display: flex;
+            align-items: center;
+            margin-top: 20px;
+        }
+        
+        .score-circle {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--primary-blue-gradient);
+            color: var(--text-light);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin-right: 20px;
+            box-shadow: 0 3px 10px rgba(11, 87, 164, 0.2);
+        }
+        
+        .score-value {
+            font-size: 24px;
+            font-weight: 700;
+            line-height: 1;
+        }
+        
+        .score-total {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+        
+        .score-details {
+            flex: 1;
+        }
+        
+        .score-label {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--dark-blue);
+            margin-bottom: 10px;
+        }
+        
+        .score-breakdown {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+        
+        .score-breakdown p {
+            margin-bottom: 5px;
+        }
+        
+        .assessment-actions {
+            margin-top: 20px;
+            display: flex;
+            gap: 15px;
+        }
+        
+        .btn-start {
+            background: var(--primary-blue-gradient);
+        }
+        
+        .btn-review {
+            background: var(--bg-light);
+            color: var(--text-dark);
+            border: 1px solid var(--border-light);
+        }
+        
+        .btn-review:hover {
+            background: var(--primary-blue-lighter);
+            color: var(--primary-blue);
+        }
+        
+        .btn-disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .btn-disabled:hover {
+            transform: none;
+            box-shadow: none;
+        }
+        
+        /* Progress section */
+        .progress-overview {
+            background-color: var(--bg-white);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: var(--box-shadow-sm);
+        }
+        
+        .progress-title {
+            font-size: 18px;
+            color: var(--dark-blue);
+            margin-bottom: 20px;
+        }
+        
+        .progress-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+        }
+        
+        .progress-item {
+            text-align: center;
+        }
+        
+        .progress-circle {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 15px;
+            position: relative;
+        }
+        
+        .progress-circle svg {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .progress-circle svg circle {
+            fill: none;
+            stroke-width: 8;
+            stroke-linecap: round;
+            transform: translate(5px, 5px);
+        }
+        
+        .progress-circle svg circle:first-child {
+            stroke: var(--border-light);
+        }
+        
+        .progress-circle svg circle:last-child {
+            stroke: var(--primary-blue);
+            stroke-dasharray: 283;
+            stroke-dashoffset: calc(283 - (283 * var(--percent)) / 100);
+            transition: stroke-dashoffset 1s ease;
+        }
+        
+        .progress-circle.green svg circle:last-child {
+            stroke: var(--success-color);
+        }
+        
+        .progress-circle.yellow svg circle:last-child {
+            stroke: var(--warning-color);
+        }
+        
+        .progress-circle.red svg circle:last-child {
+            stroke: var(--danger-color);
+        }
+        
+        .progress-percent {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--dark-blue);
+        }
+        
+        .progress-label {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+        
+        /* Exam Section */
+        .exam-schedule {
+            background-color: var(--bg-white);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: var(--box-shadow-sm);
+        }
+        
+        .exam-title {
+            font-size: 18px;
+            color: var(--dark-blue);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .exam-title i {
+            margin-right: 10px;
+            color: var(--primary-blue);
+        }
+        
+        .upcoming-exams {
+            border: 1px solid var(--border-light);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+        }
+        
+        .exam-item {
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border-light);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: var(--transition);
+        }
+        
+        .exam-item:last-child {
+            border-bottom: none;
+        }
+        
+        .exam-item:hover {
+            background-color: var(--bg-light);
+        }
+        
+        .exam-detail {
+            display: flex;
+            align-items: center;
+        }
+        
+        .exam-date {
+            width: 60px;
+            height: 60px;
+            background: var(--primary-blue-lighter);
+            color: var(--primary-blue);
+            border-radius: var(--border-radius);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin-right: 15px;
+        }
+        
+        .exam-date .day {
+            font-size: 20px;
+            font-weight: 700;
+            line-height: 1;
+        }
+        
+        .exam-date .month {
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+        
+        .exam-info h4 {
+            font-size: 16px;
+            margin-bottom: 5px;
+            color: var(--dark-blue);
+        }
+        
+        .exam-info p {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+        
+        .countdown {
+            font-size: 14px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+        
+        .countdown span {
+            color: var(--primary-blue);
+        }
+    </style>
+</head>
+<body class="dashboard-body">
+    <!-- Dashboard Header -->
+    <header class="dashboard-header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo-area">
+                    <img src="{%static 'images/logo.png'%}" alt="Arthavidya Trading Community">
+                    <div class="welcome-text">
+                        <h4>Welcome</h4>
+                        <h2>Kanheyalal Jena</h2>
+                    </div>
+                </div>
+                <div class="user-actions">
+                    <div class="notifications">
+                        <button class="notification-btn">
+                            <i class="fas fa-bell"></i>
+                            <span class="badge">3</span>
+                        </button>
+                    </div>
+                    <div class="user-profile">
+                        <button class="profile-btn">
+                            <img src="{%static 'images/user-avatar.jpg'%}" alt="User Profile">
+                            <span>Kanheyalal Jena</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="dropdown-menu">
+                            <a href="#"><i class="fas fa-user"></i> My Profile</a>
+                            <a href="#"><i class="fas fa-cog"></i> Settings</a>
+                            <a href="{% url "home" %}"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Dashboard Main Content -->
+    <div class="dashboard-container">
+        <!-- Sidebar Navigation -->
+        <aside class="dashboard-sidebar">
+            <nav class="sidebar-nav">
+                <ul>
+                    <li>
+                        <a href="{% url "dashboard" %}">
+                            <i class="fas fa-home"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url "my_programs" %}">
+                            <i class="fas fa-graduation-cap"></i>
+                            <span>My Programs</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url "library" %}">
+                            <i class="fas fa-book"></i>
+                            <span>Library</span>
+                        </a>
+                    </li>
+                    <li class="active">
+                        <a href="{% url "assessment" %}">
+                            <i class="fas fa-tasks"></i>
+                            <span>Assessment</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url "refer_earn" %}">
+                            <i class="fas fa-user-plus"></i>
+                            <span>Refer & Earn</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="{% url "home" %}" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="dashboard-main">
+            <section>
+                <div class="section-header">
+                    <h2><i class="fas fa-tasks"></i> Assessments</h2>
+                </div>
+
+                <!-- Progress Overview -->
+                <div class="progress-overview">
+                    <h3 class="progress-title">Overall Assessment Progress</h3>
+                    <div class="progress-grid">
+                        <div class="progress-item">
+                            <div class="progress-circle" style="--percent: 80">
+                                <svg viewBox="0 0 100 100">
+                                    <circle cx="45" cy="45" r="45"></circle>
+                                    <circle cx="45" cy="45" r="45"></circle>
+                                </svg>
+                                <span class="progress-percent">80%</span>
+                            </div>
+                            <div class="progress-label">Quizzes</div>
+                        </div>
+                        <div class="progress-item">
+                            <div class="progress-circle green" style="--percent: 60">
+                                <svg viewBox="0 0 100 100">
+                                    <circle cx="45" cy="45" r="45"></circle>
+                                    <circle cx="45" cy="45" r="45"></circle>
+                                </svg>
+                                <span class="progress-percent">60%</span>
+                            </div>
+                            <div class="progress-label">Assignments</div>
+                        </div>
+                        <div class="progress-item">
+                            <div class="progress-circle yellow" style="--percent: 50">
+                                <svg viewBox="0 0 100 100">
+                                    <circle cx="45" cy="45" r="45"></circle>
+                                    <circle cx="45" cy="45" r="45"></circle>
+                                </svg>
+                                <span class="progress-percent">50%</span>
+                            </div>
+                            <div class="progress-label">Exams</div>
+                        </div>
+                        <div class="progress-item">
+                            <div class="progress-circle" style="--percent: 70">
+                                <svg viewBox="0 0 100 100">
+                                    <circle cx="45" cy="45" r="45"></circle>
+                                    <circle cx="45" cy="45" r="45"></circle>
+                                </svg>
+                                <span class="progress-percent">70%</span>
+                            </div>
+                            <div class="progress-label">Overall</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Assessment Tabs -->
+                <div class="assessment-tabs">
+                    <div class="assessment-tab active" data-tab="quizzes">
+                        <i class="fas fa-question-circle"></i> Quizzes
+                    </div>
+                    <div class="assessment-tab" data-tab="assignments">
+                        <i class="fas fa-clipboard-list"></i> Assignments
+                    </div>
+                    <div class="assessment-tab" data-tab="exams">
+                        <i class="fas fa-file-alt"></i> Exams
+                    </div>
+                </div>
+
+                <!-- Quizzes Tab Content -->
+                <div class="assessment-content active" id="quizzes">
+                    <!-- Quiz 1 -->
+                    <div class="assessment-card">
+                        <div class="assessment-header">
+                            <h3 class="assessment-title">Quiz 1: Basics of Financial Markets</h3>
+                            <span class="assessment-status status-completed">Completed</span>
+                        </div>
+                        <div class="assessment-body">
+                            <div class="assessment-info">
+                                <div class="info-item">
+                                    <span class="info-label">Due Date</span>
+                                    <span class="info-value">April 05, 2025</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">Completion Date</span>
+                                    <span class="info-value">April 04, 2025</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">Time Limit</span>
+                                    <span class="info-value">30 minutes</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">Questions</span>
+                                    <span class="info-value">20 multiple choice</span>
+                                </div>
+                            </div>
+                            <div class="assessment-score">
+                                <div class="score-circle">
+                                    <span class="score-value">18</span>
+                                    <span class="score-total">/20</span>
+                                </div>
+                                <div class="score-details">
+                                    <div class="score-label">Excellent Performance!</div>
+                                    <div class="score-breakdown">
+                                        <p>Correct Answers: 18/20</p>
+                                        <p>Incorrect Answers: 2/20</p>
+                                        <p>Score: 90%</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="assessment-actions">
+                                <a href="#" class="btn btn-review"><i class="fas fa-eye"></i> Review Quiz</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quiz 2 -->
+                    <div class="assessment-card">
+                        <div class="assessment-header">
+                            <h3 class="assessment-title">Quiz 2: Candle Anatomy</h3>
+                            <span class="assessment-status status-completed">Completed</span>
+                        </div>
+                        <div class="assessment-body">
+                            <div class="assessment-info">
+                                <div class="info-item">
+                                    <span class="info-label">Due Date</span>
+                                    <span class="info-value">April 12, 2025</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">Completion Date</span>
+                                    <span class="info-value">April 10, 2025</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">Time Limit</span>
+                                    <span class="info-value">30 minutes</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">Questions</span>
+                                    <span class="info-value">15 multiple choice</span>
+                                </div>
+                            </div>
+                            <div class="assessment-score">
+                                <div class="score-circle">
+                                    <span class="score-value">12</span>
+                                    <span class="score-total">/15</span>
+                                </div>
+                                <div class="score-details">
+                                    <div class="score-label">Good Performance!</div>
+                                    <div class="score-breakdown">
+                                        <p>Correct Answers: 12/15</p>
+                                        <p>Incorrect Answers: 3/15</p>
+                                        <p>Score: 80%</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="assessment-actions">
+                                <a href="#" class="btn btn-review"><i class="fas fa-eye"></i> Review Quiz</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quiz 3 -->
+                    <div class="assessment-card">
+                        <div class="assessment-header">
+                            <h3 class="assessment-title">Quiz 3: Market Structure</h3>
+                            <span class="assessment-status status-pending">Pending</span>
+                        </div>
+                        <div class="assessment-body">
+                            <div class="assessment-info">
+                                <div class="info-item">
+                                    <span class="info-label">Due Date</span>
+                                    <span class="info-value">April 19, 2025</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">Available From</span>
+                                    <span class="info-value">April 15, 2025</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">Time Limit</span>
+                                    <span class="info-value">30 minutes</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">Questions</span>
+                                    <span class="info-value">15 multiple choice</span>
+                                </div>
+                            </div>
+                            <div class="assessment-actions">
+                                <a href="#" class="btn btn-start"><i class="fas fa-play"></i> Start Quiz</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quiz 4 -->
+                    <div class="assessment-card">
+                        <div class="assessment-header">
+                            <h3 class="assessment-title">Quiz 4: Support & Resistance</h3>
+                            <span class="assessment-status status-upcoming">Upcoming</span>
+                        </div>
+                        <div class="assessment-body">
+                            <div class="assessment-info">
+                                <div class="info-item">
+                                    <span class="info-label">Due Date</span>
+                                    <span class="info-value">April 26, 2025</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">Available From</span>
+                                    <span class="info-value">April 22, 2025</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">Time Limit</span>
+                                    <span class="info-value">45 minutes</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">Questions</span>
+                                    <span class="info-value">25 multiple choice</span>
+                                </div>
+                            </div>
+                            <div class="assessment-actions">
+                                <a href="#" class="btn btn-disabled"><i class="fas fa-play"></i> Not Available Yet</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Assignments Tab Content -->
+                <div class="assessment-content" id="assignments">
+                    <!-- Assignment 1 -->
+                    <div class="assessment-card">
+                        <div class="assessment-header">
+                            <h3 class="assessment-title">Assignment 1: Candle Anatomy</h3>
+                            <span class="assessment-status status-completed">Completed</span>
+                        </div>
+                        <div class="assessment-body">
+                            <div class="assessment-info">
+                                <div class="info-item">
+                                    <span class="info-label">Due Date</span>
+                                    <span class="info-value">April 08, 2025</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">Submission Date</span>
+                                    <span class="info-value">April 05, 2025</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">Type</span>
+                                    <span class="info-value">Practical Exercise</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">Submission Type</span>
+                                    <span class="info-value">PDF Upload</span>
+                                </div>
+                            </div>
+                            <div class="assessment-score">
+                                <div class="score-circle">
+                                    <span class="score-value">85</span>
+                                    <span class="score-total">/100</span>
+                                </div>
+                                <div class="score-details">
+                                    <div class="score-label">Good Job!</div>
+                                    <div class="score-breakdown">
+                                        <p>Instructor Comments: Good identification of candle patterns, but needs improvement in explaining the market psychology behind patterns.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="assessment-actions">
+                                <a href="#" class="btn btn-review"><i class="fas fa-eye"></i> View Feedback</a>
+                                <a href="#" class="btn btn-outline"><i class="fas fa-download"></i> Download Submission</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Assignment 2 -->
+                    <div class="assessment-card">
+                        <div class="assessment-header">
+                            <h3 class="assessment-title">Assignment 2: Market Structure</h3>
+                            <span class="assessment-status status-completed">Completed</span>
+                        </div>
+                        <div class="assessment-body">
+                            <div class="assessment-info">
+                                <div class="info-item">
+                                    <span class="info-label">Due Date</span>
+                                    <span class="info-value">April 15, 2025</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">Submission Date</span>
+                                    <span class="info-value">April 14, 2025</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">Type</span>
+                                    <span class="info-value">Chart Analysis</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">Submission Type</span>
+                                    <span class="info-value">PDF Upload</span>
+                                </div>
+                            </div>
+                            <div class="assessment-score">
+                                <div class="score-circle">
+                                    <span class="score-value">78</span>
+                                    <span class="score-total">/100</span>
+                                </div>
+                                <div class="score-details">
+                                    <div class="score-label">Satisfactory</div>
+                                    <div class="score-breakdown">
+                                        <p>Instructor Comments: Accurate identification of market structure, but missed some key higher timeframe context. Work on multi-timeframe analysis.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="assessment-actions">
+                                <a href="#" class="btn btn-review"><i class="fas fa-eye"></i> View Feedback</a>
+                                <a href="#" class="btn btn-outline"><i class="fas fa-download"></i> Download Submission</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Assignment 3 -->
+                    <div class="assessment-card">
+                        <div class="assessment-header">
+                            <h3 class="assessment-title">Assignment 3: Fibonacci Retracement Tool</h3>
+                            <span class="assessment-status status-pending">Pending</span>
+                        </div>
+                        <div class="assessment-body">
+                            <div class="assessment-info">
+                                <div class="info-item">
+                                    <span class="info-label">Due Date</span>
+                                    <span class="info-value">April 22, 2025</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">Released Date</span>
+                                    <span class="info-value">April 16, 2025</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">Type</span>
+                                    <span class="info-value">Practical Exercise</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">Submission Type</span>
+                                    <span class="info-value">PDF Upload</span>
+                                </div>
+                            </div>
+                            <div class="assessment-actions">
+                                <a href="#" class="btn btn-primary"><i class="fas fa-file-upload"></i> Submit Assignment</a>
+                                <a href="#" class="btn btn-outline"><i class="fas fa-download"></i> Download Instructions</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Exams Tab Content -->
+                <div class="assessment-content" id="exams">
+                    <!-- Exam Schedule -->
+                    <div class="exam-schedule">
+                        <h3 class="exam-title"><i class="fas fa-calendar-alt"></i> Upcoming Exams</h3>
+                        <div class="upcoming-exams">
+                            <div class="exam-item">
+                                <div class="exam-detail">
+                                    <div class="exam-date">
+                                        <span class="day">15</span>
+                                        <span class="month">May</span>
+                                    </div>
+                                    <div class="exam-info">
+                                        <h4>Mid-Term Assessment</h4>
+                                        <p>Covers modules 1-4 of the Complete Trading Program</p>
+                                    </div>
+                                </div>
+                                <div class="countdown">Time Left: <span>16 days, 8 hours</span></div>
+                            </div>
+                            <div class="exam-item">
+                                <div class="exam-detail">
+                                    <div class="exam-date">
+                                        <span class="day">25</span>
+                                        <span class="month">Jun</span>
+                                    </div>
+                                    <div class="exam-info">
+                                        <h4>Final Assessment</h4>
+                                        <p>Comprehensive exam covering all modules of the program</p>
+                                    </div>
+                                </div>
+                                <div class="countdown">Time Left: <span>57 days, 8 hours</span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Test Exam (Completed) -->
+                    <div class="assessment-card">
+                        <div class="assessment-header">
+                            <h3 class="assessment-title">Test Exam: Trading Fundamentals</h3>
+                            <span class="assessment-status status-completed">Completed</span>
+                        </div>
+                        <div class="assessment-body">
+                            <div class="assessment-info">
+                                <div class="info-item">
+                                    <span class="info-label">Date</span>
+                                    <span class="info-value">April 15, 2025</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">Duration</span>
+                                    <span class="info-value">2 hours</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">Total Questions</span>
+                                    <span class="info-value">50 questions</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">Format</span>
+                                    <span class="info-value">MCQ & Practical</span>
+                                </div>
+                            </div>
+                            <div class="assessment-score">
+                                <div class="score-circle">
+                                    <span class="score-value">85</span>
+                                    <span class="score-total">/100</span>
+                                </div>
+                                <div class="score-details">
+                                    <div class="score-label">Excellent Performance!</div>
+                                    <div class="score-breakdown">
+                                        <p>MCQ Section: 42/50</p>
+                                        <p>Practical Section: 43/50</p>
+                                        <p>Total Score: 85%</p>
+                                        <p>Grade: A</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="assessment-actions">
+                                <a href="#" class="btn btn-review"><i class="fas fa-eye"></i> View Results</a>
+                                <a href="#" class="btn btn-outline"><i class="fas fa-download"></i> Download Certificate</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="dashboard-footer">
+        <div class="container">
+            <div class="footer-content">
+                <p>Management reserves the right to deny or revoke admission to any participant, even after the fee has been paid</p>
+                <div class="footer-links">
+                    <a href="#">Terms and Conditions</a>
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Refund Policy</a>
+                </div>
+                <p class="copyright">Arthavidya Trading Community Pvt Ltd © All Rights Reserved - 2025</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="../../assets/js/main.js"></script>
+    <script src="js/dashboard.js"></script>
+    <script>
+        // Tab functionality
+        const tabs = document.querySelectorAll('.assessment-tab');
+        const contents = document.querySelectorAll('.assessment-content');
+        
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const target = tab.dataset.tab;
+                
+                // Update active tab
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                // Update active content
+                contents.forEach(content => {
+                    content.classList.remove('active');
+                    if (content.id === target) {
+                        content.classList.add('active');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

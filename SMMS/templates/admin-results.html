@@ -1,0 +1,736 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Admin Result{% endblock %}
+{% block content %}
+    <style>
+        /* Modal Form Styles */
+        .modal-form {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-form.active {
+            display: flex;
+        }
+        
+        .form-container {
+            background-color: var(--bg-white);
+            border-radius: var(--border-radius);
+            width: 90%;
+            max-width: 800px;
+            box-shadow: var(--box-shadow-lg);
+            overflow: hidden;
+        }
+        
+        .form-header {
+            padding: 20px;
+            background-color: var(--primary-blue-lighter);
+            color: var(--primary-blue);
+            font-weight: 600;
+            font-size: 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-light);
+        }
+        
+        .form-header .close-btn {
+            cursor: pointer;
+            font-size: 20px;
+            color: var(--text-muted);
+            transition: var(--transition);
+        }
+        
+        .form-header .close-btn:hover {
+            color: var(--danger-color);
+            transform: rotate(90deg);
+        }
+        
+        .form-body {
+            padding: 20px;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+        
+        .form-row {
+            margin-bottom: 20px;
+        }
+        
+        .form-footer {
+            padding: 20px;
+            border-top: 1px solid var(--border-light);
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+        }
+        
+        /* Results Details Styles */
+        .result-summary {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-light);
+        }
+        
+        .student-info {
+            display: flex;
+            align-items: flex-start;
+        }
+        
+        .student-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 20px;
+        }
+        
+        .student-details h3 {
+            font-size: 18px;
+            margin-bottom: 8px;
+            color: var(--dark-blue);
+        }
+        
+        .student-details p {
+            margin: 5px 0;
+            color: var(--text-medium);
+            font-size: 14px;
+        }
+        
+        .exam-score {
+            text-align: center;
+            padding: 15px 25px;
+            background-color: var(--bg-light);
+            border-radius: var(--border-radius);
+        }
+        
+        .score-label {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 5px;
+        }
+        
+        .score-value {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .score-value.passed {
+            color: var(--success-color);
+        }
+        
+        .score-value.failed {
+            color: var(--danger-color);
+        }
+        
+        .score-status {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-light);
+        }
+        
+        .score-status.passed {
+            background-color: var(--success-color);
+        }
+        
+        .score-status.failed {
+            background-color: var(--danger-color);
+        }
+        
+        .exam-details {
+            margin-bottom: 25px;
+        }
+        
+        .detail-row {
+            display: flex;
+            margin-bottom: 10px;
+        }
+        
+        .detail-label {
+            width: 180px;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+        
+        .detail-value {
+            flex: 1;
+            color: var(--text-medium);
+        }
+        
+        .answers-section h3 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: var(--dark-blue);
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-light);
+        }
+        
+        .answer-item {
+            background-color: var(--bg-light);
+            border-radius: var(--border-radius);
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .question-text {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--text-dark);
+        }
+        
+        .answer-options {
+            margin-bottom: 10px;
+        }
+        
+        .answer-option {
+            display: flex;
+            align-items: center;
+            padding: 8px 10px;
+            margin-bottom: 5px;
+            border-radius: var(--border-radius-sm);
+        }
+        
+        .answer-option.selected {
+            background-color: var(--primary-blue-lighter);
+            color: var(--primary-blue);
+        }
+        
+        .answer-option.correct {
+            background-color: var(--success-light);
+            color: var(--success-color);
+        }
+        
+        .answer-option.incorrect {
+            background-color: var(--danger-light);
+            color: var(--danger-color);
+        }
+        
+        .option-indicator {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .selected .option-indicator {
+            background-color: var(--primary-blue);
+            color: var(--text-light);
+        }
+        
+        .correct .option-indicator {
+            background-color: var(--success-color);
+            color: var(--text-light);
+        }
+        
+        .incorrect .option-indicator {
+            background-color: var(--danger-color);
+            color: var(--text-light);
+        }
+        
+        .option-text {
+            flex: 1;
+        }
+        
+        .answer-feedback {
+            border-top: 1px solid var(--border-light);
+            margin-top: 10px;
+            padding-top: 10px;
+            font-size: 14px;
+            color: var(--text-medium);
+        }
+        
+        .insights-section {
+            margin-top: 25px;
+            background-color: var(--primary-blue-lighter);
+            padding: 20px;
+            border-radius: var(--border-radius);
+        }
+        
+        .insights-section h3 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: var(--primary-blue);
+        }
+        
+        .insights-content {
+            color: var(--text-medium);
+            line-height: 1.6;
+        }
+        
+        /* Export button */
+        .export-btn {
+            background-color: var(--success-color);
+            color: var(--text-light);
+            padding: 10px 20px;
+            border-radius: var(--border-radius);
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            display: flex;
+            align-items: center;
+            transition: var(--transition);
+        }
+        
+        .export-btn:hover {
+            background-color: var(--success-color);
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+        
+        .export-btn i {
+            margin-right: 8px;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .result-summary {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .student-info {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+            
+            .student-avatar {
+                margin-right: 0;
+                margin-bottom: 15px;
+            }
+            
+            .exam-score {
+                width: 100%;
+            }
+            
+            .detail-row {
+                flex-direction: column;
+                margin-bottom: 15px;
+            }
+            
+            .detail-label {
+                width: 100%;
+                margin-bottom: 5px;
+            }
+        }
+    </style>
+</head>
+<body class="admin-body">
+    <!-- Admin Container -->
+    <div class="admin-container">
+        <!-- Main Content Area -->
+        <main class="admin-main">
+            <!-- Page Header -->
+            <section class="page-header">
+                <div class="header-content">
+                    <div class="page-title">
+                        <h1>Exam Results</h1>
+                        <p>View and analyze student exam performance</p>
+                    </div>
+                    <div class="header-actions">
+                        <button class="export-btn">
+                            <i class="fas fa-file-export"></i> Export Results
+                        </button>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Main Table Section -->
+            <section class="table-section">
+                <div class="table-container">
+                    <div class="table-header">
+                        <h3 class="table-title">All Exam Results</h3>
+                        <div class="table-actions">
+                            <div class="search-container">
+                                <i class="fas fa-search search-icon"></i>
+                                <input type="text" class="search-input" id="searchInput" placeholder="Search results...">
+                            </div>
+                            <div class="filter-container">
+                                <button class="filter-btn" id="filterBtn">
+                                    <i class="fas fa-filter"></i> Filter
+                                </button>
+                                <div class="filter-dropdown" id="filterDropdown">
+                                    <div class="filter-group">
+                                        <label class="filter-label">Program</label>
+                                        <select class="filter-select" id="programFilter">
+                                            <option value="">All Programs</option>
+                                            <option value="CTP">Complete Trading Program</option>
+                                            <option value="AMP">Arthavidya Mentorship Program</option>
+                                            <option value="GMP">Growth Mindset Program</option>
+                                            <option value="SIP">Smart Income Program</option>
+                                        </select>
+                                    </div>
+                                    <div class="filter-group">
+                                        <label class="filter-label">Exam</label>
+                                        <select class="filter-select" id="examFilter">
+                                            <option value="">All Exams</option>
+                                            <option value="1">Market Structure Final Exam</option>
+                                            <option value="2">Risk Management Assessment</option>
+                                            <option value="3">Trading Psychology Test</option>
+                                            <option value="4">Asset Allocation Strategies Quiz</option>
+                                        </select>
+                                    </div>
+                                    <div class="filter-group">
+                                        <label class="filter-label">Result</label>
+                                        <select class="filter-select" id="resultFilter">
+                                            <option value="">All Results</option>
+                                            <option value="passed">Passed</option>
+                                            <option value="failed">Failed</option>
+                                        </select>
+                                    </div>
+                                    <div class="filter-actions">
+                                        <button class="btn-reset" id="resetFilterBtn">Reset</button>
+                                        <button class="btn-apply" id="applyFilterBtn">Apply</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Table Content -->
+                    <div class="table-responsive">
+                        <table class="admin-table" id="resultsTable">
+                            <thead>
+                                <tr>
+                                    <th>Student</th>
+                                    <th>Program</th>
+                                    <th>Exam</th>
+                                    <th>Attempt</th>
+                                    <th>Date</th>
+                                    <th>Duration</th>
+                                    <th>Score</th>
+                                    <th>Result</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Sample data rows -->
+                                <tr>
+                                    <td>
+                                        <div class="user-info">
+                                            <img src="{% static 'images/student-avatar-1.jpg' %}" alt="Student" class="user-avatar">
+                                            <div class="user-details">
+                                                <h4>Rahul Sharma</h4>
+                                                <p>ID: ATC2504001</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>Complete Trading Program</td>
+                                    <td>Market Structure Final Exam</td>
+                                    <td>1</td>
+                                    <td>Apr 5, 2025</td>
+                                    <td>48 mins</td>
+                                    <td>85%</td>
+                                    <td><span class="status-badge status-success">Passed</span></td>
+                                    <td>
+                                        <div class="row-actions">
+                                            <button class="action-btn view" title="View Details">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="action-btn download" title="Download">
+                                                <i class="fas fa-download"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="user-info">
+                                            <img src="{% static 'images/student-avatar-2.jpg' %}" alt="Student" class="user-avatar">
+                                            <div class="user-details">
+                                                <h4>Priya Patel</h4>
+                                                <p>ID: ATC2504002</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>Arthavidya Mentorship Program</td>
+                                    <td>Risk Management Assessment</td>
+                                    <td>1</td>
+                                    <td>Apr 4, 2025</td>
+                                    <td>40 mins</td>
+                                    <td>92%</td>
+                                    <td><span class="status-badge status-success">Passed</span></td>
+                                    <td>
+                                        <div class="row-actions">
+                                            <button class="action-btn view" title="View Details">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="action-btn download" title="Download">
+                                                <i class="fas fa-download"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="user-info">
+                                            <img src="{% static 'images/student-avatar-3.jpg' %}" alt="Student" class="user-avatar">
+                                            <div class="user-details">
+                                                <h4>Amit Kumar</h4>
+                                                <p>ID: ATC2504003</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>Growth Mindset Program</td>
+                                    <td>Trading Psychology Test</td>
+                                    <td>2</td>
+                                    <td>Apr 6, 2025</td>
+                                    <td>28 mins</td>
+                                    <td>65%</td>
+                                    <td><span class="status-badge status-success">Passed</span></td>
+                                    <td>
+                                        <div class="row-actions">
+                                            <button class="action-btn view" title="View Details">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="action-btn download" title="Download">
+                                                <i class="fas fa-download"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="user-info">
+                                            <img src="{% static 'images/student-avatar-4.jpg' %}" alt="Student" class="user-avatar">
+                                            <div class="user-details">
+                                                <h4>Neha Singh</h4>
+                                                <p>ID: ATC2504004</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>Smart Income Program</td>
+                                    <td>Asset Allocation Strategies Quiz</td>
+                                    <td>1</td>
+                                    <td>Apr 3, 2025</td>
+                                    <td>35 mins</td>
+                                    <td>58%</td>
+                                    <td><span class="status-badge status-danger">Failed</span></td>
+                                    <td>
+                                        <div class="row-actions">
+                                            <button class="action-btn view" title="View Details">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="action-btn download" title="Download">
+                                                <i class="fas fa-download"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Table Footer with Pagination -->
+                    <div class="table-footer">
+                        <div class="page-info">
+                            Showing <span id="startRange">1</span> to <span id="endRange">10</span> of <span id="totalItems">25</span> entries
+                        </div>
+                        <div class="pagination">
+                            <button class="page-btn" id="prevPage" disabled>
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <button class="page-btn active">1</button>
+                            <button class="page-btn">2</button>
+                            <button class="page-btn">3</button>
+                            <button class="page-btn" id="nextPage">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    
+    <!-- Result Details Modal -->
+    <div class="modal-form" id="resultDetailsForm">
+        <div class="form-container">
+            <div class="form-header">
+                <span id="formTitle">Result Details</span>
+                <i class="fas fa-times close-btn" id="closeForm"></i>
+            </div>
+            <div class="form-body">
+                <div class="result-summary">
+                    <div class="student-info">
+                        <img src="{% static 'images/student-avatar-1.jpg' %}" alt="Student" class="student-avatar">
+                        <div class="student-details">
+                            <h3>Rahul Sharma</h3>
+                            <p><strong>Student ID:</strong> ATC2504001</p>
+                            <p><strong>Email:</strong> rahul.sharma@gmail.com</p>
+                            <p><strong>Program:</strong> Complete Trading Program</p>
+                            <p><strong>Batch:</strong> April 2025</p>
+                        </div>
+                    </div>
+                    <div class="exam-score">
+                        <div class="score-label">Exam Score</div>
+                        <div class="score-value passed">85%</div>
+                        <div class="score-status passed">Passed</div>
+                    </div>
+                </div>
+                
+                <div class="exam-details">
+                    <h3>Exam Information</h3>
+                    <div class="detail-row">
+                        <div class="detail-label">Exam Name:</div>
+                        <div class="detail-value">Market Structure Final Exam</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Date Taken:</div>
+                        <div class="detail-value">April 5, 2025 at 14:30</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Duration:</div>
+                        <div class="detail-value">48 minutes (out of 60 minutes)</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Total Questions:</div>
+                        <div class="detail-value">20</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Correct Answers:</div>
+                        <div class="detail-value">17 (85%)</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Incorrect Answers:</div>
+                        <div class="detail-value">3 (15%)</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Required to Pass:</div>
+                        <div class="detail-value">70%</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Attempt:</div>
+                        <div class="detail-value">1 of 2</div>
+                    </div>
+                </div>
+                
+                <div class="answers-section">
+                    <h3>Question Responses</h3>
+                    
+                    <div class="answer-item">
+                        <div class="question-text">Question 1: What is the most important aspect of market structure analysis?</div>
+                        <div class="answer-options">
+                            <div class="answer-option correct selected">
+                                <div class="option-indicator">A</div>
+                                <div class="option-text">Identifying key support and resistance levels</div>
+                            </div>
+                            <div class="answer-option">
+                                <div class="option-indicator">B</div>
+                                <div class="option-text">Calculating moving averages</div>
+                            </div>
+                            <div class="answer-option">
+                                <div class="option-indicator">C</div>
+                                <div class="option-text">Following news and events</div>
+                            </div>
+                            <div class="answer-option">
+                                <div class="option-indicator">D</div>
+                                <div class="option-text">Looking at candlestick patterns only</div>
+                            </div>
+                        </div>
+                        <div class="answer-feedback">
+                            <strong>Correct:</strong> Identifying key support and resistance levels is indeed the most important aspect of market structure analysis.
+                        </div>
+                    </div>
+                    
+                    <div class="answer-item">
+                        <div class="question-text">Question 2: Which of the following best describes an uptrend?</div>
+                        <div class="answer-options">
+                            <div class="answer-option">
+                                <div class="option-indicator">A</div>
+                                <div class="option-text">Lower highs and lower lows</div>
+                            </div>
+                            <div class="answer-option correct">
+                                <div class="option-indicator">B</div>
+                                <div class="option-text">Higher highs and higher lows</div>
+                            </div>
+                            <div class="answer-option incorrect selected">
+                                <div class="option-indicator">C</div>
+                                <div class="option-text">Lower highs and higher lows</div>
+                            </div>
+                            <div class="answer-option">
+                                <div class="option-indicator">D</div>
+                                <div class="option-text">Higher highs and lower lows</div>
+                            </div>
+                        </div>
+                        <div class="answer-feedback">
+                            <strong>Incorrect:</strong> The correct answer is 'Higher highs and higher lows'. A series of higher highs and higher lows is the definition of an uptrend in market structure.
+                        </div>
+                    </div>
+                    
+                    <!-- More answer items would follow -->
+                </div>
+                
+                <div class="insights-section">
+                    <h3>Performance Insights</h3>
+                    <div class="insights-content">
+                        <p>Rahul demonstrated strong understanding of market structure concepts, particularly in identifying support and resistance levels, trend patterns, and market phases. However, there is a need for improvement in understanding consolidation patterns and trend reversals.</p>
+                        <p>Recommendation: Review the materials on trend reversals and consolidation patterns in Module 3.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-footer">
+                <button type="button" class="export-btn">
+                    <i class="fas fa-file-export"></i> Export Result
+                </button>
+            </div>
+        </div>
+    </div>
+    {% block footer %}{% endblock footer %}
+    <script src="{% static 'js/admin.js' %}"></script>  
+    <!-- Include the common form handling JavaScript -->
+    <script src="{% static "js/admin-forms.js" %}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // View details button handlers
+            const viewButtons = document.querySelectorAll('.action-btn.view');
+            const resultDetailsForm = document.getElementById('resultDetailsForm');
+            const closeForm = document.getElementById('closeForm');
+            
+            viewButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    resultDetailsForm.classList.add('active');
+                });
+            });
+            
+            // Close modal
+            closeForm.addEventListener('click', function() {
+                resultDetailsForm.classList.remove('active');
+            });
+            
+            // Close when clicking outside
+            resultDetailsForm.addEventListener('click', function(e) {
+                if (e.target === resultDetailsForm) {
+                    resultDetailsForm.classList.remove('active');
+                }
+            });
+            
+            // Export button functionality
+            const exportButtons = document.querySelectorAll('.export-btn');
+            exportButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    alert('Exporting result as PDF... In a real application, this would generate and download a PDF report.');
+                });
+            });
+        });
+    </script>
+{% endblock %}

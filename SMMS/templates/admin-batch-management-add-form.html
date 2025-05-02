@@ -1,0 +1,503 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Batch Management{% endblock %}
+{% block content %}
+    <style>
+        /* Modal Form Styles */
+        .modal-form {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-form.active {
+            display: flex;
+        }
+        
+        .form-container {
+            background-color: var(--bg-white);
+            border-radius: var(--border-radius);
+            width: 90%;
+            max-width: 700px;
+            box-shadow: var(--box-shadow-lg);
+            overflow: hidden;
+        }
+        
+        .form-header {
+            padding: 20px;
+            background-color: var(--primary-blue-lighter);
+            color: var(--primary-blue);
+            font-weight: 600;
+            font-size: 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-light);
+        }
+        
+        .form-header .close-btn {
+            cursor: pointer;
+            font-size: 20px;
+            color: var(--text-muted);
+            transition: var(--transition);
+        }
+        
+        .form-header .close-btn:hover {
+            color: var(--danger-color);
+            transform: rotate(90deg);
+        }
+        
+        .form-body {
+            padding: 20px;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+        
+        .form-row {
+            margin-bottom: 20px;
+        }
+        
+        .form-row label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-dark);
+        }
+        
+        .form-row input, 
+        .form-row select, 
+        .form-row textarea {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid var(--border-medium);
+            border-radius: var(--border-radius);
+            font-size: 14px;
+            transition: var(--transition);
+        }
+        
+        .form-row input:focus, 
+        .form-row select:focus, 
+        .form-row textarea:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(11, 87, 164, 0.1);
+            outline: none;
+        }
+        
+        .form-row textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+        
+        .form-footer {
+            padding: 20px;
+            border-top: 1px solid var(--border-light);
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+        }
+        
+        .cancel-btn {
+            padding: 10px 20px;
+            border: 1px solid var(--border-medium);
+            border-radius: var(--border-radius);
+            background-color: var(--bg-white);
+            color: var(--text-medium);
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .cancel-btn:hover {
+            background-color: var(--bg-light);
+        }
+        
+        .submit-btn {
+            padding: 10px 25px;
+            border-radius: var(--border-radius);
+            background-color: var(--primary-blue);
+            color: var(--text-light);
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: var(--transition);
+        }
+        
+        .submit-btn:hover {
+            background-color: var(--primary-blue-dark);
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body class="admin-body">
+    <!-- Admin Container -->
+    <div class="admin-container">
+        <!-- Main Content Area -->
+        <main class="admin-main">
+            <!-- Page Header -->
+            <section class="page-header">
+                <div class="header-content">
+                    <div class="page-title">
+                        <h1>Batch Management</h1>
+                        <p>Create and manage program batches</p>
+                    </div>
+                    <div class="header-actions">
+                        <button class="btn-add" id="addBatchBtn">
+                            <i class="fas fa-plus"></i> Create New Batch
+                        </button>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Main Table Section -->
+            <section class="table-section">
+                <div class="table-container">
+                    <div class="table-header">
+                        <h3 class="table-title">All Batches</h3>
+                        <div class="table-actions">
+                            <div class="search-container">
+                                <i class="fas fa-search search-icon"></i>
+                                <input type="text" class="search-input" id="searchInput" placeholder="Search batches...">
+                            </div>
+                            <div class="filter-container">
+                                <button class="filter-btn" id="filterBtn">
+                                    <i class="fas fa-filter"></i> Filter
+                                </button>
+                                <div class="filter-dropdown" id="filterDropdown">
+                                    <div class="filter-group">
+                                        <label class="filter-label">Program</label>
+                                        <select class="filter-select" id="programFilter">
+                                            <option value="">All Programs</option>
+                                            <option value="CTP">Complete Trading Program</option>
+                                            <option value="AMP">Arthavidya Mentorship Program</option>
+                                            <option value="GMP">Growth Mindset Program</option>
+                                            <option value="SIP">Smart Income Program</option>
+                                        </select>
+                                    </div>
+                                    <div class="filter-group">
+                                        <label class="filter-label">Status</label>
+                                        <select class="filter-select" id="statusFilter">
+                                            <option value="">All Status</option>
+                                            <option value="active">Active</option>
+                                            <option value="upcoming">Upcoming</option>
+                                            <option value="completed">Completed</option>
+                                        </select>
+                                    </div>
+                                    <div class="filter-actions">
+                                        <button class="btn-reset" id="resetFilterBtn">Reset</button>
+                                        <button class="btn-apply" id="applyFilterBtn">Apply</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Table Content -->
+                    <div class="table-responsive">
+                        <table class="admin-table" id="batchesTable">
+                            <thead>
+                                <tr>
+                                    <th>Batch Code</th>
+                                    <th>Batch Name</th>
+                                    <th>Program</th>
+                                    <th>Start Date</th>
+                                    <th>End Date</th>
+                                    <th>Capacity</th>
+                                    <th>Enrolled</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Sample data row -->
+                                <tr>
+                                    <td>CTP-APR-2025</td>
+                                    <td>CTP April 2025 Batch</td>
+                                    <td>Complete Trading Program</td>
+                                    <td>Apr 1, 2025</td>
+                                    <td>Jun 30, 2025</td>
+                                    <td>30</td>
+                                    <td>18</td>
+                                    <td><span class="status-badge status-success">Active</span></td>
+                                    <td>
+                                        <div class="row-actions">
+                                            <button class="action-btn view" title="View Details">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="action-btn edit" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="action-btn delete" title="Delete">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <!-- More sample data rows -->
+                                <tr>
+                                    <td>CTP-JUL-2025</td>
+                                    <td>CTP July 2025 Batch</td>
+                                    <td>Complete Trading Program</td>
+                                    <td>Jul 1, 2025</td>
+                                    <td>Sep 30, 2025</td>
+                                    <td>30</td>
+                                    <td>8</td>
+                                    <td><span class="status-badge status-warning">Upcoming</span></td>
+                                    <td>
+                                        <div class="row-actions">
+                                            <button class="action-btn view" title="View Details">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="action-btn edit" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="action-btn delete" title="Delete">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>AMP-APR-2025</td>
+                                    <td>AMP April 2025 Batch</td>
+                                    <td>Arthavidya Mentorship Program</td>
+                                    <td>Apr 10, 2025</td>
+                                    <td>Jul 10, 2025</td>
+                                    <td>15</td>
+                                    <td>12</td>
+                                    <td><span class="status-badge status-success">Active</span></td>
+                                    <td>
+                                        <div class="row-actions">
+                                            <button class="action-btn view" title="View Details">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="action-btn edit" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="action-btn delete" title="Delete">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Table Footer with Pagination -->
+                    <div class="table-footer">
+                        <div class="page-info">
+                            Showing <span id="startRange">1</span> to <span id="endRange">10</span> of <span id="totalItems">25</span> entries
+                        </div>
+                        <div class="pagination">
+                            <button class="page-btn" id="prevPage" disabled>
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <button class="page-btn active">1</button>
+                            <button class="page-btn">2</button>
+                            <button class="page-btn">3</button>
+                            <button class="page-btn" id="nextPage">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    
+    <!-- Modal Form for Adding/Editing Batch -->
+    <div class="modal-form" id="batchForm">
+        <div class="form-container">
+            <div class="form-header">
+                <span id="formTitle">Create New Batch</span>
+                <i class="fas fa-times close-btn" id="closeForm"></i>
+            </div>
+            <form id="batchDataForm">
+                <div class="form-body">
+                    <input type="hidden" id="batchId" name="batchId">
+                    
+                    <div class="form-grid">
+                        <div class="form-row">
+                            <label for="batchCode">Batch Code <span class="required">*</span></label>
+                            <input type="text" id="batchCode" name="batchCode" required>
+                        </div>
+                        <div class="form-row">
+                            <label for="batchName">Batch Name <span class="required">*</span></label>
+                            <input type="text" id="batchName" name="batchName" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <label for="program">Program <span class="required">*</span></label>
+                        <select id="program" name="program" required>
+                            <option value="">Select Program</option>
+                            <option value="CTP">Complete Trading Program</option>
+                            <option value="AMP">Arthavidya Mentorship Program</option>
+                            <option value="GMP">Growth Mindset Program</option>
+                            <option value="SIP">Smart Income Program</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-grid">
+                        <div class="form-row">
+                            <label for="startDate">Start Date <span class="required">*</span></label>
+                            <input type="date" id="startDate" name="startDate" required>
+                        </div>
+                        <div class="form-row">
+                            <label for="endDate">End Date <span class="required">*</span></label>
+                            <input type="date" id="endDate" name="endDate" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-grid">
+                        <div class="form-row">
+                            <label for="capacity">Capacity <span class="required">*</span></label>
+                            <input type="number" id="capacity" name="capacity" min="1" required>
+                        </div>
+                        <div class="form-row">
+                            <label for="status">Status <span class="required">*</span></label>
+                            <select id="status" name="status" required>
+                                <option value="">Select Status</option>
+                                <option value="active">Active</option>
+                                <option value="upcoming">Upcoming</option>
+                                <option value="completed">Completed</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <label for="trainerAssignment">Assign Trainers</label>
+                        <select id="trainerAssignment" name="trainerAssignment[]" multiple size="4">
+                            <option value="1">Andaz Aaron (Main Trainer)</option>
+                            <option value="2">Kanheyalal Jena (Co-Trainer)</option>
+                            <option value="3">Prashanta Kumar Palei (Main Trainer)</option>
+                            <option value="4">Shalini Verma (Guest Faculty)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-row">
+                        <label for="description">Description</label>
+                        <textarea id="description" name="description"></textarea>
+                    </div>
+                </div>
+                
+                <div class="form-footer">
+                    <button type="button" class="cancel-btn" id="cancelForm">Cancel</button>
+                    <button type="submit" class="submit-btn">Save Batch</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    {% block footer %}{% endblock footer %}
+    <!-- JavaScript for Form Handling -->
+    <script src="{% static 'js/admin.js' %}"></script>  
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Form open/close functionality
+            const addBatchBtn = document.getElementById('addBatchBtn');
+            const batchForm = document.getElementById('batchForm');
+            const closeForm = document.getElementById('closeForm');
+            const cancelForm = document.getElementById('cancelForm');
+            const batchDataForm = document.getElementById('batchDataForm');
+            
+            // Open form when Add button is clicked
+            addBatchBtn.addEventListener('click', function() {
+                document.getElementById('formTitle').textContent = 'Create New Batch';
+                batchDataForm.reset();
+                batchForm.classList.add('active');
+            });
+            
+            // Close form when X button is clicked
+            closeForm.addEventListener('click', function() {
+                batchForm.classList.remove('active');
+            });
+            
+            // Close form when Cancel button is clicked
+            cancelForm.addEventListener('click', function() {
+                batchForm.classList.remove('active');
+            });
+            
+            // Submit form handler
+            batchDataForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                // Here you would typically send the data to your backend
+                alert('Batch data submitted! In a real application, this would be saved to the database.');
+                batchForm.classList.remove('active');
+            });
+            
+            // Edit batch handlers (for demonstration)
+            const editButtons = document.querySelectorAll('.action-btn.edit');
+            editButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const row = this.closest('tr');
+                    const batchCode = row.cells[0].textContent;
+                    const batchName = row.cells[1].textContent;
+                    const program = row.cells[2].textContent;
+                    
+                    // Fill the form with the row data
+                    document.getElementById('formTitle').textContent = 'Edit Batch';
+                    document.getElementById('batchCode').value = batchCode;
+                    document.getElementById('batchName').value = batchName;
+                    
+                    // Set selected option in dropdown by text
+                    const programSelect = document.getElementById('program');
+                    for (let i = 0; i < programSelect.options.length; i++) {
+                        if (programSelect.options[i].text === program) {
+                            programSelect.selectedIndex = i;
+                            break;
+                        }
+                    }
+                    
+                    // Open the form
+                    batchForm.classList.add('active');
+                });
+            });
+            
+            // Filter functionality
+            const filterBtn = document.getElementById('filterBtn');
+            const filterDropdown = document.getElementById('filterDropdown');
+            
+            filterBtn.addEventListener('click', function() {
+                filterDropdown.classList.toggle('show');
+            });
+            
+            // Close filter dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!filterBtn.contains(e.target) && !filterDropdown.contains(e.target)) {
+                    filterDropdown.classList.remove('show');
+                }
+            });
+            
+            // Search functionality
+            const searchInput = document.getElementById('searchInput');
+            searchInput.addEventListener('keyup', function() {
+                const searchText = this.value.toLowerCase();
+                const tableRows = document.querySelectorAll('#batchesTable tbody tr');
+                
+                tableRows.forEach(row => {
+                    const text = row.textContent.toLowerCase();
+                    row.style.display = text.includes(searchText) ? '' : 'none';
+                });
+            });
+        });
+    </script>
+{% endblock content %}

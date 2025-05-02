@@ -1,0 +1,458 @@
+{% extends "base.html"%}
+
+{% block title %}Schedule New Class{% endblock %}
+
+{% load static %}
+
+{% block content %}
+    <style>
+        /* Form specific styles */
+        .form-container {
+            background-color: var(--bg-white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow-sm);
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .form-title {
+            font-size: 18px;
+            color: var(--dark-blue);
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-light);
+        }
+        
+        .form-section {
+            margin-bottom: 30px;
+        }
+        
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--dark-blue);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .section-title i {
+            margin-right: 10px;
+            color: var(--primary-blue);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-dark);
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .form-row .form-group {
+            flex: 1;
+            min-width: 250px;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            font-size: 14px;
+            border: 1px solid var(--border-light);
+            border-radius: var(--border-radius);
+            transition: var(--transition);
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 2px rgba(11, 87, 164, 0.1);
+            outline: none;
+        }
+        
+        .form-text {
+            margin-top: 5px;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        
+        .form-check {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+        
+        .form-check input {
+            margin-right: 10px;
+            margin-top: 3px;
+        }
+        
+        .form-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-light);
+        }
+        
+        .btn-cancel {
+            padding: 12px 24px;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            border: 1px solid var(--border-light);
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .btn-cancel:hover {
+            background-color: var(--bg-white);
+        }
+        
+        .btn-submit {
+            padding: 12px 24px;
+            background-color: var(--primary-blue);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .btn-submit:hover {
+            background-color: var(--primary-blue-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(11, 87, 164, 0.2);
+        }
+        
+        /* Class info box */
+        .class-info-box {
+            background-color: var(--primary-blue-lighter);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .class-info-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--primary-blue);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .class-info-title i {
+            margin-right: 10px;
+        }
+        
+        .info-box-content {
+            font-size: 14px;
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+        
+        .info-box-content ul {
+            padding-left: 20px;
+            margin-top: 10px;
+        }
+        
+        .info-box-content li {
+            margin-bottom: 5px;
+        }
+        
+        /* Time picker style */
+        .time-inputs {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .time-separator {
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+    </style>
+        <!-- Main Content Area -->
+        <main class="admin-main">
+            <!-- Page Header -->
+            <section class="page-header">
+                <div class="header-content">
+                    <div class="page-title">
+                        <h1>Schedule New Class</h1>
+                        <p>Create and schedule a new live class session</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Class Info Box -->
+            <div class="class-info-box">
+                <h3 class="class-info-title"><i class="fas fa-info-circle"></i> Schedule a Live Class</h3>
+                <div class="info-box-content">
+                    <p>Before scheduling a new live class, please ensure the following:</p>
+                    <ul>
+                        <li>Check for any scheduling conflicts with existing classes</li>
+                        <li>Confirm trainer availability for the selected time slot</li>
+                        <li>Prepare all class materials and resources in advance</li>
+                        <li>Set up appropriate Zoom meeting settings (recording, waiting room, etc.)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Schedule Class Form -->
+            <form id='admin-cls'  action="{%url 'reg' %}" method="post" class="form-container">
+                <h2 class="form-title">Class Details</h2>
+                {% csrf_token %}
+                <!-- Class Information Section -->
+                <div class="form-section">
+                    <h3 class="section-title"><i class="fas fa-info-circle"></i> Basic Information</h3>
+                    
+                    <div class="form-group">
+                        <label for="class_title">Class Title</label>
+                        <input type="text" id="class_title" name="class_title" class="form-control" placeholder="e.g. CTP Class 14 - Market Session Analysis" required>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="program">Program</label>
+                            <select id="program" name="program" class="form-control" required>
+                                <option value="">Select Program</option>
+                                <option value="ctp">Complete Trading Program (CTP)</option>
+                                <option value="amp">Arthavidya Mentorship Program (AMP)</option>
+                                <option value="gmp">Growth Mindset Program (GMP)</option>
+                                <option value="sip">Smart Income Program (SIP)</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="batch">Batch</label>
+                            <select id="batch" name="batch" class="form-control" required>
+                                <option value="">Select Batch</option>
+                                <option value="apr-2025">April 2025</option>
+                                <option value="mar-2025">March 2025</option>
+                                <option value="feb-2025">February 2025</option>
+                                <option value="jan-2025">January 2025</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="description">Class Description</label>
+                        <textarea id="description" name="description" class="form-control" rows="4" placeholder="Brief description of the class content and objectives"></textarea>
+                    </div>
+                </div>
+                
+                <!-- Schedule Information Section -->
+                <div class="form-section">
+                    <h3 class="section-title"><i class="fas fa-calendar-alt"></i> Schedule Information</h3>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="class_date">Class Date</label>
+                            <input type="date" id="class_date" name="class_date" class="form-control" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Class Time</label>
+                            <div class="time-inputs">
+                                <select id="start_hour" name="start_hour" class="form-control" required>
+                                    <option value="">Hour</option>
+                                    <option value="09">09</option>
+                                    <option value="10">10</option>
+                                    <option value="11">11</option>
+                                    <option value="12">12</option>
+                                    <option value="13">13</option>
+                                    <option value="14">14</option>
+                                    <option value="15">15</option>
+                                    <option value="16">16</option>
+                                    <option value="17">17</option>
+                                    <option value="18">18</option>
+                                    <option value="19">19</option>
+                                    <option value="20">20</option>
+                                    <option value="21">21</option>
+                                </select>
+                                <span class="time-separator">:</span>
+                                <select id="start_minute" name="start_minute" class="form-control" required>
+                                    <option value="">Min</option>
+                                    <option value="00">00</option>
+                                    <option value="15">15</option>
+                                    <option value="30">30</option>
+                                    <option value="45">45</option>
+                                </select>
+                                <span class="time-separator">to</span>
+                                <select id="end_hour" name="end_hour" class="form-control" required>
+                                    <option value="">Hour</option>
+                                    <option value="10">10</option>
+                                    <option value="11">11</option>
+                                    <option value="12">12</option>
+                                    <option value="13">13</option>
+                                    <option value="14">14</option>
+                                    <option value="15">15</option>
+                                    <option value="16">16</option>
+                                    <option value="17">17</option>
+                                    <option value="18">18</option>
+                                    <option value="19">19</option>
+                                    <option value="20">20</option>
+                                    <option value="21">21</option>
+                                    <option value="22">22</option>
+                                </select>
+                                <span class="time-separator">:</span>
+                                <select id="end_minute" name="end_minute" class="form-control" required>
+                                    <option value="">Min</option>
+                                    <option value="00">00</option>
+                                    <option value="15">15</option>
+                                    <option value="30">30</option>
+                                    <option value="45">45</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="duration">Duration (in minutes)</label>
+                        <input type="number" id="duration" name="duration" class="form-control" min="30" max="240" step="15" value="120" required>
+                        <div class="form-text">Standard class duration is 120 minutes (2 hours)</div>
+                    </div>
+                </div>
+                
+                <!-- Trainer & Platform Section -->
+                <div class="form-section">
+                    <h3 class="section-title"><i class="fas fa-chalkboard-teacher"></i> Trainer & Platform</h3>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="trainer">Assign Trainer</label>
+                            <select id="trainer" name="trainer" class="form-control" required>
+                                <option value="">Select Trainer</option>
+                                <option value="andaz">Andaz Aaron</option>
+                                <option value="prashanta">Prashanta Kumar Palei</option>
+                                <option value="mayank">Mayank Sharma</option>
+                                <option value="anita">Anita Desai</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="platform">Platform</label>
+                            <select id="platform" name="platform" class="form-control" required>
+                                <option value="zoom">Zoom</option>
+                                <option value="google-meet">Google Meet</option>
+                                <option value="microsoft-teams">Microsoft Teams</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="meeting_link">Meeting Link</label>
+                        <input type="url" id="meeting_link" name="meeting_link" class="form-control" placeholder="https://zoom.us/j/123456789">
+                        <div class="form-text">You can add the meeting link now or update it later</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="meeting_password">Meeting Password</label>
+                        <input type="text" id="meeting_password" name="meeting_password" class="form-control" placeholder="e.g. ATC#012025">
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="form-check">
+                            <input type="checkbox" id="enable_recording" name="enable_recording" checked>
+                            <label for="enable_recording">Enable recording for this class</label>
+                        </div>
+                        
+                        <div class="form-check">
+                            <input type="checkbox" id="send_notification" name="send_notification" checked>
+                            <label for="send_notification">Send notification to all students in this batch</label>
+                        </div>
+                        
+                        <div class="form-check">
+                            <input type="checkbox" id="add_calendar" name="add_calendar" checked>
+                            <label for="add_calendar">Add to Google Calendar</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Additional Information Section -->
+                <div class="form-section">
+                    <h3 class="section-title"><i class="fas fa-file-alt"></i> Additional Information</h3>
+                    
+                    <div class="form-group">
+                        <label for="prerequisites">Prerequisites</label>
+                        <textarea id="prerequisites" name="prerequisites" class="form-control" rows="3" placeholder="Any prerequisites for students to complete before this class"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="materials">Class Materials</label>
+                        <textarea id="materials" name="materials" class="form-control" rows="3" placeholder="List any materials or resources students should have ready for the class"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="notes">Additional Notes</label>
+                        <textarea id="notes" name="notes" class="form-control" rows="3" placeholder="Any additional notes or information for the trainer or admin"></textarea>
+                    </div>
+                </div>
+                
+                <!-- Form Footer -->
+                <div class="form-footer">
+                    <a href="admin-classes.html" class="btn-cancel">Cancel</a>
+                    <button type="submit" class="btn-submit">Schedule Class</button>
+                </div>
+            </form>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="{% static 'js/admin.js' %}"></script>
+    <script src="{% static 'js/admin-main.js' %}"></script>
+    <script>
+        // Auto-calculate duration based on start and end time
+        function updateDuration() {
+            const startHour = parseInt(document.getElementById('start_hour').value) || 0;
+            const startMinute = parseInt(document.getElementById('start_minute').value) || 0;
+            const endHour = parseInt(document.getElementById('end_hour').value) || 0;
+            const endMinute = parseInt(document.getElementById('end_minute').value) || 0;
+            
+            if (startHour && endHour) {
+                const startTime = startHour * 60 + startMinute;
+                const endTime = endHour * 60 + endMinute;
+                
+                // If end time is after start time
+                if (endTime > startTime) {
+                    const durationMinutes = endTime - startTime;
+                    document.getElementById('duration').value = durationMinutes;
+                }
+            }
+        }
+        
+        // Attach events to time selects
+        document.getElementById('start_hour').addEventListener('change', updateDuration);
+        document.getElementById('start_minute').addEventListener('change', updateDuration);
+        document.getElementById('end_hour').addEventListener('change', updateDuration);
+        document.getElementById('end_minute').addEventListener('change', updateDuration);
+        
+        // Update meeting platform details based on selection
+        document.getElementById('platform').addEventListener('change', function() {
+            const platform = this.value;
+            const meetingLinkField = document.getElementById('meeting_link');
+            
+            if (platform === 'zoom') {
+                meetingLinkField.placeholder = 'https://zoom.us/j/123456789';
+            } else if (platform === 'google-meet') {
+                meetingLinkField.placeholder = 'https://meet.google.com/abc-defg-hij';
+            } else if (platform === 'microsoft-teams') {
+                meetingLinkField.placeholder = 'https://teams.microsoft.com/l/meetup-join/...';
+            }
+        });
+        
+        // Form submission
+       
+    </script>
+{% endblock %}

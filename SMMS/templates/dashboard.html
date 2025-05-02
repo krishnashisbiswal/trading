@@ -1,0 +1,575 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard - Arthavidya Trading Community</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{%static 'css/dashboard.css'%}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="dashboard-body">
+    <!-- Dashboard Header -->
+    <header class="dashboard-header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo-area">
+                    <img src="/static/images/logo.png" alt="Arthavidya Trading Community">
+                    <div class="welcome-text">
+                        <h4>Welcome</h4>
+                        <h2>Kanheyalal Jena</h2>
+                    </div>
+                </div>
+                <div class="user-actions">
+                    <div class="notifications">
+                        <button class="notification-btn">
+                            <i class="fas fa-bell"></i>
+                            <span class="badge">3</span>
+                        </button>
+                    </div>
+                    <div class="user-profile">
+                        <button class="profile-btn">
+                            <img src="/static/images/user-avatar.jpg" alt="User Profile">
+                            <span>Kanheyalal Jena</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="dropdown-menu">
+                            <a href="#"><i class="fas fa-user"></i> My Profile</a>
+                            <a href="#"><i class="fas fa-cog"></i> Settings</a>
+                            <a href="../../index.html"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Dashboard Main Content -->
+    <div class="dashboard-container">
+        <!-- Sidebar Navigation -->
+        <aside class="dashboard-sidebar">
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="active">
+                        <a href="{% url "home" %}">
+                            <i class="fas fa-home"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url "my_programs" %}">
+                            <i class="fas fa-graduation-cap"></i>
+                            <span>My Programs</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'library' %}">
+                            <i class="fas fa-book"></i>
+                            <span>Library</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'assessment' %}">
+                            <i class="fas fa-tasks"></i>
+                            <span>Assessment</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url "refer_earn" %}">
+                            <i class="fas fa-user-plus"></i>
+                            <span>Refer & Earn</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="{% url "home" %}" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="dashboard-main">
+            <!-- Student Profile Summary -->
+            <section class="profile-summary">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="student-profile">
+                            <div class="profile-image">
+                                <img src="{% static "images/user-avatar.jpg" %}" alt="Student Profile">
+                            </div>
+                            <div class="profile-details">
+                                <h3>Kanheyalal Jena</h3>
+                                <p class="student-id">ID: ATC010125</p>
+                                <div class="profile-meta">
+                                    <div class="meta-item">
+                                        <i class="fas fa-envelope"></i>
+                                        <span>kanheyalalala@gmail.com</span>
+                                    </div>
+                                    <div class="meta-item">
+                                        <i class="fas fa-phone"></i>
+                                        <span>+91 8249727526</span>
+                                    </div>
+                                    <div class="meta-item">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                        <span>Baliguda, Puri, Odisha - 752002</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="enrollment-details">
+                            <div class="enrollment-info">
+                                <h4>Enrollment Details</h4>
+                                <p><strong>Course:</strong> Complete Trading Program (CTP)</p>
+                                <p><strong>Batch Duration:</strong> 01.04.2025 to 30.06.2025</p>
+                            </div>
+                            <div class="course-progress">
+                                <h4>Course Progress</h4>
+                                <div class="progress-bar">
+                                    <div class="progress" style="width: 70%;">70%</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Live Class Section -->
+            <section class="live-class-section">
+                <div class="section-header">
+                    <h2>Live Class</h2>
+                    <a href="#" class="view-all">View All</a>
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <div class="live-class-details">
+                            <div class="class-info">
+                                <h3>CTP CLASS 1 - BASICS OF FINANCIAL MARKET</h3>
+                                <p><strong>Date:</strong> 01.04.2025</p>
+                                <p><strong>Time:</strong> 08:00 PM</p>
+                                <p><strong>Instructor:</strong> Andaz Aaron</p>
+                            </div>
+                            <div class="class-actions">
+                                <div class="password-box">
+                                    <p><strong>Password:</strong> ATC#012025</p>
+                                </div>
+                                <a href="https://us04web.zoom.us/j/75691973032?pwd=RMRBRQ4i6QH3WWLUZ0QHIk0OZI0HY.1" target="_blank" class="join-btn">
+                                    <i class="fas fa-video"></i> Join Now
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Performance & Progress Section -->
+            <section class="performance-section">
+                <div class="row">
+                    <!-- Class Attendance -->
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3>Class Status</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="class-grid">
+                                    <div class="class-box attended">1</div>
+                                    <div class="class-box absent">2</div>
+                                    <div class="class-box attended">3</div>
+                                    <div class="class-box attended">4</div>
+                                    <div class="class-box attended">5</div>
+                                    <div class="class-box attended">6</div>
+                                    <div class="class-box attended">7</div>
+                                    <div class="class-box attended">8</div>
+                                    <div class="class-box attended">9</div>
+                                    <div class="class-box attended">10</div>
+                                    <div class="class-box absent">11</div>
+                                    <div class="class-box attended">12</div>
+                                    <div class="class-box attended">13</div>
+                                    <div class="class-box attended">14</div>
+                                    <div class="class-box attended">15</div>
+                                    <div class="class-box attended">16</div>
+                                    <div class="class-box absent">17</div>
+                                    <div class="class-box attended">18</div>
+                                    <div class="class-box attended">19</div>
+                                    <div class="class-box absent">20</div>
+                                    <div class="class-box attended">21</div>
+                                    <div class="class-box attended">22</div>
+                                    <div class="class-box attended">23</div>
+                                    <div class="class-box attended">24</div>
+                                </div>
+                                <div class="summary-boxes">
+                                    <div class="summary-box">
+                                        <span class="label">Total Classes</span>
+                                        <span class="value">24</span>
+                                    </div>
+                                    <div class="summary-box">
+                                        <span class="label">Present</span>
+                                        <span class="value">20</span>
+                                    </div>
+                                    <div class="summary-box">
+                                        <span class="label">Absent</span>
+                                        <span class="value">04</span>
+                                    </div>
+                                    <div class="summary-box">
+                                        <span class="label">Progress</span>
+                                        <span class="value">80%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quizzes & Assignments -->
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3>Assessments</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="tabs">
+                                    <div class="tab-header">
+                                        <div class="tab-item active" data-tab="quizzes">Quizzes</div>
+                                        <div class="tab-item" data-tab="assignments">Assignments</div>
+                                    </div>
+                                    <div class="tab-content">
+                                        <div class="tab-pane active" id="quizzes">
+                                            <div class="quiz-grid">
+                                                <div class="quiz-box completed">
+                                                    <span>Quiz 1</span>
+                                                </div>
+                                                <div class="quiz-box failed">
+                                                    <span>Quiz 2</span>
+                                                </div>
+                                                <div class="quiz-box pending">
+                                                    <span>Quiz 3</span>
+                                                </div>
+                                                <div class="quiz-box pending">
+                                                    <span>Quiz 4</span>
+                                                </div>
+                                                <div class="quiz-box pending">
+                                                    <span>Quiz 5</span>
+                                                </div>
+                                            </div>
+                                            <div class="summary-boxes">
+                                                <div class="summary-box">
+                                                    <span class="label">Total</span>
+                                                    <span class="value">5</span>
+                                                </div>
+                                                <div class="summary-box">
+                                                    <span class="label">Attended</span>
+                                                    <span class="value">3</span>
+                                                </div>
+                                                <div class="summary-box">
+                                                    <span class="label">Not Attended</span>
+                                                    <span class="value">2</span>
+                                                </div>
+                                                <div class="summary-box">
+                                                    <span class="label">Progress</span>
+                                                    <span class="value">60%</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="tab-pane" id="assignments">
+                                            <div class="assignment-list">
+                                                <div class="assignment-item completed">
+                                                    <div class="assignment-info">
+                                                        <span class="assignment-name">Assignment 1: Candle Anatomy</span>
+                                                    </div>
+                                                    <div class="assignment-status">
+                                                        <span class="badge badge-success">Completed</span>
+                                                    </div>
+                                                </div>
+                                                <div class="assignment-item failed">
+                                                    <div class="assignment-info">
+                                                        <span class="assignment-name">Assignment 2: Market Structure</span>
+                                                    </div>
+                                                    <div class="assignment-status">
+                                                        <span class="badge badge-danger">Failed</span>
+                                                    </div>
+                                                </div>
+                                                <div class="assignment-item pending">
+                                                    <div class="assignment-info">
+                                                        <span class="assignment-name">Assignment 3: Fibonacci Retracement Tool</span>
+                                                    </div>
+                                                    <div class="assignment-status">
+                                                        <span class="badge badge-warning">Pending</span>
+                                                    </div>
+                                                </div>
+                                                <div class="assignment-item pending">
+                                                    <div class="assignment-info">
+                                                        <span class="assignment-name">Assignment 4: Trendline</span>
+                                                    </div>
+                                                    <div class="assignment-status">
+                                                        <span class="badge badge-warning">Pending</span>
+                                                    </div>
+                                                </div>
+                                                <div class="assignment-item pending">
+                                                    <div class="assignment-info">
+                                                        <span class="assignment-name">Assignment 5: Candlestick Patterns</span>
+                                                    </div>
+                                                    <div class="assignment-status">
+                                                        <span class="badge badge-warning">Pending</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="summary-boxes">
+                                                <div class="summary-box">
+                                                    <span class="label">Total</span>
+                                                    <span class="value">10</span>
+                                                </div>
+                                                <div class="summary-box">
+                                                    <span class="label">Submitted</span>
+                                                    <span class="value">5</span>
+                                                </div>
+                                                <div class="summary-box">
+                                                    <span class="label">Not Submitted</span>
+                                                    <span class="value">5</span>
+                                                </div>
+                                                <div class="summary-box">
+                                                    <span class="label">Progress</span>
+                                                    <span class="value">50%</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Exam Status Section -->
+            <section class="exam-status-section">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3>Test Exam</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="exam-status completed">
+                                    <span class="status-label">Status</span>
+                                    <span class="status-value">Completed</span>
+                                </div>
+                                <div class="exam-details">
+                                    <p><strong>Date:</strong> 15.05.2025</p>
+                                    <p><strong>Score:</strong> 85/100</p>
+                                    <p><strong>Grade:</strong> A</p>
+                                </div>
+                                <a href="#" class="btn btn-primary">View Results</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3>Final Exam</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="exam-status pending">
+                                    <span class="status-label">Status</span>
+                                    <span class="status-value">Not Completed</span>
+                                </div>
+                                <div class="exam-details">
+                                    <p><strong>Date:</strong> 25.06.2025</p>
+                                    <p><strong>Duration:</strong> 3 hours</p>
+                                    <p><strong>Total Marks:</strong> 100</p>
+                                </div>
+                                <button class="btn btn-primary" disabled>Not Available Yet</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Recent Activities Section -->
+            <section class="recent-activities-section">
+                <div class="section-header">
+                    <h2>Recent Activities</h2>
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <div class="activity-list">
+                            <div class="activity-item">
+                                <div class="activity-icon">
+                                    <i class="fas fa-video"></i>
+                                </div>
+                                <div class="activity-details">
+                                    <h4>Attended Live Class</h4>
+                                    <p>CTP CLASS 10 - SUPPORT, RESISTANCE & POI</p>
+                                    <span class="activity-time">Today, 08:00 PM</span>
+                                </div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-icon">
+                                    <i class="fas fa-tasks"></i>
+                                </div>
+                                <div class="activity-details">
+                                    <h4>Completed Assignment</h4>
+                                    <p>Assignment 1: Candle Anatomy</p>
+                                    <span class="activity-time">Yesterday, 03:45 PM</span>
+                                </div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-icon">
+                                    <i class="fas fa-file-pdf"></i>
+                                </div>
+                                <div class="activity-details">
+                                    <h4>Downloaded Study Material</h4>
+                                    <p>Technical Analysis PDF</p>
+                                    <span class="activity-time">19/05/2025, 11:20 AM</span>
+                                </div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-icon">
+                                    <i class="fas fa-pen"></i>
+                                </div>
+                                <div class="activity-details">
+                                    <h4>Completed Quiz</h4>
+                                    <p>Quiz 1: Basics of Financial Markets</p>
+                                    <span class="activity-time">18/05/2025, 09:15 PM</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Upcoming Events Section -->
+            <section class="upcoming-events-section">
+                <div class="section-header">
+                    <h2>Upcoming Events</h2>
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <div class="events-list">
+                            <div class="event-item">
+                                <div class="event-date">
+                                    <span class="day">10</span>
+                                    <span class="month">Jun</span>
+                                </div>
+                                <div class="event-details">
+                                    <h4>Growth Mindset Program</h4>
+                                    <p>A special workshop on developing the right mindset for trading success.</p>
+                                    <div class="event-meta">
+                                        <span><i class="fas fa-clock"></i> 10:00 AM - 01:00 PM</span>
+                                        <span><i class="fas fa-user"></i> Andaz Aaron</span>
+                                    </div>
+                                </div>
+                                <div class="event-actions">
+                                    <a href="#" class="btn btn-outline">Add to Calendar</a>
+                                </div>
+                            </div>
+                            <div class="event-item">
+                                <div class="event-date">
+                                    <span class="day">15</span>
+                                    <span class="month">Jun</span>
+                                </div>
+                                <div class="event-details">
+                                    <h4>Q&A Session: Advanced Trading Strategies</h4>
+                                    <p>Interactive session to clarify your doubts on advanced trading strategies.</p>
+                                    <div class="event-meta">
+                                        <span><i class="fas fa-clock"></i> 07:00 PM - 09:00 PM</span>
+                                        <span><i class="fas fa-user"></i> Prakash Nayak</span>
+                                    </div>
+                                </div>
+                                <div class="event-actions">
+                                    <a href="#" class="btn btn-outline">Add to Calendar</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Contact Trainers Section -->
+            <section class="contact-trainers-section">
+                <div class="section-header">
+                    <h2>Contact Trainers</h2>
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <div class="trainers-contact-list">
+                            <div class="trainer-contact-item">
+                                <div class="trainer-image">
+                                    <img src="{% static "images/trainers/andaz-aaron.jpg" %}" alt="Andaz Aaron">
+                                </div>
+                                <div class="trainer-info">
+                                    <h4>Andaz Aaron</h4>
+                                    <p>Main Trainer</p>
+                                    <div class="trainer-contact">
+                                        <a href="tel:+919853840034" class="contact-btn phone">
+                                            <i class="fas fa-phone"></i>
+                                        </a>
+                                        <a href="https://wa.me/919853840034" class="contact-btn whatsapp">
+                                            <i class="fab fa-whatsapp"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="trainer-contact-item">
+                                <div class="trainer-image">
+                                    <img src="{% static "images/trainers/prashanta-palei.jpg" %}" alt="Prashanta Kumar Palei">
+                                </div>
+                                <div class="trainer-info">
+                                    <h4>Prashanta Kumar Palei</h4>
+                                    <p>Co-Trainer</p>
+                                    <div class="trainer-contact">
+                                        <a href="tel:+919937593759" class="contact-btn phone">
+                                            <i class="fas fa-phone"></i>
+                                        </a>
+                                        <a href="https://wa.me/919937593759" class="contact-btn whatsapp">
+                                            <i class="fab fa-whatsapp"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div> 
+                            <div class="trainer-contact-item">
+                                <div class="trainer-image">
+                                    <img src="{% static "images/support.jpg" %}" alt="ATC Support">
+                                </div>
+                                <div class="trainer-info">
+                                    <h4>ATC Support</h4>
+                                    <p>Technical Support</p>
+                                    <div class="trainer-contact">
+                                        <a href="tel:+917854933728" class="contact-btn phone">
+                                            <i class="fas fa-phone"></i>
+                                        </a>
+                                        <a href="mailto:arthavidyacommunity@gmail.com" class="contact-btn email">
+                                            <i class="fas fa-envelope"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="dashboard-footer">
+        <div class="container">
+            <div class="footer-content">
+                <p>Management reserves the right to deny or revoke admission to any participant, even after the fee has been paid</p>
+                <div class="footer-links">
+                    <a href="#">Terms and Conditions</a>
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Refund Policy</a>
+                </div>
+                <p class="copyright">Arthavidya Trading Community Pvt Ltd © All Rights Reserved - 2025</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="{% static "js/main.js" %}"></script>
+    <script src="{% static "js/dashboard.js" %}"></script>
+</body>
+</html>

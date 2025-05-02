@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us - Arthavidya Trading Community</title>
+    <link rel="stylesheet" href="../../assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Contact page specific styles */
+        .page-banner {
+            background: linear-gradient(135deg, #0b57a4 0%, #191f45 100%);
+            color: #ffffff;
+            padding: 60px 0;
+            text-align: center;
+            position: relative;
+            margin-bottom: 50px;
+        }
+        
+        .page-banner::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url("../assets/images/pattern-bg.png");
+            background-size: cover;
+            opacity: 0.05;
+            z-index: 0;
+        }
+        
+        .page-banner h1 {
+            font-size: 36px;
+            margin-bottom: 15px;
+            font-weight: 700;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .page-banner p {
+            font-size: 18px;
+            max-width: 700px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .contact-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+        
+        .contact-form-section {
+            flex: 1;
+            min-width: 300px;
+        }
+        
+        .contact-info-section {
+            flex: 0 0 350px;
+        }
+        
+        .section-heading {
+            margin-bottom: 25px;
+            position: relative;
+            padding-bottom: 15px;
+        }
+        
+        .section-heading h2 {
+            font-size: 24px;
+            color: #0b57a4;
+            margin-bottom: 10px;
+        }
+        
+        .section-heading::after {
+            content: '';
+            position: absolute;
+            width: 60px;
+            height: 3px;
+            background-color: #cb0a3c;
+            bottom: 0;
+            left: 0;
+        }
+        
+        .contact-form {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #333;
+        }
+        
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .form-row .form-group {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            font-size: 16px;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            transition: all 0.3s;
+        }
+        
+        .form-control:focus {
+            border-color: #0b57a4;
+            box-shadow: 0 0 0 2px rgba(11, 87, 164, 0.2);
+            outline: none;
+        }
+        
+        .submit-btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #0b57a4 0%, #191f45 100%);
+            color: #ffffff;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+        
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(11, 87, 164, 0.3);
+        }
+        
+        .contact-info-card {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+        }
+        
+        .contact-info-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .contact-info-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+        
+        .contact-info-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .contact-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #0b57a4 0%, #191f45 100%);
+            color: #ffffff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+        
+        .contact-text {
+            flex: 1;
+        }
+        
+        .contact-text h3 {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .contact-text p, 
+        .contact-text a {
+            font-size: 16px;
+            color: #6c757d;
+            margin: 0;
+            line-height: 1.6;
+        }
+        
+        .contact-text a:hover {
+            color: #0b57a4;
+        }
+        
+        .social-links-card {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .social-links-heading {
+            margin-bottom: 20px;
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .social-link {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f5f7fa;
+            color: #0b57a4;
+            transition: all 0.3s;
+            font-size: 20px;
+        }
+        
+        .social-link:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .social-link.facebook:hover {
+            background-color: #4267B2;
+            color: #ffffff;
+        }
+        
+        .social-link.twitter:hover {
+            background-color: #1DA1F2;
+            color: #ffffff;
+        }
+        
+        .social-link.instagram:hover {
+            background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+            color: #ffffff;
+        }
+        
+        .social-link.youtube:hover {
+            background-color: #FF0000;
+            color: #ffffff;
+        }
+        
+        .social-link.linkedin:hover {
+            background-color: #0077B5;
+            color: #ffffff;
+        }
+        
+        .map-section {
+            margin-bottom: 60px;
+        }
+        
+        .map-container {
+            height: 400px;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .map-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        
+        .faq-section {
+            margin-bottom: 60px;
+        }
+        
+        .faq-list {
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+        
+        .faq-item {
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .faq-item:last-child {
+            border-bottom: none;
+        }
+        
+        .faq-question {
+            padding: 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s;
+        }
+        
+        .faq-question h3 {
+            font-size: 16px;
+            margin: 0;
+            color: #333;
+            transition: all 0.3s;
+        }
+        
+        .faq-question i {
+            color: #0b57a4;
+            transition: all 0.3s;
+        }
+        
+        .faq-question:hover h3 {
+            color: #0b57a4;
+        }
+        
+        .faq-answer {
+            padding: 0 20px;
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.3s ease-out;
+        }
+        
+        .faq-answer p {
+            margin: 0;
+            padding-bottom: 20px;
+            font-size: 14px;
+            color: #6c757d;
+            line-height: 1.6;
+        }
+        
+        .faq-item.active .faq-question {
+            background-color: #f8f9fa;
+        }
+        
+        .faq-item.active .faq-question i {
+            transform: rotate(180deg);
+        }
+        
+        .faq-item.active .faq-answer {
+            max-height: 1000px;
+        }
+        
+        /* Responsive styles */
+        @media (max-width: 768px) {
+            .contact-container {
+                flex-direction: column;
+            }
+            
+            .contact-info-section {
+                order: -1;
+            }
+            
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+            
+            .page-banner h1 {
+                font-size: 28px;
+            }
+            
+            .page-banner p {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Section -->
+    <header class="main-header">
+        <div class="container">
+            <div class="header-inner">
+                <div class="logo">
+                    <img src="../assets/images/logo.png" alt="Arthavidya Trading Community">
+                    <div class="logo-text">
+                        <h1>Arthavidya Trading Community</h1>
+                        <p>Building A Wealthy Nation</p>
+                    </div>
+                </div>
+                <nav class="main-nav">
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="programs.html">Our Programs</a></li>
+                        <li><a href="success-stories.html">Success Stories</a></li>
+                        <li><a href="business.html">Business</a></li>
+                        <li><a href="#" class="login-btn">Login</a></li>
+                    </ul>
+                </nav>
+                <div class="mobile-menu-toggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Page Banner -->
+    <section class="page-banner">
+        <div class="container">
+            <h1>Contact Us</h1>
+            <p>Get in touch with us for any inquiries or support</p>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main>
+        <div class="container">
+            <!-- Contact Information and Form -->
+            <div class="contact-container">
+                <div class="contact-form-section">
+                    <div class="section-heading">
+                        <h2>Send Us a Message</h2>
+                    </div>
+                    <div class="contact-form">
+                        <form id="contactForm" action="#" method="post">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="name">Full Name</label>
+                                    <input type="text" id="name" name="name" class="form-control" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="email">Email Address</label>
+                                    <input type="email" id="email" name="email" class="form-control" required>
+                                </div>
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="phone">Phone Number</label>
+                                    <input type="tel" id="phone" name="phone" class="form-control" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="subject">Subject</label>
+                                    <select id="subject" name="subject" class="form-control" required>
+                                        <option value="">Select Subject</option>
+                                        <option value="general">General Inquiry</option>
+                                        <option value="program">Program Information</option>
+                                        <option value="admission">Admission Query</option>
+                                        <option value="payment">Payment Issue</option>
+                                        <option value="technical">Technical Support</option>
+                                        <option value="business">Business Opportunity</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="message">Your Message</label>
+                                <textarea id="message" name="message" class="form-control" rows="5" required></textarea>
+                            </div>
+                            
+                            <div style="text-align: right;">
+                                <button type="submit" class="submit-btn">Send Message</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <div class="contact-info-section">
+                    <div class="section-heading">
+                        <h2>Contact Information</h2>
+                    </div>
+                    <div class="contact-info-card">
+                        <ul class="contact-info-list">
+                            <li class="contact-info-item">
+                                <div class="contact-icon">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                </div>
+                                <div class="contact-text">
+                                    <h3>Office Address</h3>
+                                    <p>1234 Trading Street, Financial District, Puri, Odisha - 752002, India</p>
+                                </div>
+                            </li>
+                            <li class="contact-info-item">
+                                <div class="contact-icon">
+                                    <i class="fas fa-phone-alt"></i>
+                                </div>
+                                <div class="contact-text">
+                                    <h3>Phone Number</h3>
+                                    <a href="tel:+917854933728">+91 7854933728</a>
+                                </div>
+                            </li>
+                            <li class="contact-info-item">
+                                <div class="contact-icon">
+                                    <i class="fas fa-envelope"></i>
+                                </div>
+                                <div class="contact-text">
+                                    <h3>Email Address</h3>
+                                    <a href="mailto:arthavidyacommunity@gmail.com">arthavidyacommunity@gmail.com</a>
+                                </div>
+                            </li>
+                            <li class="contact-info-item">
+                                <div class="contact-icon">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                                <div class="contact-text">
+                                    <h3>Operating Hours</h3>
+                                    <p>Monday - Saturday: 9:00 AM - 6:00 PM</p>
+                                    <p>Sunday: Closed</p>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div class="social-links-card">
+                        <div class="social-links-heading">
+                            <h3>Connect With Us</h3>
+                        </div>
+                        <div class="social-links">
+                            <a href="#" class="social-link facebook">
+                                <i class="fab fa-facebook-f"></i>
+                            </a>
+                            <a href="#" class="social-link twitter">
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                            <a href="#" class="social-link instagram">
+                                <i class="fab fa-instagram"></i>
+                            </a>
+                            <a href="#" class="social-link youtube">
+                                <i class="fab fa-youtube"></i>
+                            </a>
+                            <a href="#" class="social-link linkedin">
+                                <i class="fab fa-linkedin-in"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Google Map -->
+            <div class="map-section">
+                <div class="section-heading">
+                    <h2>Find Us On Map</h2>
+                </div>
+                <div class="map-container">
+                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d60116.31818287355!2d85.7841098508856!3d19.798974088073873!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a19c4acbf499c0d%3A0xe1829a27b87a7bed!2sPuri%2C%20Odisha!5e0!3m2!1sen!2sin!4v1713961225663!5m2!1sen!2sin" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                </div>
+            </div>
+            
+            <!-- FAQ Section -->
+            <div class="faq-section">
+                <div class="section-heading">
+                    <h2>Frequently Asked Questions</h2>
+                </div>
+                <div class="faq-list">
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <h3>How can I join Arthavidya Trading Community?</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>You can join Arthavidya Trading Community by enrolling in any of our programs. Visit our Programs page to explore the options and register for the course that suits your needs and goals.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <h3>What payment methods do you accept?</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>We accept various payment methods including UPI, debit/credit cards, net banking, and bank transfers. You can choose your preferred payment method during the registration process.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <h3>Are the classes conducted online or offline?</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>We offer both online and offline classes. Our online classes are conducted through Zoom, while offline classes are held at our training centers in select cities. You can choose the mode that's most convenient for you.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <h3>How can I become a business development associate?</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>To become a business development associate, visit our Business page and fill out the partner registration form. Our team will review your application and get in touch with you within 2-3 business days.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <h3>Do you provide certificates after course completion?</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Yes, we provide certificates upon successful completion of our programs. These certificates validate your skills and knowledge in trading and can be a valuable addition to your portfolio.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="contact-info">
+                    <a href="mailto:arthavidyacommunity@gmail.com" class="contact-item">
+                        <i class="fas fa-envelope"></i>
+                        <span>arthavidyacommunity@gmail.com</span>
+                    </a>
+                    <a href="tel:+917854933728" class="contact-item">
+                        <i class="fas fa-phone"></i>
+                        <span>+91 7854933728</span>
+                    </a>
+                </div>
+                
+                <div class="social-links">
+                    <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-youtube"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+            
+            <div class="footer-links">
+                <a href="#">Terms and Conditions</a>
+                <a href="#">Privacy Policy</a>
+                <a href="#">Refund Policy</a>
+            </div>
+            
+            <div class="copyright">
+                <p>Arthavidya Trading Community Pvt Ltd © All Rights Reserved - 2025</p>
+                <p>Design and Developed by Arthavidya Trading Community</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // FAQ Toggle
+            const faqQuestions = document.querySelectorAll('.faq-question');
+            
+            faqQuestions.forEach(question => {
+                question.addEventListener('click', function() {
+                    const faqItem = this.parentElement;
+                    const isActive = faqItem.classList.contains('active');
+                    
+                    // Close all FAQ items
+                    document.querySelectorAll('.faq-item').forEach(item => {
+                        item.classList.remove('active');
+                    });
+                    
+                    // If the clicked item wasn't active, make it active
+                    if (!isActive) {
+                        faqItem.classList.add('active');
+                    }
+                });
+            });
+            
+            // Form Submission
+            const contactForm = document.getElementById('contactForm');
+            
+            contactForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Basic validation
+                const name = document.getElementById('name').value;
+                const email = document.getElementById('email').value;
+                const phone = document.getElementById('phone').value;
+                const subject = document.getElementById('subject').value;
+                const message = document.getElementById('message').value;
+                
+                if (!name || !email || !phone || !subject || !message) {
+                    alert('Please fill in all fields.');
+                    return;
+                }
+                
+                // Email validation
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(email)) {
+                    alert('Please enter a valid email address.');
+                    return;
+                }
+                
+                // Phone validation (basic)
+                const phoneRegex = /^\d{10}$/;
+                if (!phoneRegex.test(phone.replace(/[^0-9]/g, ''))) {
+                    alert('Please enter a valid 10-digit phone number.');
+                    return;
+                }
+                
+                // If all validation passes, submit the form
+                // In a real application, you would send this data to a server
+                alert('Thank you for your message! We will get back to you soon.');
+                contactForm.reset();
+            });
+        });
+    </script>
+</body>
+</html>

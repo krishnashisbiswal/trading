@@ -1,0 +1,825 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Admin Revenue Report{% endblock %}
+{% block content %}
+    <style>
+        /* Revenue Report Styles */
+        .date-filter {
+            background-color: var(--bg-white);
+            padding: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow-sm);
+            margin-bottom: 25px;
+        }
+        
+        .filter-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--dark-blue);
+            margin-bottom: 15px;
+        }
+        
+        .filter-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            align-items: flex-end;
+        }
+        
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .filter-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-dark);
+            font-size: 14px;
+        }
+        
+        .filter-group select,
+        .filter-group input {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid var(--border-medium);
+            border-radius: var(--border-radius);
+            font-size: 14px;
+            transition: var(--transition);
+        }
+        
+        .filter-group select:focus,
+        .filter-group input:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(11, 87, 164, 0.1);
+            outline: none;
+        }
+        
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+        }
+        
+        .filter-btn {
+            height: 42px;
+            padding: 0 20px;
+            border-radius: var(--border-radius);
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+        
+        .filter-btn.apply {
+            background-color: var(--primary-blue);
+            color: var(--text-light);
+            border: none;
+        }
+        
+        .filter-btn.apply:hover {
+            background-color: var(--primary-blue-dark);
+        }
+        
+        .filter-btn.reset {
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            border: 1px solid var(--border-medium);
+        }
+        
+        .filter-btn.reset:hover {
+            background-color: var(--bg-white);
+        }
+        
+        .filter-btn i {
+            margin-right: 8px;
+        }
+        
+        /* Revenue Summary Cards */
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+        
+        .summary-card {
+            background-color: var(--bg-white);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: var(--box-shadow-sm);
+            position: relative;
+            overflow: hidden;
+            transition: var(--transition);
+            border: 1px solid var(--border-light);
+        }
+        
+        .summary-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--box-shadow-md);
+        }
+        
+        .summary-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 3px;
+            width: 100%;
+            background: linear-gradient(90deg, var(--primary-blue), var(--primary-blue-light));
+            opacity: 0;
+            transition: var(--transition);
+        }
+        
+        .summary-card:hover::before {
+            opacity: 1;
+        }
+        
+        .summary-title {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+        
+        .summary-title i {
+            margin-right: 8px;
+            color: var(--primary-blue);
+            font-size: 16px;
+        }
+        
+        .summary-value {
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--dark-blue);
+            margin-bottom: 8px;
+        }
+        
+        .summary-comparison {
+            display: flex;
+            align-items: center;
+            font-size: 13px;
+        }
+        
+        .summary-comparison.positive {
+            color: var(--success-color);
+        }
+        
+        .summary-comparison.negative {
+            color: var(--danger-color);
+        }
+        
+        .summary-comparison i {
+            margin-right: 5px;
+        }
+        
+        /* Chart Section */
+        .chart-section {
+            background-color: var(--bg-white);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: var(--box-shadow-sm);
+            margin-bottom: 25px;
+        }
+        
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-light);
+        }
+        
+        .chart-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--dark-blue);
+            display: flex;
+            align-items: center;
+        }
+        
+        .chart-title i {
+            margin-right: 10px;
+            color: var(--primary-blue);
+        }
+        
+        .chart-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .chart-action-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--border-radius);
+            background-color: var(--bg-light);
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-medium);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .chart-action-btn:hover {
+            background-color: var(--primary-blue-lighter);
+            color: var(--primary-blue);
+        }
+        
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 350px;
+        }
+        
+        /* Revenue Table */
+        .revenue-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .revenue-table th {
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            padding: 12px 15px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .revenue-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--border-light);
+            font-size: 14px;
+        }
+        
+        .revenue-table tr:hover td {
+            background-color: var(--primary-blue-lighter);
+        }
+        
+        .revenue-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .revenue-table .text-right {
+            text-align: right;
+        }
+        
+        .revenue-table .total-row td {
+            font-weight: 700;
+            background-color: var(--bg-light);
+            color: var(--dark-blue);
+        }
+        
+        /* Export Buttons */
+        .export-options {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .export-btn {
+            padding: 10px 20px;
+            border-radius: var(--border-radius);
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            transition: var(--transition);
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            border: 1px solid var(--border-medium);
+        }
+        
+        .export-btn:hover {
+            background-color: var(--bg-white);
+            transform: translateY(-2px);
+        }
+        
+        .export-btn i {
+            margin-right: 8px;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .filter-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .filter-group {
+                width: 100%;
+            }
+            
+            .filter-buttons {
+                width: 100%;
+                margin-top: 15px;
+            }
+            
+            .filter-btn {
+                flex: 1;
+            }
+            
+            .summary-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .chart-section {
+                overflow-x: auto;
+            }
+            
+            .chart-container {
+                min-width: 500px;
+            }
+        }
+    </style>
+</head>
+<body class="admin-body">
+    <!-- Admin Container -->
+    <div class="admin-container">
+        <!-- Main Content Area -->
+        <main class="admin-main">
+            <!-- Page Header -->
+            <section class="page-header">
+                <div class="header-content">
+                    <div class="page-title">
+                        <h1>Revenue Reports</h1>
+                        <p>View and analyze revenue data across all programs</p>
+                    </div>
+                    <div class="header-actions">
+                        <div class="export-options">
+                            <button class="export-btn" id="exportPDF">
+                                <i class="fas fa-file-pdf"></i> Export PDF
+                            </button>
+                            <button class="export-btn" id="exportExcel">
+                                <i class="fas fa-file-excel"></i> Export Excel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Date Filter Section -->
+            <section class="date-filter">
+                <h3 class="filter-title">Filter Report</h3>
+                <div class="filter-content">
+                    <div class="filter-group">
+                        <label for="periodFilter">Time Period</label>
+                        <select id="periodFilter">
+                            <option value="monthly">Monthly</option>
+                            <option value="quarterly">Quarterly</option>
+                            <option value="yearly">Yearly</option>
+                            <option value="custom">Custom Range</option>
+                        </select>
+                    </div>
+                    <div class="filter-group" id="monthFilterGroup">
+                        <label for="monthFilter">Month</label>
+                        <select id="monthFilter">
+                            <option value="04-2025">April 2025</option>
+                            <option value="03-2025">March 2025</option>
+                            <option value="02-2025">February 2025</option>
+                            <option value="01-2025">January 2025</option>
+                            <option value="12-2024">December 2024</option>
+                        </select>
+                    </div>
+                    <div class="filter-group" id="yearFilterGroup" style="display: none;">
+                        <label for="yearFilter">Year</label>
+                        <select id="yearFilter">
+                            <option value="2025">2025</option>
+                            <option value="2024">2024</option>
+                            <option value="2023">2023</option>
+                        </select>
+                    </div>
+                    <div class="filter-group" id="quarterFilterGroup" style="display: none;">
+                        <label for="quarterFilter">Quarter</label>
+                        <select id="quarterFilter">
+                            <option value="Q1-2025">Q1 2025 (Jan-Mar)</option>
+                            <option value="Q4-2024">Q4 2024 (Oct-Dec)</option>
+                            <option value="Q3-2024">Q3 2024 (Jul-Sep)</option>
+                            <option value="Q2-2024">Q2 2024 (Apr-Jun)</option>
+                        </select>
+                    </div>
+                    <div class="filter-group" id="startDateGroup" style="display: none;">
+                        <label for="startDate">Start Date</label>
+                        <input type="date" id="startDate">
+                    </div>
+                    <div class="filter-group" id="endDateGroup" style="display: none;">
+                        <label for="endDate">End Date</label>
+                        <input type="date" id="endDate">
+                    </div>
+                    <div class="filter-group">
+                        <label for="programFilterRevenue">Program</label>
+                        <select id="programFilterRevenue">
+                            <option value="">All Programs</option>
+                            <option value="CTP">Complete Trading Program</option>
+                            <option value="AMP">Arthavidya Mentorship Program</option>
+                            <option value="GMP">Growth Mindset Program</option>
+                            <option value="SIP">Smart Income Program</option>
+                        </select>
+                    </div>
+                    <div class="filter-buttons">
+                        <button class="filter-btn reset" id="resetFilterBtn">
+                            <i class="fas fa-undo"></i> Reset
+                        </button>
+                        <button class="filter-btn apply" id="applyFilterBtn">
+                            <i class="fas fa-filter"></i> Apply Filter
+                        </button>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Revenue Summary Cards -->
+            <section class="summary-cards">
+                <div class="summary-card">
+                    <div class="summary-title">
+                        <i class="fas fa-rupee-sign"></i> Total Revenue
+                    </div>
+                    <div class="summary-value">₹12.6L</div>
+                    <div class="summary-comparison positive">
+                        <i class="fas fa-arrow-up"></i> 8.3% vs previous period
+                    </div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-title">
+                        <i class="fas fa-user-graduate"></i> New Enrollments
+                    </div>
+                    <div class="summary-value">63</div>
+                    <div class="summary-comparison positive">
+                        <i class="fas fa-arrow-up"></i> 12% vs previous period
+                    </div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-title">
+                        <i class="fas fa-chart-line"></i> Avg. Revenue Per Student
+                    </div>
+                    <div class="summary-value">₹19,999</div>
+                    <div class="summary-comparison negative">
+                        <i class="fas fa-arrow-down"></i> 2.5% vs previous period
+                    </div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-title">
+                        <i class="fas fa-hand-holding-usd"></i> Referral Payouts
+                    </div>
+                    <div class="summary-value">₹1.89L</div>
+                    <div class="summary-comparison positive">
+                        <i class="fas fa-arrow-up"></i> 15.2% vs previous period
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Revenue Chart -->
+            <section class="chart-section">
+                <div class="chart-header">
+                    <h3 class="chart-title">
+                        <i class="fas fa-chart-bar"></i> Revenue Trend - April 2025
+                    </h3>
+                    <div class="chart-actions">
+                        <button class="chart-action-btn" title="Download Chart">
+                            <i class="fas fa-download"></i>
+                        </button>
+                        <button class="chart-action-btn" title="Refresh Data">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                        <button class="chart-action-btn" title="More Options">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="revenueChart" height="350"></canvas>
+                </div>
+            </section>
+            
+            <!-- Revenue by Program -->
+            <section class="chart-section">
+                <div class="chart-header">
+                    <h3 class="chart-title">
+                        <i class="fas fa-chart-pie"></i> Revenue by Program
+                    </h3>
+                    <div class="chart-actions">
+                        <button class="chart-action-btn" title="Download Chart">
+                            <i class="fas fa-download"></i>
+                        </button>
+                        <button class="chart-action-btn" title="Refresh Data">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                        <button class="chart-action-btn" title="More Options">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="programRevenueChart" height="350"></canvas>
+                </div>
+            </section>
+            
+            <!-- Revenue Table -->
+            <section class="chart-section">
+                <div class="chart-header">
+                    <h3 class="chart-title">
+                        <i class="fas fa-table"></i> Revenue Breakdown
+                    </h3>
+                    <div class="chart-actions">
+                        <button class="chart-action-btn" title="Download Data">
+                            <i class="fas fa-download"></i>
+                        </button>
+                        <button class="chart-action-btn" title="Refresh Data">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                        <button class="chart-action-btn" title="More Options">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="revenue-table">
+                        <thead>
+                            <tr>
+                                <th>Program</th>
+                                <th>Students</th>
+                                <th>Gross Revenue</th>
+                                <th>Discounts</th>
+                                <th>Referral Commission</th>
+                                <th>Net Revenue</th>
+                                <th>% of Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Complete Trading Program</td>
+                                <td>32</td>
+                                <td class="text-right">₹7,99,968</td>
+                                <td class="text-right">₹1,60,000</td>
+                                <td class="text-right">₹96,000</td>
+                                <td class="text-right">₹5,43,968</td>
+                                <td class="text-right">43.2%</td>
+                            </tr>
+                            <tr>
+                                <td>Arthavidya Mentorship Program</td>
+                                <td>12</td>
+                                <td class="text-right">₹4,79,988</td>
+                                <td class="text-right">₹60,000</td>
+                                <td class="text-right">₹36,000</td>
+                                <td class="text-right">₹3,83,988</td>
+                                <td class="text-right">30.5%</td>
+                            </tr>
+                            <tr>
+                                <td>Growth Mindset Program</td>
+                                <td>9</td>
+                                <td class="text-right">₹89,991</td>
+                                <td class="text-right">₹9,000</td>
+                                <td class="text-right">₹27,000</td>
+                                <td class="text-right">₹53,991</td>
+                                <td class="text-right">4.3%</td>
+                            </tr>
+                            <tr>
+                                <td>Smart Income Program</td>
+                                <td>18</td>
+                                <td class="text-right">₹2,69,982</td>
+                                <td class="text-right">₹18,000</td>
+                                <td class="text-right">₹30,000</td>
+                                <td class="text-right">₹2,21,982</td>
+                                <td class="text-right">17.6%</td>
+                            </tr>
+                            <tr>
+                                <td>Other Revenue (Resources, etc.)</td>
+                                <td>-</td>
+                                <td class="text-right">₹60,000</td>
+                                <td class="text-right">₹0</td>
+                                <td class="text-right">₹0</td>
+                                <td class="text-right">₹60,000</td>
+                                <td class="text-right">4.8%</td>
+                            </tr>
+                            <tr class="total-row">
+                                <td>Total</td>
+                                <td>71</td>
+                                <td class="text-right">₹16,99,929</td>
+                                <td class="text-right">₹2,47,000</td>
+                                <td class="text-right">₹1,89,000</td>
+                                <td class="text-right">₹12,63,929</td>
+                                <td class="text-right">100%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+    {% block footer %}{% endblock footer %}
+    <!-- Include chart.js library -->
+     
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.1/chart.min.js"></script>
+    <script src="{% static 'js/admin.js' %}"></script>  
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize filter toggles
+            const periodFilter = document.getElementById('periodFilter');
+            const monthFilterGroup = document.getElementById('monthFilterGroup');
+            const yearFilterGroup = document.getElementById('yearFilterGroup');
+            const quarterFilterGroup = document.getElementById('quarterFilterGroup');
+            const startDateGroup = document.getElementById('startDateGroup');
+            const endDateGroup = document.getElementById('endDateGroup');
+            
+            periodFilter.addEventListener('change', function() {
+                // Hide all filter groups first
+                monthFilterGroup.style.display = 'none';
+                yearFilterGroup.style.display = 'none';
+                quarterFilterGroup.style.display = 'none';
+                startDateGroup.style.display = 'none';
+                endDateGroup.style.display = 'none';
+                
+                // Show relevant filter groups based on selection
+                switch(this.value) {
+                    case 'monthly':
+                        monthFilterGroup.style.display = 'block';
+                        break;
+                    case 'quarterly':
+                        quarterFilterGroup.style.display = 'block';
+                        break;
+                    case 'yearly':
+                        yearFilterGroup.style.display = 'block';
+                        break;
+                    case 'custom':
+                        startDateGroup.style.display = 'block';
+                        endDateGroup.style.display = 'block';
+                        break;
+                }
+            });
+            
+            // Apply filter button
+            document.getElementById('applyFilterBtn').addEventListener('click', function() {
+                alert('Filter applied. In a real application, this would update all the reports based on your filter criteria.');
+                
+                // Here you would make an API call to fetch data based on filters
+                // and update charts and tables
+            });
+            
+            // Reset filter button
+            document.getElementById('resetFilterBtn').addEventListener('click', function() {
+                // Reset all filters to defaults
+                periodFilter.value = 'monthly';
+                document.getElementById('monthFilter').value = '04-2025';
+                document.getElementById('yearFilter').value = '2025';
+                document.getElementById('quarterFilter').value = 'Q1-2025';
+                document.getElementById('programFilterRevenue').value = '';
+                
+                // Show/hide filter groups
+                monthFilterGroup.style.display = 'block';
+                yearFilterGroup.style.display = 'none';
+                quarterFilterGroup.style.display = 'none';
+                startDateGroup.style.display = 'none';
+                endDateGroup.style.display = 'none';
+                
+                alert('Filters reset. In a real application, this would reset the reports to default view.');
+            });
+            
+            // Export buttons
+            document.getElementById('exportPDF').addEventListener('click', function() {
+                alert('Exporting report as PDF... In a real application, this would generate and download a PDF report.');
+            });
+            
+            document.getElementById('exportExcel').addEventListener('click', function() {
+                alert('Exporting report as Excel... In a real application, this would generate and download an Excel report.');
+            });
+            
+            // Initialize Charts
+            const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+            const revenueChart = new Chart(revenueCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Apr 1', 'Apr 5', 'Apr 10', 'Apr 15', 'Apr 20', 'Apr 25', 'Apr 30'],
+                    datasets: [{
+                        label: 'Daily Revenue (₹)',
+                        data: [25000, 42000, 38000, 72000, 55000, 85000, 62000],
+                        backgroundColor: 'rgba(11, 87, 164, 0.1)',
+                        borderColor: 'rgba(11, 87, 164, 1)',
+                        borderWidth: 2,
+                        pointBackgroundColor: 'rgba(11, 87, 164, 1)',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointRadius: 5,
+                        pointHoverRadius: 7,
+                        fill: true,
+                        tension: 0.3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.y !== null) {
+                                        label += '₹' + context.parsed.y.toLocaleString();
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '₹' + value.toLocaleString();
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            const programRevenueCtx = document.getElementById('programRevenueChart').getContext('2d');
+            const programRevenueChart = new Chart(programRevenueCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Complete Trading Program', 'Arthavidya Mentorship Program', 'Growth Mindset Program', 'Smart Income Program', 'Other Revenue'],
+                    datasets: [{
+                        label: 'Revenue by Program',
+                        data: [543968, 383988, 53991, 221982, 60000],
+                        backgroundColor: [
+                            'rgba(11, 87, 164, 0.8)',
+                            'rgba(25, 31, 69, 0.8)',
+                            'rgba(203, 10, 60, 0.8)',
+                            'rgba(40, 167, 69, 0.8)',
+                            'rgba(23, 162, 184, 0.8)'
+                        ],
+                        borderColor: [
+                            'rgba(11, 87, 164, 1)',
+                            'rgba(25, 31, 69, 1)',
+                            'rgba(203, 10, 60, 1)',
+                            'rgba(40, 167, 69, 1)',
+                            'rgba(23, 162, 184, 1)'
+                        ],
+                        borderWidth: 1,
+                        hoverOffset: 15
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed !== null) {
+                                        label += '₹' + context.parsed.toLocaleString();
+                                    }
+                                    return label;
+                                },
+                                afterLabel: function(context) {
+                                    const dataset = context.dataset;
+                                    const total = dataset.data.reduce((acc, data) => acc + data, 0);
+                                    const currentValue = dataset.data[context.dataIndex];
+                                    const percentage = parseFloat((currentValue/total*100).toFixed(1));
+                                    return `${percentage}% of total revenue`;
+                                }
+                            }
+                        }
+                    },
+                    cutout: '60%'
+                }
+            });
+            
+            // Chart Action Buttons
+            const downloadButtons = document.querySelectorAll('.chart-action-btn:first-child');
+            downloadButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    alert('Downloading chart as image... In a real application, this would generate and download a PNG image of the chart.');
+                });
+            });
+            
+            const refreshButtons = document.querySelectorAll('.chart-action-btn:nth-child(2)');
+            refreshButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    alert('Refreshing chart data... In a real application, this would fetch the latest data from the server.');
+                });
+            });
+        });
+    </script>
+{%endblock%}

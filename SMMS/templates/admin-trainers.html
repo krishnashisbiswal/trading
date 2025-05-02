@@ -1,0 +1,289 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Admin Trainers{% endblock title %}
+{% block content %}
+<body class="admin-body">
+
+        <!-- Main Content Area -->
+        <main class="admin-main">
+            <!-- Page Header -->
+            <section class="page-header">
+                <div class="header-content">
+                    <div class="page-title">
+                        <h1>Trainers</h1>
+                        <p>Manage trainers and instructors for programs</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Trainers Table Section -->
+            <section class="table-container">
+                <!-- Bulk Actions Bar -->
+                <div class="bulk-actions" id="bulk-actions">
+                    <div class="bulk-selected">
+                        <span id="selected-count">0</span> trainers selected
+                    </div>
+                    <div class="bulk-buttons">
+                        <button class="bulk-btn assign"><i class="fas fa-user-tag"></i> Assign to Program</button>
+                        <button class="bulk-btn delete"><i class="fas fa-trash-alt"></i> Delete</button>
+                    </div>
+                </div>
+                
+                <!-- Table Header with Search and Actions -->
+                <div class="table-header">
+                    <h2 class="table-title">All Trainers</h2>
+                    <div class="table-actions">
+                        <div class="search-container">
+                            <i class="fas fa-search search-icon"></i>
+                            <input type="text" class="search-input" placeholder="Search trainers...">
+                        </div>
+                        <div class="filter-container">
+                            <button class="filter-btn" id="filter-btn">
+                                <i class="fas fa-filter"></i>
+                                <span>Filter</span>
+                            </button>
+                            <div class="filter-dropdown" id="filter-dropdown">
+                                <div class="filter-group">
+                                    <label class="filter-label">Program</label>
+                                    <select class="filter-select">
+                                        <option value="">All Programs</option>
+                                        <option value="ctp">Complete Trading Program (CTP)</option>
+                                        <option value="amp">Arthavidya Mentorship Program (AMP)</option>
+                                        <option value="gmp">Growth Mindset Program (GMP)</option>
+                                        <option value="sip">Smart Income Program (SIP)</option>
+                                    </select>
+                                </div>
+                                <div class="filter-group">
+                                    <label class="filter-label">Expertise</label>
+                                    <select class="filter-select">
+                                        <option value="">All Expertise</option>
+                                        <option value="technical">Technical Analysis</option>
+                                        <option value="fundamentals">Fundamental Analysis</option>
+                                        <option value="options">Options Trading</option>
+                                        <option value="psychology">Trading Psychology</option>
+                                    </select>
+                                </div>
+                                <div class="filter-group">
+                                    <label class="filter-label">Status</label>
+                                    <select class="filter-select">
+                                        <option value="">All Status</option>
+                                        <option value="active">Active</option>
+                                        <option value="inactive">Inactive</option>
+                                    </select>
+                                </div>
+                                <div class="filter-actions">
+                                    <button class="btn-reset">Reset</button>
+                                    <button class="btn-apply">Apply Filters</button>
+                                </div>
+                            </div>
+                        </div>
+                        <a href="{% url "admin_trainer_add"%}" class="btn-add">
+                            <i class="fas fa-plus"></i>
+                            <span>Add Trainer</span>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Trainers Table -->
+                <div class="table-responsive">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th class="checkbox-cell">
+                                    <label class="custom-checkbox">
+                                        <input type="checkbox" id="select-all">
+                                        <span class="checkmark"></span>
+                                    </label>
+                                </th>
+                                <th>Trainer</th>
+                                <th>Programs</th>
+                                <th>Expertise</th>
+                                <th>Contact</th>
+                                <th>Joined On</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="checkbox-cell">
+                                    <label class="custom-checkbox">
+                                        <input type="checkbox" class="row-checkbox">
+                                        <span class="checkmark"></span>
+                                    </label>
+                                </td>
+                                <td>
+                                    <div class="user-info">
+                                        <img src="{%static 'images/trainer-avatar-4.jpg'%}" alt="Trainer" class="user-avatar">
+                                        <div class="user-details">
+                                            <h4>Anita Desai</h4>
+                                            <p>ID: TRN004</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        <span class="status-badge status-info">GMP</span>
+                                    </div>
+                                </td>
+                                <td>Options Trading, Derivatives</td>
+                                <td>
+                                    <div>
+                                        <p>anita.d@arthavidya.com</p>
+                                        <p>+91 7654321098</p>
+                                    </div>
+                                </td>
+                                <td>September 21, 2023</td>
+                                <td><span class="status-badge status-warning">On Leave</span></td>
+                                <td>
+                                    <div class="row-actions">
+                                        <button class="action-btn view" title="View Profile">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="action-btn edit" title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="action-btn delete" title="Delete">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="checkbox-cell">
+                                    <label class="custom-checkbox">
+                                        <input type="checkbox" class="row-checkbox">
+                                        <span class="checkmark"></span>
+                                    </label>
+                                </td>
+                                <td>
+                                    <div class="user-info">
+                                        <img src="{%static 'images/trainer-avatar-5.jpg'%}" alt="Trainer" class="user-avatar">
+                                        <div class="user-details">
+                                            <h4>Rajiv Kapoor</h4>
+                                            <p>ID: TRN005</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        <span class="status-badge status-info">CTP</span>
+                                        <span class="status-badge status-info">AMP</span>
+                                    </div>
+                                </td>
+                                <td>Chart Patterns, Market Structure</td>
+                                <td>
+                                    <div>
+                                        <p>rajiv.k@arthavidya.com</p>
+                                        <p>+91 6543210987</p>
+                                    </div>
+                                </td>
+                                <td>November 10, 2023</td>
+                                <td><span class="status-badge status-danger">Inactive</span></td>
+                                <td>
+                                    <div class="row-actions">
+                                        <button class="action-btn view" title="View Profile">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="action-btn edit" title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="action-btn delete" title="Delete">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Table Footer with Pagination -->
+                <div class="table-footer">
+                    <div class="page-info">
+                        Showing 1 to 5 of 12 entries
+                    </div>
+                    <div class="pagination">
+                        <button class="page-btn disabled">
+                            <i class="fas fa-angle-double-left"></i>
+                        </button>
+                        <button class="page-btn disabled">
+                            <i class="fas fa-angle-left"></i>
+                        </button>
+                        <button class="page-btn active">1</button>
+                        <button class="page-btn">2</button>
+                        <button class="page-btn">3</button>
+                        <button class="page-btn">
+                            <i class="fas fa-angle-right"></i>
+                        </button>
+                        <button class="page-btn">
+                            <i class="fas fa-angle-double-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    
+    {% block footer %}
+    {% endblock %}
+    
+    <!-- Scripts -->
+    <script src="{% static 'js/admin.js' %}"></script>
+    <script src="{% static 'js/admin-main.js' %}"></script>
+    <script>
+        // Filter dropdown toggle
+        const filterBtn = document.getElementById('filter-btn');
+        const filterDropdown = document.getElementById('filter-dropdown');
+        
+        filterBtn.addEventListener('click', function() {
+            filterDropdown.classList.toggle('show');
+        });
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            if (!filterBtn.contains(event.target) && !filterDropdown.contains(event.target)) {
+                filterDropdown.classList.remove('show');
+            }
+        });
+        
+        // Select all checkbox functionality
+        const selectAllCheckbox = document.getElementById('select-all');
+        const rowCheckboxes = document.querySelectorAll('.row-checkbox');
+        const bulkActions = document.getElementById('bulk-actions');
+        const selectedCount = document.getElementById('selected-count');
+        
+        selectAllCheckbox.addEventListener('change', function() {
+            rowCheckboxes.forEach(checkbox => {
+                checkbox.checked = this.checked;
+            });
+            
+            updateBulkActions();
+        });
+        
+        rowCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                updateBulkActions();
+                
+                // Update select all checkbox
+                if (!this.checked) {
+                    selectAllCheckbox.checked = false;
+                } else {
+                    const allChecked = Array.from(rowCheckboxes).every(c => c.checked);
+                    selectAllCheckbox.checked = allChecked;
+                }
+            });
+        });
+        
+        function updateBulkActions() {
+            const checkedCount = document.querySelectorAll('.row-checkbox:checked').length;
+            
+            if (checkedCount > 0) {
+                bulkActions.classList.add('show');
+                selectedCount.textContent = checkedCount;
+            } else {
+                bulkActions.classList.remove('show');
+            }
+        }
+    </script>
+{% endblock %}

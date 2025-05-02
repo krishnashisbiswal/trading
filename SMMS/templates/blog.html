@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+{% load static %} 
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arthavidya Community</title>
+    <link rel="stylesheet" href="{% static "css/style.css" %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header Section -->
+    <header class="main-header">
+        <div class="container">
+            <div class="header-inner">
+                <div class="logo">
+                    <img src="{%static 'images/logo.png'%}" alt="Arthavidya Trading Community">
+                    <div class="logo-text">
+                        <h1>Arthavidya Trading Community</h1>
+                        <p>Building A Wealthy Nation</p>
+                    </div>
+                </div>
+                <nav class="main-nav">
+                    <ul>
+                        <li><a href="{% url "home" %}" >Home</a></li>
+                        <li><a href="{% url "about" %}">About Us</a></li>
+                        <li><a href="{% url "programs" %}">Our Programs</a></li>
+                        <li><a href="{% url "community"%}">Community</a></li>
+                        <li><a href="{% url "blog" %}"class="active">Blog</a></li>
+                        <li><a href="{% url "student_form" %}" class="register-btn">Register</a></li>
+                        <li><a href="{% url "login" %}" class="login-btn">Login</a></li>
+                    </ul>
+                </nav>
+                <div class="mobile-menu-toggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </div>
+    </header>
+    <style>
+        / Blog Page Specific Styles /
+        .blog-section {
+            padding: 60px 0;
+            background-color: #f9f9f9;
+        }
+        
+        .blog-section-title {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .blog-section-title h2 {
+            color: #0a3d7c;
+            font-size: 32px;
+            margin-bottom: 15px;
+            font-weight: 700;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .blog-section-title h2:after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background-color: #d1003a;
+        }
+        
+        .blog-section-title p {
+            color: #555;
+            font-size: 18px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .blog-container {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+        }
+        
+        .blog-main {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 30px;
+        }
+        
+        .blog-post {
+            background-color: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .blog-post:hover {
+            transform: translateY(-5px);
+        }
+        
+        .blog-post-img {
+            height: 300px;
+            overflow: hidden;
+        }
+        
+        .blog-post-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+        
+        .blog-post:hover .blog-post-img img {
+            transform: scale(1.05);
+        }
+        
+        .blog-post-content {
+            padding: 25px;
+        }
+        
+        .blog-post-meta {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 15px;
+            color: #777;
+            font-size: 14px;
+        }
+        
+        .blog-post-meta-item {
+            display: flex;
+            align-items: center;
+        }
+        
+        .blog-post-meta-item i {
+            margin-right: 5px;
+            color: #d1003a;
+        }
+        
+        .blog-post-category {
+            background-color: #0a3d7c;
+            color: #fff;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+        
+        .blog-post-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #0a3d7c;
+            margin-bottom: 15px;
+        }
+        
+        .blog-post-title a {
+            color: #0a3d7c;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .blog-post-title a:hover {
+            color: #d1003a;
+        }
+        
+        .blog-post-excerpt {
+            color: #555;
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        
+        .blog-btn {
+            display: inline-block;
+            background-color: #0a3d7c;
+            color: #fff;
+            padding: 10px 25px;
+            border-radius: 5px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+        
+        .blog-btn:hover {
+            background-color: #d1003a;
+        }
+        
+        .blog-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+        
+        .blog-sidebar-widget {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .blog-sidebar-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #0a3d7c;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+            position: relative;
+        }
+        
+        .blog-sidebar-title:after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 50px;
+            height: 2px;
+            background-color: #d1003a;
+        }
+        
+        .blog-search-form {
+            display: flex;
+            margin-bottom: 10px;
+        }
+        
+        .blog-search-input {
+            flex: 1;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-right: none;
+            border-radius: 5px 0 0 5px;
+            font-size: 15px;
+            outline: none;
+        }
+        
+        .blog-search-btn {
+            background-color: #0a3d7c;
+            color: #fff;
+            border: none;
+            padding: 0 15px;
+            border-radius: 0 5px 5px 0;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        
+        .blog-search-btn:hover {
+            background-color: #d1003a;
+        }
+        
+        .blog-categories {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .blog-categories li {
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .blog-categories li:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+        
+        .blog-categories a {
+            color: #555;
+            text-decoration: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: color 0.3s ease;
+        }
+        
+        .blog-categories a:hover {
+            color: #d1003a;
+        }
+        
+        .blog-categories span {
+            background-color: #f0f0f0;
+            color: #555;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 12px;
+        }
+        
+        .blog-recent-posts {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .blog-recent-post {
+            display: flex;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .blog-recent-post:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+        
+        .blog-recent-post-img {
+            width: 80px;
+            height: 80px;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-right: 15px;
+        }
+        
+        .blog-recent-post-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .blog-recent-post-info {
+            flex: 1;
+        }
+        
+        .blog-recent-post-title {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+        
+        .blog-recent-post-title a {
+            color: #0a3d7c;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .blog-recent-post-title a:hover {
+            color: #d1003a;
+        }
+        
+        .blog-recent-post-date {
+            font-size: 12px;
+            color: #777;
+            display: flex;
+            align-items: center;
+        }
+        
+        .blog-recent-post-date i {
+            margin-right: 5px;
+            color: #d1003a;
+        }
+        
+        .blog-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .blog-tag {
+            background-color: #f0f0f0;
+            color: #555;
+            padding: 5px 12px;
+            border-radius: 5px;
+            font-size: 14px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .blog-tag:hover {
+            background-color: #0a3d7c;
+            color: #fff;
+        }
+        
+        .blog-pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 50px;
+        }
+        
+        .blog-pagination ul {
+            display: flex;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .blog-pagination li {
+            margin: 0 5px;
+        }
+        
+        .blog-pagination a {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 5px;
+            background-color: #fff;
+            color: #0a3d7c;
+            text-decoration: none;
+            font-weight: 500;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .blog-pagination a:hover,
+        .blog-pagination a.active {
+            background-color: #0a3d7c;
+            color: #fff;
+        }
+        
+        .blog-newsletter {
+            background: linear-gradient(rgba(10, 61, 124, 0.9), rgba(209, 0, 58, 0.8)), url('../assets/images/pattern-bg.jpg') center/cover;
+            padding: 60px 0;
+            color: #fff;
+            text-align: center;
+            margin-top: 60px;
+        }
+        
+        .blog-newsletter-content {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .blog-newsletter-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+        
+        .blog-newsletter-desc {
+            font-size: 16px;
+            margin-bottom: 25px;
+            opacity: 0.9;
+        }
+        
+        .blog-newsletter-form {
+            display: flex;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        .blog-newsletter-input {
+            flex: 1;
+            padding: 12px 15px;
+            border: none;
+            border-radius: 5px 0 0 5px;
+            font-size: 15px;
+            outline: none;
+        }
+        
+        .blog-newsletter-btn {
+            background-color: #d1003a;
+            color: #fff;
+            border: none;
+            padding: 0 25px;
+            border-radius: 0 5px 5px 0;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        
+        .blog-newsletter-btn:hover {
+            background-color: #b50033;
+        }
+        
+        @media (max-width: 992px) {
+            .blog-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .blog-sidebar {
+                margin-top: 30px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .blog-section-title h2 {
+                font-size: 28px;
+            }
+            
+            .blog-post-title {
+                font-size: 22px;
+            }
+            
+            .blog-newsletter-form {
+                flex-direction: column;
+            }
+            
+            .blog-newsletter-input {
+                border-radius: 5px;
+                margin-bottom: 10px;
+            }
+            
+            .blog-newsletter-btn {
+                width: 100%;
+                padding: 12px 15px;
+                border-radius: 5px;
+            }
+        }
+    </style>
+
+            <!-- Blog Header -->
+        <section class="blog-section">
+            <div class="container">
+                <div class="blog-section-title">
+                    <h2>Trading Insights Blog</h2>
+                    <p>Stay updated with the latest market insights, trading strategies, and financial education</p>
+                </div>
+                
+                <div class="blog-container">
+                    <div class="blog-main">
+                        <!-- Blog Post 1 -->
+                        <article class="blog-post">
+                            <div class="blog-post-img">
+                                <img src="{%static 'images/blog/Market Analysis.jpg'%}" alt="Market Analysis">
+                            </div>
+                            <div class="blog-post-content">
+                                <div class="blog-post-meta">
+                                    <span class="blog-post-category">Market Analysis</span>
+                                    <span class="blog-post-meta-item">
+                                        <i class="far fa-calendar-alt"></i> April 20, 2025
+                                    </span>
+                                    <span class="blog-post-meta-item">
+                                        <i class="far fa-user"></i> Andaz Aaron
+                                    </span>
+                                    <span class="blog-post-meta-item">
+                                        <i class="far fa-comment"></i> 24 Comments
+                                    </span>
+                                </div>
+                                <h3 class="blog-post-title">
+                                    <a href="#">Understanding Market Cycles: A Comprehensive Guide for Traders</a>
+                                </h3>
+                                <p class="blog-post-excerpt">
+                                    Market cycles are the backbone of financial market movements. Understanding these cycles can help traders anticipate potential market directions and make informed trading decisions. In this comprehensive guide, we explore the four main phases of market cycles and how you can identify them in real-time trading scenarios.
+                                </p>
+                                <a href="#" class="blog-btn">Read More</a>
+                            </div>
+                        </article>
+                        
+                        <!-- Blog Post 2 -->
+                        <article class="blog-post">
+                            <div class="blog-post-img">
+                                <img src="{%static 'images/blog/Trading Strategy.jpg'%}" alt="Trading Strategy">
+                            </div>
+                            <div class="blog-post-content">
+                                <div class="blog-post-meta">
+                                    <span class="blog-post-category">Trading Strategy</span>
+                                    <span class="blog-post-meta-item">
+                                        <i class="far fa-calendar-alt"></i> April 15, 2025
+                                    </span>
+                                    <span class="blog-post-meta-item">
+                                        <i class="far fa-user"></i> Priya Sharma
+                                    </span>
+                                    <span class="blog-post-meta-item">
+                                        <i class="far fa-comment"></i> 18 Comments
+                                    </span>
+                                </div>
+                                <h3 class="blog-post-title">
+                                    <a href="#">5 High-Probability Trading Setups Every Trader Should Master</a>
+                                </h3>
+                                <p class="blog-post-excerpt">
+                                    Successful trading isn't about taking every opportunity but focusing on high-probability setups. In this article, we break down five proven trading setups that have consistently delivered results for experienced traders. Learn how to identify these patterns, when to enter and exit trades, and how to manage risk effectively.
+                                </p>
+                                <a href="#" class="blog-btn">Read More</a>
+                            </div>
+                        </article>
+                        
+                        <!-- Blog Post 3 -->
+                        <article class="blog-post">
+                            <div class="blog-post-img">
+                                <img src="{%static 'images/blog/Risk Management.jpeg'%}" alt="Risk Management">
+                            </div>
+                            <div class="blog-post-content">
+                                <div class="blog-post-meta">
+                                    <span class="blog-post-category">Risk Management</span>
+                                    <span class="blog-post-meta-item">
+                                        <i class="far fa-calendar-alt"></i> April 8, 2025
+                                    </span>
+                                    <span class="blog-post-meta-item">
+                                        <i class="far fa-user"></i> Rahul Verma
+                                    </span>
+                                    <span class="blog-post-meta-item">
+                                        <i class="far fa-comment"></i> 32 Comments
+                                    </span>
+                                </div>
+                                <h3 class="blog-post-title">
+                                    <a href="#">The Psychology of Risk: Why Most Traders Fail and How to Avoid It</a>
+                                </h3>
+                                <p class="blog-post-excerpt">
+                                    Risk management is more than just setting stop losses—it's a psychological battle. This article explores the common psychological traps that lead traders to make poor risk decisions and provides practical strategies to develop a disciplined approach to risk. Learn how successful traders maintain emotional control during volatile market conditions.
+                                </p>
+                                <a href="#" class="blog-btn">Read More</a>
+                            </div>
+                        </article>
+                        
+                        <!-- Pagination -->
+                        <!-- <div class="blog-pagination">
+                            <ul>
+                                <li><a href="#" class="active">1</a></li>
+                                <li><a href="#">2</a></li>
+                                <li><a href="#">3</a></li>
+                                <li><a href="#"><i class="fas fa-angle-right"></i></a></li>
+                            </ul>
+                        </div> -->
+                    </div>
+                    
+                    <!-- Blog Sidebar -->
+                    <div class="blog-sidebar">
+                        <!-- Search Widget -->
+                        <div class="blog-sidebar-widget">
+                            <h3 class="blog-sidebar-title">Search</h3>
+                            <form class="blog-search-form">
+                                <input type="text" class="blog-search-input" placeholder="Search...">
+                                <button type="submit" class="blog-search-btn">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </form>
+                        </div>
+                        
+                        <!-- Categories Widget -->
+                        <div class="blog-sidebar-widget">
+                            <h3 class="blog-sidebar-title">Categories</h3>
+                            <ul class="blog-categories">
+                                <li><a href="#">Market Analysis <span>12</span></a></li>
+                                <li><a href="#">Trading Strategy <span>24</span></a></li>
+                                <li><a href="#">Risk Management <span>8</span></a></li>
+                                <li><a href="#">Technical Analysis <span>16</span></a></li>
+                                <li><a href="#">Fundamental Analysis <span>9</span></a></li>
+                                <li><a href="#">Trading Psychology <span>14</span></a></li>
+                            </ul>
+                        </div>
+                        
+                        <!-- Recent Posts Widget -->
+                        <div class="blog-sidebar-widget">
+                            <h3 class="blog-sidebar-title">Recent Posts</h3>
+                            <ul class="blog-recent-posts">
+                                <li class="blog-recent-post">
+                                    <div class="blog-recent-post-img">
+                                        <img src="{%static 'images/blog/profile.jpg'%}" alt="Recent Post">
+                                    </div>
+                                    <div class="blog-recent-post-info">
+                                        <h4 class="blog-recent-post-title">
+                                            <a href="#">How to Use Volume Analysis in Your Trading Strategy</a>
+                                        </h4>
+                                        <span class="blog-recent-post-date">
+                                            <i class="far fa-calendar-alt"></i> April 5, 2025
+                                        </span>
+                                    </div>
+                                </li>
+                                <li class="blog-recent-post">
+                                    <div class="blog-recent-post-img">
+                                        <img src="{%static 'images/blog/profile.jpg'%}" alt="Recent Post">
+                                    </div>
+                                    <div class="blog-recent-post-info">
+                                        <h4 class="blog-recent-post-title">
+                                            <a href="#">Mastering Price Action: The Key to Trading Success</a>
+                                        </h4>
+                                        <span class="blog-recent-post-date">
+                                            <i class="far fa-calendar-alt"></i> April 2, 2025
+                                        </span>
+                                    </div>
+                                </li>
+                                <li class="blog-recent-post">
+                                    <div class="blog-recent-post-img">
+                                        <img src="{%static 'images/blog/profile.jpg'%}" alt="Recent Post">
+                                    </div>
+                                    <div class="blog-recent-post-info">
+                                        <h4 class="blog-recent-post-title">
+                                            <a href="#">Building a Robust Trading Plan for Consistent Results</a>
+                                        </h4>
+                                        <span class="blog-recent-post-date">
+                                            <i class="far fa-calendar-alt"></i> March 28, 2025
+                                        </span>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                        
+                        <!-- Tags Widget -->
+                        <div class="blog-sidebar-widget">
+                            <h3 class="blog-sidebar-title">Popular Tags</h3>
+                            <div class="blog-tags">
+                                <a href="#" class="blog-tag">Trading</a>
+                                <a href="#" class="blog-tag">Stock Market</a>
+                                <a href="#" class="blog-tag">Technical Analysis</a>
+                                <a href="#" class="blog-tag">Intraday</a>
+                                <a href="#" class="blog-tag">Options</a>
+                                <a href="#" class="blog-tag">Futures</a>
+                                <a href="#" class="blog-tag">Risk Management</a>
+                                <a href="#" class="blog-tag">Strategy</a>
+                                <a href="#" class="blog-tag">Candlestick</a>
+                                <a href="#" class="blog-tag">Market Trends</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Newsletter Section -->
+        <section class="blog-newsletter">
+            <div class="container">
+                <div class="blog-newsletter-content">
+                    <h2 class="blog-newsletter-title">Subscribe to Our Newsletter</h2>
+                    <p class="blog-newsletter-desc">Get the latest trading insights, market analysis, and educational content delivered directly to your inbox.</p>
+                    <form class="blog-newsletter-form">
+                        <input type="email" class="blog-newsletter-input" placeholder="Your Email Address">
+                        <button type="submit" class="blog-newsletter-btn">Subscribe</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+    <!-- Footer Section -->
+    <footer class="main-footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="contact-info">
+                    <a href="mailto:arthavidyacommunity@gmail.com" class="contact-item">
+                        <i class="fas fa-envelope"></i>
+                        <mailto:span>arthavidyacommunity@gmail.com</span>
+                    </a>
+                    <a href="tel:+917854933728" class="contact-item">
+                        <i class="fas fa-phone"></i>
+                        <span>+91 7854933728</span>
+                    </a>
+                </div>
+                
+                <div class="social-links">
+                    <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-youtube"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+            
+            <div class="footer-links">
+                <a href="{% url "terms_and_condition" %}">Shipping policy</a>
+                <a href="{% url "terms_and_condition" %}">Return Policy</a>
+                <a href="{% url "terms_and_condition" %}">Refund Policy</a>
+            </div>
+            
+            <div class="copyright">
+                <p>Arthavidya Trading Community Pvt Ltd © All Rights Reserved - 2025</p>
+                <p>Design and Developed by Arthavidya Trading Community</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Script -->
+    <script src="{% static "js/main.js" %}"></script>
+    <script>
+        
+        // Add this script at the end of your body tag or in your JS file
+        document.addEventListener('DOMContentLoaded', function() {
+            // Clone the partner logos to create the infinite effect
+            const partnersGrid = document.querySelector('.partners-grid');
+            const partnerLogos = document.querySelectorAll('.partner-logo');
+            
+            // Create a clone of each logo
+            partnerLogos.forEach(logo => {
+                const clone = logo.cloneNode(true);
+                partnersGrid.appendChild(clone);
+            });
+            
+            // Add the necessary CSS for sliding animation
+            const style = document.createElement('style');
+            style.textContent = `
+                .partners-grid {
+                    display: flex;
+                    justify-content: flex-start;
+                    align-items: center;
+                    flex-wrap: nowrap;
+                    gap: 30px;
+                    animation: slideLogos 20s linear infinite;
+                    width: auto;
+                    overflow: visible;
+                }
+                
+                @keyframes slideLogos {
+                    0% {
+                        transform: translateX(0);
+                    }
+                    100% {
+                        transform: translateX(calc(-100% / 2));
+                    }
+                }
+                
+                .partners-section {
+                    overflow: hidden;
+                }
+                
+                / Pause animation on hover /
+                .partners-grid:hover {
+                    animation-play-state: paused;
+                }
+                
+                .partner-logo {
+                    flex: 0 0 auto;
+                    min-width: 150px;
+                }
+            `;
+            
+            document.head.appendChild(style);
+        });
+            </script>
+</body>
+</html>

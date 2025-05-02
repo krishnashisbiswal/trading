@@ -1,0 +1,760 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Class recording{% endblock title %}
+{% block content %}
+<style>
+/* Modal Form Styles */
+        .modal-form {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-form.active {
+            display: flex;
+        }
+        
+        .form-container {
+            background-color: var(--bg-white);
+            border-radius: var(--border-radius);
+            width: 90%;
+            max-width: 700px;
+            box-shadow: var(--box-shadow-lg);
+            overflow: hidden;
+        }
+        
+        .form-header {
+            padding: 20px;
+            background-color: var(--primary-blue-lighter);
+            color: var(--primary-blue);
+            font-weight: 600;
+            font-size: 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-light);
+        }
+        
+        .form-header .close-btn {
+            cursor: pointer;
+            font-size: 20px;
+            color: var(--text-muted);
+            transition: var(--transition);
+        }
+        
+        .form-header .close-btn:hover {
+            color: var(--danger-color);
+            transform: rotate(90deg);
+        }
+        
+        .form-body {
+            padding: 20px;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+        
+        .form-row {
+            margin-bottom: 20px;
+        }
+        
+        .form-row label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-dark);
+        }
+        
+        .form-row input, 
+        .form-row select, 
+        .form-row textarea {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid var(--border-medium);
+            border-radius: var(--border-radius);
+            font-size: 14px;
+            transition: var(--transition);
+        }
+        
+        .form-row input:focus, 
+        .form-row select:focus, 
+        .form-row textarea:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(11, 87, 164, 0.1);
+            outline: none;
+        }
+        
+        .form-row textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+        
+        .form-footer {
+            padding: 20px;
+            border-top: 1px solid var(--border-light);
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+        }
+        
+        .cancel-btn {
+            padding: 10px 20px;
+            border: 1px solid var(--border-medium);
+            border-radius: var(--border-radius);
+            background-color: var(--bg-white);
+            color: var(--text-medium);
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .cancel-btn:hover {
+            background-color: var(--bg-light);
+        }
+        
+        .submit-btn {
+            padding: 10px 25px;
+            border-radius: var(--border-radius);
+            background-color: var(--primary-blue);
+            color: var(--text-light);
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: var(--transition);
+        }
+        
+        .submit-btn:hover {
+            background-color: var(--primary-blue-dark);
+        }
+        
+        /* Recording Cards Style */
+        .recording-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .recording-card {
+            background-color: var(--bg-white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow-sm);
+            overflow: hidden;
+            transition: var(--transition);
+            border: 1px solid var(--border-light);
+        }
+        
+        .recording-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--box-shadow-md);
+        }
+        
+        .recording-thumbnail {
+            position: relative;
+            height: 180px;
+            background-color: var(--bg-light);
+            overflow: hidden;
+        }
+        
+        .recording-thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .recording-duration {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: var(--text-light);
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+        }
+        
+        .play-button {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 60px;
+            background-color: rgba(11, 87, 164, 0.8);
+            border-radius: 50%;
+            color: var(--text-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            cursor: pointer;
+            opacity: 0;
+            transition: var(--transition);
+        }
+        
+        .recording-card:hover .play-button {
+            opacity: 1;
+        }
+        
+        .recording-details {
+            padding: 15px;
+        }
+        
+        .recording-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--dark-blue);
+        }
+        
+        .recording-info {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+        
+        .recording-info span {
+            display: block;
+            margin-bottom: 4px;
+        }
+        
+        .recording-info i {
+            margin-right: 5px;
+            color: var(--primary-blue);
+            width: 16px;
+            text-align: center;
+        }
+        
+        .recording-actions {
+            display: flex;
+            justify-content: space-between;
+            padding-top: 10px;
+            border-top: 1px solid var(--border-light);
+        }
+        
+        .action-links a {
+            margin-right: 15px;
+            color: var(--primary-blue);
+            font-size: 14px;
+            transition: var(--transition);
+        }
+        
+        .action-links a:hover {
+            color: var(--primary-blue-dark);
+        }
+        
+        .recording-visibility {
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .visibility-switch {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 20px;
+            margin-left: 8px;
+        }
+        
+        .visibility-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .visibility-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--border-medium);
+            transition: var(--transition);
+            border-radius: 20px;
+        }
+        
+        .visibility-slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 2px;
+            bottom: 2px;
+            background-color: var(--bg-white);
+            transition: var(--transition);
+            border-radius: 50%;
+        }
+        
+        input:checked + .visibility-slider {
+            background-color: var(--primary-blue);
+        }
+        
+        input:checked + .visibility-slider:before {
+            transform: translateX(20px);
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .recording-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body class="admin-body">
+    <!-- Admin Container -->
+    <div class="admin-container">
+        <!-- Main Content Area -->
+        <main class="admin-main">
+            <!-- Page Header -->
+            <section class="page-header">
+                <div class="header-content">
+                    <div class="page-title">
+                        <h1>Class Recordings</h1>
+                        <p>Manage recorded class sessions for all programs</p>
+                    </div>
+                    <div class="header-actions">
+                        <button class="btn-add" id="addRecordingBtn">
+                            <i class="fas fa-plus"></i> Add New Recording
+                        </button>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Filter Section -->
+            <section class="filter-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Filter Recordings</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-grid">
+                            <div class="form-row">
+                                <label for="programFilter">Program</label>
+                                <select id="programFilter" name="programFilter">
+                                    <option value="">All Programs</option>
+                                    <option value="CTP">Complete Trading Program</option>
+                                    <option value="AMP">Arthavidya Mentorship Program</option>
+                                    <option value="GMP">Growth Mindset Program</option>
+                                    <option value="SIP">Smart Income Program</option>
+                                </select>
+                            </div>
+                            <div class="form-row">
+                                <label for="batchFilter">Batch</label>
+                                <select id="batchFilter" name="batchFilter">
+                                    <option value="">All Batches</option>
+                                    <option value="CTP-APR-2025">CTP April 2025</option>
+                                    <option value="CTP-JUL-2025">CTP July 2025</option>
+                                    <option value="AMP-APR-2025">AMP April 2025</option>
+                                    <option value="GMP-MAY-2025">GMP May 2025</option>
+                                </select>
+                            </div>
+                            <div class="form-row">
+                                <label for="trainerFilter">Trainer</label>
+                                <select id="trainerFilter" name="trainerFilter">
+                                    <option value="">All Trainers</option>
+                                    <option value="1">Andaz Aaron</option>
+                                    <option value="2">Kanheyalal Jena</option>
+                                    <option value="3">Prashanta Kumar Palei</option>
+                                </select>
+                            </div>
+                            <div class="form-row">
+                                <label for="searchRecording">Search</label>
+                                <input type="text" id="searchRecording" placeholder="Search by topic or description...">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            {% comment %} <!-- Recording Cards -->
+            <section class="recording-cards">
+                <!-- Sample Cards -->
+                <div class="recording-card">
+                    <div class="recording-thumbnail">
+                        <img src="../assets/images/recording-thumbnail-1.jpg" alt="Market Structure">
+                        <div class="recording-duration">2:05:34</div>
+                        <div class="play-button">
+                            <i class="fas fa-play"></i>
+                        </div>
+                    </div>
+                    <div class="recording-details">
+                        <h3 class="recording-title">Market Structure - CTP Class 8</h3>
+                        <div class="recording-info">
+                            <span><i class="fas fa-graduation-cap"></i> Complete Trading Program</span>
+                            <span><i class="fas fa-users"></i> CTP April 2025 Batch</span>
+                            <span><i class="fas fa-user"></i> Andaz Aaron</span>
+                            <span><i class="fas fa-calendar"></i> April 1, 2025</span>
+                        </div>
+                        <div class="recording-actions">
+                            <div class="action-links">
+                                <a href="#" class="edit-recording"><i class="fas fa-edit"></i> Edit</a>
+                                <a href="#" class="delete-recording"><i class="fas fa-trash"></i> Delete</a>
+                            </div>
+                            <div class="recording-visibility">
+                                <span>Visible</span>
+                                <label class="visibility-switch">
+                                    <input type="checkbox" checked>
+                                    <span class="visibility-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="recording-card">
+                    <div class="recording-thumbnail">
+                        <img src="../assets/images/recording-thumbnail-2.jpg" alt="Advanced Risk Management">
+                        <div class="recording-duration">1:45:20</div>
+                        <div class="play-button">
+                            <i class="fas fa-play"></i>
+                        </div>
+                    </div>
+                    <div class="recording-details">
+                        <h3 class="recording-title">Advanced Risk Management - AMP Class 6</h3>
+                        <div class="recording-info">
+                            <span><i class="fas fa-graduation-cap"></i> Arthavidya Mentorship Program</span>
+                            <span><i class="fas fa-users"></i> AMP April 2025 Batch</span>
+                            <span><i class="fas fa-user"></i> Prashanta Kumar Palei</span>
+                            <span><i class="fas fa-calendar"></i> April 2, 2025</span>
+                        </div>
+                        <div class="recording-actions">
+                            <div class="action-links">
+                                <a href="#" class="edit-recording"><i class="fas fa-edit"></i> Edit</a>
+                                <a href="#" class="delete-recording"><i class="fas fa-trash"></i> Delete</a>
+                            </div>
+                            <div class="recording-visibility">
+                                <span>Visible</span>
+                                <label class="visibility-switch">
+                                    <input type="checkbox" checked>
+                                    <span class="visibility-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="recording-card">
+                    <div class="recording-thumbnail">
+                        <img src="../assets/images/recording-thumbnail-3.jpg" alt="Emotional Intelligence in Trading">
+                        <div class="recording-duration">1:58:45</div>
+                        <div class="play-button">
+                            <i class="fas fa-play"></i>
+                        </div>
+                    </div>
+                    <div class="recording-details">
+                        <h3 class="recording-title">Emotional Intelligence in Trading - GMP Class 5</h3>
+                        <div class="recording-info">
+                            <span><i class="fas fa-graduation-cap"></i> Growth Mindset Program</span>
+                            <span><i class="fas fa-users"></i> GMP May 2025 Batch</span>
+                            <span><i class="fas fa-user"></i> Kanheyalal Jena</span>
+                            <span><i class="fas fa-calendar"></i> April 4, 2025</span>
+                        </div>
+                        <div class="recording-actions">
+                            <div class="action-links">
+                                <a href="#" class="edit-recording"><i class="fas fa-edit"></i> Edit</a>
+                                <a href="#" class="delete-recording"><i class="fas fa-trash"></i> Delete</a>
+                            </div>
+                            <div class="recording-visibility">
+                                <span>Visible</span>
+                                <label class="visibility-switch">
+                                    <input type="checkbox" checked>
+                                    <span class="visibility-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="recording-card">
+                    <div class="recording-thumbnail">
+                        <img src="../assets/images/recording-thumbnail-4.jpg" alt="Asset Allocation Strategies">
+                        <div class="recording-duration">1:38:12</div>
+                        <div class="play-button">
+                            <i class="fas fa-play"></i>
+                        </div>
+                    </div>
+                    <div class="recording-details">
+                        <h3 class="recording-title">Asset Allocation Strategies - SIP Class 3</h3>
+                        <div class="recording-info">
+                            <span><i class="fas fa-graduation-cap"></i> Smart Income Program</span>
+                            <span><i class="fas fa-users"></i> SIP March 2025 Batch</span>
+                            <span><i class="fas fa-user"></i> Andaz Aaron</span>
+                            <span><i class="fas fa-calendar"></i> April 5, 2025</span>
+                        </div>
+                        <div class="recording-actions">
+                            <div class="action-links">
+                                <a href="#" class="edit-recording"><i class="fas fa-edit"></i> Edit</a>
+                                <a href="#" class="delete-recording"><i class="fas fa-trash"></i> Delete</a>
+                            </div>
+                            <div class="recording-visibility">
+                                <span>Hidden</span>
+                                <label class="visibility-switch">
+                                    <input type="checkbox">
+                                    <span class="visibility-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+             {% endcomment %}
+             
+            <!-- Table View -->
+            <section class="table-section">
+                <div class="table-container">
+                    <div class="table-header">
+                        <h3 class="table-title">All Recordings</h3>
+                        <div class="table-actions">
+                            <div class="search-container">
+                                <i class="fas fa-search search-icon"></i>
+                                <input type="text" class="search-input" id="searchTableInput" placeholder="Search recordings...">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Table Content -->
+                    <div class="table-responsive">
+                        <table class="admin-table" id="recordingsTable">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Program</th>
+                                    <th>Batch</th>
+                                    <th>Trainer</th>
+                                    <th>Recording Date</th>
+                                    <th>Duration</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Sample data rows -->
+                                <tr>
+                                    <td>Market Structure - CTP Class 8</td>
+                                    <td>Complete Trading Program</td>
+                                    <td>CTP April 2025</td>
+                                    <td>Andaz Aaron</td>
+                                    <td>Apr 1, 2025</td>
+                                    <td>2:05:34</td>
+                                    <td><span class="status-badge status-success">Visible</span></td>
+                                    <td>
+                                        <div class="row-actions">
+                                            <button class="action-btn view" title="View">
+                                                <i class="fas fa-play"></i>
+                                            </button>
+                                            <button class="action-btn edit" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="action-btn delete" title="Delete">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Advanced Risk Management - AMP Class 6</td>
+                                    <td>Arthavidya Mentorship Program</td>
+                                    <td>AMP April 2025</td>
+                                    <td>Prashanta Kumar Palei</td>
+                                    <td>Apr 2, 2025</td>
+                                    <td>1:45:20</td>
+                                    <td><span class="status-badge status-success">Visible</span></td>
+                                    <td>
+                                        <div class="row-actions">
+                                            <button class="action-btn view" title="View">
+                                                <i class="fas fa-play"></i>
+                                            </button>
+                                            <button class="action-btn edit" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="action-btn delete" title="Delete">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Emotional Intelligence in Trading - GMP Class 5</td>
+                                    <td>Growth Mindset Program</td>
+                                    <td>GMP May 2025</td>
+                                    <td>Kanheyalal Jena</td>
+                                    <td>Apr 4, 2025</td>
+                                    <td>1:58:45</td>
+                                    <td><span class="status-badge status-success">Visible</span></td>
+                                    <td>
+                                        <div class="row-actions">
+                                            <button class="action-btn view" title="View">
+                                                <i class="fas fa-play"></i>
+                                            </button>
+                                            <button class="action-btn edit" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="action-btn delete" title="Delete">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Asset Allocation Strategies - SIP Class 3</td>
+                                    <td>Smart Income Program</td>
+                                    <td>SIP March 2025</td>
+                                    <td>Andaz Aaron</td>
+                                    <td>Apr 5, 2025</td>
+                                    <td>1:38:12</td>
+                                    <td><span class="status-badge status-danger">Hidden</span></td>
+                                    <td>
+                                        <div class="row-actions">
+                                            <button class="action-btn view" title="View">
+                                                <i class="fas fa-play"></i>
+                                            </button>
+                                            <button class="action-btn edit" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="action-btn delete" title="Delete">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Table Footer with Pagination -->
+                    <div class="table-footer">
+                        <div class="page-info">
+                            Showing <span id="startRange">1</span> to <span id="endRange">10</span> of <span id="totalItems">25</span> entries
+                        </div>
+                        <div class="pagination">
+                            <button class="page-btn" id="prevPage" disabled>
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <button class="page-btn active">1</button>
+                            <button class="page-btn">2</button>
+                            <button class="page-btn">3</button>
+                            <button class="page-btn" id="nextPage">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    
+    <!-- Modal Form for Adding/Editing Recording -->
+    <div class="modal-form" id="recordingForm">
+        <div class="form-container">
+            <div class="form-header">
+                <span id="formTitle">Add New Recording</span>
+                <i class="fas fa-times close-btn" id="closeForm"></i>
+            </div>
+            <form id="recordingDataForm">
+                <div class="form-body">
+                    <input type="hidden" id="recordingId" name="recordingId">
+                    
+                    <div class="form-row">
+                        <label for="recordingTitle">Recording Title <span class="required">*</span></label>
+                        <input type="text" id="recordingTitle" name="recordingTitle" required>
+                    </div>
+                    
+                    <div class="form-grid">
+                        <div class="form-row">
+                            <label for="program">Program <span class="required">*</span></label>
+                            <select id="program" name="program" required>
+                                <option value="">Select Program</option>
+                                <option value="CTP">Complete Trading Program</option>
+                                <option value="AMP">Arthavidya Mentorship Program</option>
+                                <option value="GMP">Growth Mindset Program</option>
+                                <option value="SIP">Smart Income Program</option>
+                            </select>
+                        </div>
+                        <div class="form-row">
+                            <label for="batch">Batch <span class="required">*</span></label>
+                            <select id="batch" name="batch" required>
+                                <option value="">Select Batch</option>
+                                <option value="CTP-APR-2025">CTP April 2025</option>
+                                <option value="CTP-JUL-2025">CTP July 2025</option>
+                                <option value="AMP-APR-2025">AMP April 2025</option>
+                                <option value="GMP-MAY-2025">GMP May 2025</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-grid">
+                        <div class="form-row">
+                            <label for="trainer">Trainer <span class="required">*</span></label>
+                            <select id="trainer" name="trainer" required>
+                                <option value="">Select Trainer</option>
+                                <option value="1">Andaz Aaron</option>
+                                <option value="2">Kanheyalal Jena</option>
+                                <option value="3">Prashanta Kumar Palei</option>
+                            </select>
+                        </div>
+                        <div class="form-row">
+                            <label for="recordingDate">Recording Date <span class="required">*</span></label>
+                            <input type="date" id="recordingDate" name="recordingDate" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-grid">
+                        <div class="form-row">
+                            <label for="recordingURL">Recording URL <span class="required">*</span></label>
+                            <input type="url" id="recordingURL" name="recordingURL" required>
+                        </div>
+                        <div class="form-row">
+                            <label for="duration">Duration <span class="required">*</span></label>
+                            <input type="text" id="duration" name="duration" placeholder="HH:MM:SS" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <label for="thumbnail">Thumbnail URL</label>
+                        <input type="url" id="thumbnail" name="thumbnail">
+                    </div>
+                    
+                    <div class="form-row">
+                        <label for="description">Description</label>
+                        <textarea id="description" name="description"></textarea>
+                    </div>
+                    
+                    <div class="form-row">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="isVisible" name="isVisible" checked>
+                            Make recording visible to students
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="form-footer">
+                    <button type="button" class="cancel-btn" id="cancelForm">Cancel</button>
+                    <button type="submit" class="submit-btn">Save Recording</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    {% block footer %}{% endblock footer %}
+    <!-- Include the common form handling JavaScript -->
+    <script src="{% static 'js/admin.js' %}"></script>
+    <script src="{% static 'js/admin-forms.js' %}"></script>
+    {% endblock content %}

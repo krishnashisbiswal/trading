@@ -1,0 +1,1346 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Admin Resources{% endblock %}
+{% block content %}
+    <style>
+        /* Modal Form Styles */
+        .modal-form {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-form.active {
+            display: flex;
+        }
+        
+        .form-container {
+            background-color: var(--bg-white);
+            border-radius: var(--border-radius);
+            width: 90%;
+            max-width: 700px;
+            box-shadow: var(--box-shadow-lg);
+            overflow: hidden;
+        }
+        
+        .form-header {
+            padding: 20px;
+            background-color: var(--primary-blue-lighter);
+            color: var(--primary-blue);
+            font-weight: 600;
+            font-size: 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-light);
+        }
+        
+        .form-header .close-btn {
+            cursor: pointer;
+            font-size: 20px;
+            color: var(--text-muted);
+            transition: var(--transition);
+        }
+        
+        .form-header .close-btn:hover {
+            color: var(--danger-color);
+            transform: rotate(90deg);
+        }
+        
+        .form-body {
+            padding: 20px;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+        
+        .form-row {
+            margin-bottom: 20px;
+        }
+        
+        .form-row label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-dark);
+        }
+        
+        .form-row input, 
+        .form-row select, 
+        .form-row textarea {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid var(--border-medium);
+            border-radius: var(--border-radius);
+            font-size: 14px;
+            transition: var(--transition);
+        }
+        
+        .form-row input:focus, 
+        .form-row select:focus, 
+        .form-row textarea:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(11, 87, 164, 0.1);
+            outline: none;
+        }
+        
+        .form-row textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+        
+        .form-footer {
+            padding: 20px;
+            border-top: 1px solid var(--border-light);
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+        }
+        
+        .cancel-btn {
+            padding: 10px 20px;
+            border: 1px solid var(--border-medium);
+            border-radius: var(--border-radius);
+            background-color: var(--bg-white);
+            color: var(--text-medium);
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .cancel-btn:hover {
+            background-color: var(--bg-light);
+        }
+        
+        .submit-btn {
+            padding: 10px 25px;
+            border-radius: var(--border-radius);
+            background-color: var(--primary-blue);
+            color: var(--text-light);
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: var(--transition);
+        }
+        
+        .submit-btn:hover {
+            background-color: var(--primary-blue-dark);
+        }
+        
+        /* File Upload Styles */
+        .file-upload {
+            background-color: var(--bg-light);
+            border: 2px dashed var(--border-medium);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-bottom: 15px;
+        }
+        
+        .file-upload:hover {
+            background-color: var(--primary-blue-lighter);
+            border-color: var(--primary-blue);
+        }
+        
+        .file-upload i {
+            font-size: 36px;
+            color: var(--primary-blue);
+            margin-bottom: 15px;
+        }
+        
+        .file-upload p {
+            margin: 0;
+            color: var(--text-medium);
+            font-size: 14px;
+        }
+        
+        .file-upload .browse {
+            color: var(--primary-blue);
+            font-weight: 600;
+            text-decoration: underline;
+        }
+        
+        .file-upload input[type="file"] {
+            display: none;
+        }
+        
+        .file-info {
+            display: none;
+            background-color: var(--bg-light);
+            border-radius: var(--border-radius);
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .file-info.show {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .file-name {
+            display: flex;
+            align-items: center;
+        }
+        
+        .file-name i {
+            margin-right: 10px;
+            font-size: 20px;
+        }
+        
+        .file-meta {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 5px;
+        }
+        
+        .file-remove {
+            color: var(--danger-color);
+            cursor: pointer;
+            font-size: 18px;
+            transition: var(--transition);
+        }
+        
+        .file-remove:hover {
+            transform: scale(1.2);
+        }
+        
+        /* Checkbox toggle for premium */
+        .switch-container {
+            display: flex;
+            align-items: center;
+        }
+        
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+            margin-right: 10px;
+        }
+        
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--border-medium);
+            transition: var(--transition);
+            border-radius: 24px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: var(--bg-white);
+            transition: var(--transition);
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: var(--primary-blue);
+        }
+        
+        input:focus + .slider {
+            box-shadow: 0 0 1px var(--primary-blue);
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        
+        /* Resource Cards */
+        .resource-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .resource-card {
+            background-color: var(--bg-white);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--box-shadow-sm);
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        
+        .resource-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--box-shadow-md);
+        }
+        
+        .resource-thumbnail {
+            height: 150px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .resource-thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: var(--transition);
+        }
+        
+        .resource-card:hover .resource-thumbnail img {
+            transform: scale(1.05);
+        }
+        
+        .resource-type {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-light);
+            z-index: 1;
+        }
+        
+        .resource-type.pdf {
+            background-color: var(--danger-color);
+        }
+        
+        .resource-type.video {
+            background-color: var(--primary-blue);
+        }
+        
+        .resource-type.template {
+            background-color: var(--success-color);
+        }
+        
+        .resource-type.link {
+            background-color: var(--warning-color);
+        }
+        
+        .premium-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            background-color: rgba(249, 201, 34, 0.9);
+            color: var(--dark-blue);
+            z-index: 1;
+        }
+        
+        .resource-details {
+            padding: 15px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .resource-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--dark-blue);
+            line-height: 1.3;
+        }
+        
+        .resource-description {
+            font-size: 13px;
+            color: var(--text-medium);
+            margin-bottom: 15px;
+            line-height: 1.4;
+            flex: 1;
+        }
+        
+        .resource-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: auto;
+            border-top: 1px solid var(--border-light);
+            padding-top: 10px;
+        }
+        
+        .resource-meta .stats {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .resource-meta .stat {
+            display: flex;
+            align-items: center;
+        }
+        
+        .resource-meta .stat i {
+            margin-right: 5px;
+            color: var(--primary-blue);
+        }
+        
+        .resource-actions {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            display: flex;
+            gap: 8px;
+            z-index: 2;
+            opacity: 0;
+            transition: var(--transition);
+        }
+        
+        .resource-card:hover .resource-actions {
+            opacity: 1;
+        }
+        
+        .resource-actions .action-btn {
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+        
+        /* Category Management Section */
+        .categories-section {
+            background-color: var(--bg-white);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: var(--box-shadow-sm);
+        }
+        
+        .categories-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-light);
+        }
+        
+        .categories-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--dark-blue);
+        }
+        
+        .add-category-btn {
+            display: flex;
+            align-items: center;
+            padding: 8px 15px;
+            background-color: var(--primary-blue-lighter);
+            color: var(--primary-blue);
+            border: none;
+            border-radius: var(--border-radius);
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .add-category-btn:hover {
+            background-color: var(--primary-blue);
+            color: var(--text-light);
+        }
+        
+        .add-category-btn i {
+            margin-right: 8px;
+        }
+        
+        .categories-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .category-item {
+            background-color: var(--bg-light);
+            border-radius: var(--border-radius);
+            padding: 15px;
+            transition: var(--transition);
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .category-item:hover {
+            background-color: var(--primary-blue-lighter);
+            transform: translateY(-3px);
+        }
+        
+        .category-item.active {
+            background-color: var(--primary-blue-lighter);
+            border-left: 3px solid var(--primary-blue);
+        }
+        
+        .category-name {
+            display: flex;
+            align-items: center;
+            font-weight: 500;
+            color: var(--dark-blue);
+        }
+        
+        .category-name i {
+            margin-right: 8px;
+            color: var(--primary-blue);
+        }
+        
+        .category-count {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 5px;
+        }
+        
+        .category-actions {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            gap: 8px;
+            opacity: 0;
+            transition: var(--transition);
+        }
+        
+        .category-item:hover .category-actions {
+            opacity: 1;
+        }
+        
+        .category-actions .action-btn {
+            width: 24px;
+            height: 24px;
+            font-size: 12px;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .resource-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .categories-list {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body class="admin-body">
+    <!-- Admin Container -->
+    <div class="admin-container">
+        <!-- Main Content Area -->
+        <main class="admin-main">
+            <!-- Page Header -->
+            <section class="page-header">
+                <div class="header-content">
+                    <div class="page-title">
+                        <h1>Resources Management</h1>
+                        <p>Manage learning resources for students</p>
+                    </div>
+                    <div class="header-actions">
+                        <button class="btn-add" id="addResourceBtn">
+                            <i class="fas fa-plus"></i> Add New Resource
+                        </button>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Categories Section -->
+            <section class="categories-section">
+                <div class="categories-header">
+                    <h3 class="categories-title">Resource Categories</h3>
+                    <button class="add-category-btn" id="addCategoryBtn">
+                        <i class="fas fa-plus"></i> Add Category
+                    </button>
+                </div>
+                <div class="categories-list">
+                    <div class="category-item active">
+                        <div class="category-name">
+                            <i class="fas fa-folder"></i> All Resources
+                        </div>
+                        <div class="category-count">12 resources</div>
+                    </div>
+                    <div class="category-item">
+                        <div class="category-actions">
+                            <button class="action-btn edit" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="action-btn delete" title="Delete">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                        <div class="category-name">
+                            <i class="fas fa-book"></i> Trading Basics
+                        </div>
+                        <div class="category-count">4 resources</div>
+                    </div>
+                    <div class="category-item">
+                        <div class="category-actions">
+                            <button class="action-btn edit" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="action-btn delete" title="Delete">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                        <div class="category-name">
+                            <i class="fas fa-chart-line"></i> Technical Analysis
+                        </div>
+                        <div class="category-count">3 resources</div>
+                    </div>
+                    <div class="category-item">
+                        <div class="category-actions">
+                            <button class="action-btn edit" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="action-btn delete" title="Delete">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                        <div class="category-name">
+                            <i class="fas fa-brain"></i> Trading Psychology
+                        </div>
+                        <div class="category-count">2 resources</div>
+                    </div>
+                    <div class="category-item">
+                        <div class="category-actions">
+                            <button class="action-btn edit" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="action-btn delete" title="Delete">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                        <div class="category-name">
+                            <i class="fas fa-tools"></i> Trading Tools
+                        </div>
+                        <div class="category-count">3 resources</div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Resource Cards -->
+            <section class="resource-cards">
+                <!-- Sample Resource Cards -->
+                <div class="resource-card">
+                    <div class="resource-thumbnail">
+                        <img src="../assets/images/resource-thumbnail-1.jpg" alt="Basics of Financial Market">
+                        <span class="resource-type pdf">PDF</span>
+                    </div>
+                    <div class="resource-actions">
+                        <button class="action-btn edit" title="Edit">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="action-btn delete" title="Delete">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                    <div class="resource-details">
+                        <h3 class="resource-title">Basics of Financial Market</h3>
+                        <p class="resource-description">Comprehensive guide on financial market fundamentals, market participants, and types of markets. Perfect for beginners.</p>
+                        <div class="resource-meta">
+                            <div class="stats">
+                                <div class="stat"><i class="fas fa-eye"></i> 452</div>
+                                <div class="stat"><i class="fas fa-download"></i> 186</div>
+                            </div>
+                            <div class="date">Apr 5, 2025</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="resource-card">
+                    <div class="resource-thumbnail">
+                        <img src="../assets/images/resource-thumbnail-2.jpg" alt="Advanced Price Action">
+                        <span class="resource-type pdf">PDF</span>
+                        <span class="premium-badge">Premium</span>
+                    </div>
+                    <div class="resource-actions">
+                        <button class="action-btn edit" title="Edit">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="action-btn delete" title="Delete">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                    <div class="resource-details">
+                        <h3 class="resource-title">Advanced Price Action</h3>
+                        <p class="resource-description">Learn advanced price action techniques including candlestick patterns, support/resistance, and order flow analysis.</p>
+                        <div class="resource-meta">
+                            <div class="stats">
+                                <div class="stat"><i class="fas fa-eye"></i> 324</div>
+                                <div class="stat"><i class="fas fa-download"></i> 142</div>
+                            </div>
+                            <div class="date">Apr 2, 2025</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="resource-card">
+                    <div class="resource-thumbnail">
+                        <img src="../assets/images/resource-thumbnail-3.jpg" alt="Technical Analysis">
+                        <span class="resource-type pdf">PDF</span>
+                        <span class="premium-badge">Premium</span>
+                    </div>
+                    <div class="resource-actions">
+                        <button class="action-btn edit" title="Edit">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="action-btn delete" title="Delete">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                    <div class="resource-details">
+                        <h3 class="resource-title">Technical Analysis</h3>
+                        <p class="resource-description">Comprehensive guide to technical analysis tools and indicators including RSI, MACD, Bollinger Bands, and more.</p>
+                        <div class="resource-meta">
+                            <div class="stats">
+                                <div class="stat"><i class="fas fa-eye"></i> 289</div>
+                                <div class="stat"><i class="fas fa-download"></i> 125</div>
+                            </div>
+                            <div class="date">Mar 28, 2025</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="resource-card">
+                    <div class="resource-thumbnail">
+                        <img src="../assets/images/resource-thumbnail-4.jpg" alt="Trading Psychology">
+                        <span class="resource-type pdf">PDF</span>
+                        <span class="premium-badge">Premium</span>
+                    </div>
+                    <div class="resource-actions">
+                        <button class="action-btn edit" title="Edit">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="action-btn delete" title="Delete">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                    <div class="resource-details">
+                        <h3 class="resource-title">Trading Psychology</h3>
+                        <p class="resource-description">Understanding the psychological aspects of trading, overcoming emotional biases, and building mental resilience.</p>
+                        <div class="resource-meta">
+                            <div class="stats">
+                                <div class="stat"><i class="fas fa-eye"></i> 216</div>
+                                <div class="stat"><i class="fas fa-download"></i> 98</div>
+                            </div>
+                            <div class="date">Mar 25, 2025</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="resource-card">
+                    <div class="resource-thumbnail">
+                        <img src="../assets/images/resource-thumbnail-5.jpg" alt="TradingView Setup Guide">
+                        <span class="resource-type pdf">PDF</span>
+                    </div>
+                    <div class="resource-actions">
+                        <button class="action-btn edit" title="Edit">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="action-btn delete" title="Delete">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                    <div class="resource-details">
+                        <h3 class="resource-title">TradingView Setup Guide</h3>
+                        <p class="resource-description">Step-by-step instructions for setting up your TradingView account and customizing it for optimal trading.</p>
+                        <div class="resource-meta">
+                            <div class="stats">
+                                <div class="stat"><i class="fas fa-eye"></i> 198</div>
+                                <div class="stat"><i class="fas fa-download"></i> 86</div>
+                            </div>
+                            <div class="date">Mar 22, 2025</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="resource-card">
+                    <div class="resource-thumbnail">
+                        <img src="../assets/images/resource-thumbnail-6.jpg" alt="Position Size Calculator">
+                        <span class="resource-type template">Template</span>
+                        <span class="premium-badge">Premium</span>
+                    </div>
+                    <div class="resource-actions">
+                        <button class="action-btn edit" title="Edit">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="action-btn delete" title="Delete">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                    <div class="resource-details">
+                        <h3 class="resource-title">Position Size Calculator</h3>
+                        <p class="resource-description">Excel-based tool to calculate optimal position sizes based on your risk tolerance, account size, and stop loss placement.</p>
+                        <div class="resource-meta">
+                            <div class="stats">
+                                <div class="stat"><i class="fas fa-eye"></i> 176</div>
+                                <div class="stat"><i class="fas fa-download"></i> 124</div>
+                            </div>
+                            <div class="date">Mar 18, 2025</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Table View (Alternative View) -->
+            <section class="table-section">
+                <div class="table-container">
+                    <div class="table-header">
+                        <h3 class="table-title">All Resources</h3>
+                        <div class="table-actions">
+                            <div class="search-container">
+                                <i class="fas fa-search search-icon"></i>
+                                <input type="text" class="search-input" id="searchInput" placeholder="Search resources...">
+                            </div>
+                            <div class="filter-container">
+                                <button class="filter-btn" id="filterBtn">
+                                    <i class="fas fa-filter"></i> Filter
+                                </button>
+                                <div class="filter-dropdown" id="filterDropdown">
+                                    <div class="filter-group">
+                                        <label class="filter-label">Category</label>
+                                        <select class="filter-select" id="categoryFilter">
+                                            <option value="">All Categories</option>
+                                            <option value="1">Trading Basics</option>
+                                            <option value="2">Technical Analysis</option>
+                                            <option value="3">Trading Psychology</option>
+                                            <option value="4">Trading Tools</option>
+                                        </select>
+                                    </div>
+                                    <div class="filter-group">
+                                        <label class="filter-label">Resource Type</label>
+                                        <select class="filter-select" id="typeFilter">
+                                            <option value="">All Types</option>
+                                            <option value="pdf">PDF</option>
+                                            <option value="video">Video</option>
+                                            <option value="template">Template</option>
+                                            <option value="link">Link</option>
+                                        </select>
+                                    </div>
+                                    <div class="filter-group">
+                                        <label class="filter-label">Status</label>
+                                        <select class="filter-select" id="statusFilter">
+                                            <option value="">All Status</option>
+                                            <option value="premium">Premium Only</option>
+                                            <option value="free">Free Resources</option>
+                                        </select>
+                                    </div>
+                                    <div class="filter-actions">
+                                        <button class="btn-reset" id="resetFilterBtn">Reset</button>
+                                        <button class="btn-apply" id="applyFilterBtn">Apply</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Table Content -->
+                    <div class="table-responsive">
+                        <table class="admin-table" id="resourcesTable">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Category</th>
+                                    <th>Type</th>
+                                    <th>Premium</th>
+                                    <th>Size</th>
+                                    <th>Views</th>
+                                    <th>Downloads</th>
+                                    <th>Date Added</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Sample data rows -->
+                                <tr>
+                                    <td>Basics of Financial Market</td>
+                                    <td>Trading Basics</td>
+                                    <td>PDF</td>
+                                    <td>No</td>
+                                    <td>2.4 MB</td>
+                                    <td>452</td>
+                                    <td>186</td>
+                                    <td>Apr 5, 2025</td>
+                                    <td>
+                                        <div class="row-actions">
+                                            <button class="action-btn view" title="View">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="action-btn edit" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="action-btn delete" title="Delete">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Advanced Price Action</td>
+                                    <td>Technical Analysis</td>
+                                    <td>PDF</td>
+                                    <td>Yes</td>
+                                    <td>3.8 MB</td>
+                                    <td>324</td>
+                                    <td>142</td>
+                                    <td>Apr 2, 2025</td>
+                                    <td>
+                                        <div class="row-actions">
+                                            <button class="action-btn view" title="View">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="action-btn edit" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="action-btn delete" title="Delete">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Technical Analysis</td>
+                                    <td>Technical Analysis</td>
+                                    <td>PDF</td>
+                                    <td>Yes</td>
+                                    <td>4.2 MB</td>
+                                    <td>289</td>
+                                    <td>125</td>
+                                    <td>Mar 28, 2025</td>
+                                    <td>
+                                        <div class="row-actions">
+                                            <button class="action-btn view" title="View">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="action-btn edit" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="action-btn delete" title="Delete">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Trading Psychology</td>
+                                    <td>Trading Psychology</td>
+                                    <td>PDF</td>
+                                    <td>Yes</td>
+                                    <td>2.9 MB</td>
+                                    <td>216</td>
+                                    <td>98</td>
+                                    <td>Mar 25, 2025</td>
+                                    <td>
+                                        <div class="row-actions">
+                                            <button class="action-btn view" title="View">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="action-btn edit" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="action-btn delete" title="Delete">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>TradingView Setup Guide</td>
+                                    <td>Trading Tools</td>
+                                    <td>PDF</td>
+                                    <td>No</td>
+                                    <td>1.8 MB</td>
+                                    <td>198</td>
+                                    <td>86</td>
+                                    <td>Mar 22, 2025</td>
+                                    <td>
+                                        <div class="row-actions">
+                                            <button class="action-btn view" title="View">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="action-btn edit" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="action-btn delete" title="Delete">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Position Size Calculator</td>
+                                    <td>Trading Tools</td>
+                                    <td>Template</td>
+                                    <td>Yes</td>
+                                    <td>245 KB</td>
+                                    <td>176</td>
+                                    <td>124</td>
+                                    <td>Mar 18, 2025</td>
+                                    <td>
+                                        <div class="row-actions">
+                                            <button class="action-btn view" title="View">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="action-btn edit" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="action-btn delete" title="Delete">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Table Footer with Pagination -->
+                    <div class="table-footer">
+                        <div class="page-info">
+                            Showing <span id="startRange">1</span> to <span id="endRange">6</span> of <span id="totalItems">12</span> entries
+                        </div>
+                        <div class="pagination">
+                            <button class="page-btn" id="prevPage" disabled>
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <button class="page-btn active">1</button>
+                            <button class="page-btn">2</button>
+                            <button class="page-btn" id="nextPage">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    
+    <!-- Modal Form for Adding/Editing Resource -->
+    <div class="modal-form" id="resourceForm">
+        <div class="form-container">
+            <div class="form-header">
+                <span id="formTitle">Add New Resource</span>
+                <i class="fas fa-times close-btn" id="closeForm"></i>
+            </div>
+            <form id="resourceDataForm">
+                <div class="form-body">
+                    <input type="hidden" id="resourceId" name="resourceId">
+                    <input type="hidden" id="formAction" name="formAction" value="add">
+                    
+                    <div class="form-row">
+                        <label for="title">Resource Title <span class="required">*</span></label>
+                        <input type="text" id="title" name="title" required>
+                    </div>
+                    
+                    <div class="form-grid">
+                        <div class="form-row">
+                            <label for="category">Category <span class="required">*</span></label>
+                            <select id="category" name="category" required>
+                                <option value="">Select Category</option>
+                                <option value="1">Trading Basics</option>
+                                <option value="2">Technical Analysis</option>
+                                <option value="3">Trading Psychology</option>
+                                <option value="4">Trading Tools</option>
+                            </select>
+                        </div>
+                        <div class="form-row">
+                            <label for="resourceType">Resource Type <span class="required">*</span></label>
+                            <select id="resourceType" name="resourceType" required>
+                                <option value="">Select Type</option>
+                                <option value="pdf">PDF</option>
+                                <option value="video">Video</option>
+                                <option value="template">Template</option>
+                                <option value="link">Link</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <label for="description">Description <span class="required">*</span></label>
+                        <textarea id="description" name="description" required></textarea>
+                    </div>
+                    
+                    <div class="form-row" id="fileUploadRow">
+                        <label>Upload File <span class="required">*</span></label>
+                        <div class="file-upload" id="fileDropArea">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <p>Drag & drop file here or <span class="browse">browse</span></p>
+                            <p>Supported formats: PDF, DOCX, XLSX, MP4, etc.</p>
+                            <input type="file" id="fileInput" name="fileInput">
+                        </div>
+                        <div class="file-info" id="fileInfo">
+                            <div class="file-name">
+                                <i class="fas fa-file-pdf"></i>
+                                <div>
+                                    <div id="fileName">resource-file.pdf</div>
+                                    <div class="file-meta" id="fileSize">2.4 MB</div>
+                                </div>
+                            </div>
+                            <i class="fas fa-times file-remove" id="removeFile"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row" id="linkRow" style="display: none;">
+                        <label for="resourceLink">Resource Link <span class="required">*</span></label>
+                        <input type="url" id="resourceLink" name="resourceLink" placeholder="https://example.com/resource">
+                    </div>
+                    
+                    <div class="form-grid">
+                        <div class="form-row">
+                            <label for="author">Author</label>
+                            <input type="text" id="author" name="author">
+                        </div>
+                        <div class="form-row">
+                            <label for="thumbnailUrl">Thumbnail URL</label>
+                            <input type="url" id="thumbnailUrl" name="thumbnailUrl" placeholder="https://example.com/thumbnail.jpg">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="switch-container">
+                            <label class="switch">
+                                <input type="checkbox" id="isPremium" name="isPremium">
+                                <span class="slider"></span>
+                            </label>
+                            <span>Premium Resource (Only available to enrolled students)</span>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <label>Assign to Programs</label>
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+                            <div>
+                                <label style="display: flex; align-items: center; font-weight: normal;">
+                                    <input type="checkbox" name="programs[]" value="CTP" style="width: auto; margin-right: 10px;">
+                                    Complete Trading Program
+                                </label>
+                            </div>
+                            <div>
+                                <label style="display: flex; align-items: center; font-weight: normal;">
+                                    <input type="checkbox" name="programs[]" value="AMP" style="width: auto; margin-right: 10px;">
+                                    Arthavidya Mentorship Program
+                                </label>
+                            </div>
+                            <div>
+                                <label style="display: flex; align-items: center; font-weight: normal;">
+                                    <input type="checkbox" name="programs[]" value="GMP" style="width: auto; margin-right: 10px;">
+                                    Growth Mindset Program
+                                </label>
+                            </div>
+                            <div>
+                                <label style="display: flex; align-items: center; font-weight: normal;">
+                                    <input type="checkbox" name="programs[]" value="SIP" style="width: auto; margin-right: 10px;">
+                                    Smart Income Program
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-footer">
+                    <button type="button" class="cancel-btn" id="cancelForm">Cancel</button>
+                    <button type="submit" class="submit-btn">Save Resource</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Modal Form for Adding/Editing Category -->
+    <div class="modal-form" id="categoryForm">
+        <div class="form-container">
+            <div class="form-header">
+                <span id="categoryFormTitle">Add New Category</span>
+                <i class="fas fa-times close-btn" id="closeCategoryForm"></i>
+            </div>
+            <form id="categoryDataForm">
+                <div class="form-body">
+                    <input type="hidden" id="categoryId" name="categoryId">
+                    
+                    <div class="form-row">
+                        <label for="categoryName">Category Name <span class="required">*</span></label>
+                        <input type="text" id="categoryName" name="categoryName" required>
+                    </div>
+                    
+                    <div class="form-row">
+                        <label for="categoryDescription">Description</label>
+                        <textarea id="categoryDescription" name="categoryDescription"></textarea>
+                    </div>
+                    
+                    <div class="form-row">
+                        <label for="categoryIcon">Icon</label>
+                        <select id="categoryIcon" name="categoryIcon">
+                            <option value="book">Book</option>
+                            <option value="chart-line">Chart Line</option>
+                            <option value="chart-bar">Chart Bar</option>
+                            <option value="brain">Brain</option>
+                            <option value="tools">Tools</option>
+                            <option value="graduation-cap">Graduation Cap</option>
+                            <option value="file-alt">File</option>
+                            <option value="video">Video</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-footer">
+                    <button type="button" class="cancel-btn" id="cancelCategoryForm">Cancel</button>
+                    <button type="submit" class="submit-btn">Save Category</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    {% block footer %}
+    {% endblock footer %}
+    <!-- Include the common form handling JavaScript -->
+    <script src="{% static 'js/admin.js' %}"></script>
+    <script src="{% static 'js/admin-forms.js'%}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // File upload functionality
+            const fileDropArea = document.getElementById('fileDropArea');
+            const fileInput = document.getElementById('fileInput');
+            const fileInfo = document.getElementById('fileInfo');
+            const fileName = document.getElementById('fileName');
+            const fileSize = document.getElementById('fileSize');
+            const removeFile = document.getElementById('removeFile');
+            
+            // Show file info if a file is selected
+            fileInput.addEventListener('change', function(e) {
+                if (this.files && this.files[0]) {
+                    const file = this.files[0];
+                    fileName.textContent = file.name;
+                    fileSize.textContent = formatFileSize(file.size);
+                    fileInfo.classList.add('show');
+                }
+            });
+            
+            // Click on drop area to trigger file input
+            fileDropArea.addEventListener('click', function() {
+                fileInput.click();
+            });
+            
+            // Remove file
+            removeFile.addEventListener('click', function() {
+                fileInput.value = '';
+                fileInfo.classList.remove('show');
+            });
+            
+            // Format file size
+            function formatFileSize(bytes) {
+                if (bytes < 1024) return bytes + ' bytes';
+                else if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+                else return (bytes / 1048576).toFixed(1) + ' MB';
+            }
+            
+            // Resource type change handler
+            const resourceType = document.getElementById('resourceType');
+            const fileUploadRow = document.getElementById('fileUploadRow');
+            const linkRow = document.getElementById('linkRow');
+            
+            resourceType.addEventListener('change', function() {
+                if (this.value === 'link') {
+                    fileUploadRow.style.display = 'none';
+                    linkRow.style.display = 'block';
+                } else {
+                    fileUploadRow.style.display = 'block';
+                    linkRow.style.display = 'none';
+                }
+            });
+            
+            // Category form handlers
+            const addCategoryBtn = document.getElementById('addCategoryBtn');
+            const categoryForm = document.getElementById('categoryForm');
+            const closeCategoryForm = document.getElementById('closeCategoryForm');
+            const cancelCategoryForm = document.getElementById('cancelCategoryForm');
+            const categoryDataForm = document.getElementById('categoryDataForm');
+            
+            addCategoryBtn.addEventListener('click', function() {
+                document.getElementById('categoryFormTitle').textContent = 'Add New Category';
+                categoryDataForm.reset();
+                categoryForm.classList.add('active');
+            });
+            
+            closeCategoryForm.addEventListener('click', function() {
+                categoryForm.classList.remove('active');
+            });
+            
+            cancelCategoryForm.addEventListener('click', function() {
+                categoryForm.classList.remove('active');
+            });
+            
+            categoryDataForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                alert('Category saved! In a real application, this would be saved to the database.');
+                categoryForm.classList.remove('active');
+            });
+            
+            // Edit category handlers
+            const editCategoryBtns = document.querySelectorAll('.category-item .action-btn.edit');
+            editCategoryBtns.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.stopPropagation(); // Prevent the category item click event
+                    const categoryItem = this.closest('.category-item');
+                    const name = categoryItem.querySelector('.category-name').textContent.trim();
+                    
+                    document.getElementById('categoryFormTitle').textContent = 'Edit Category';
+                    document.getElementById('categoryName').value = name.replace(/^\s*\S+\s*/, '').trim(); // Remove icon text
+                    categoryForm.classList.add('active');
+                });
+            });
+            
+            // Delete category handlers
+            const deleteCategoryBtns = document.querySelectorAll('.category-item .action-btn.delete');
+            deleteCategoryBtns.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.stopPropagation(); // Prevent the category item click event
+                    const categoryItem = this.closest('.category-item');
+                    const name = categoryItem.querySelector('.category-name').textContent.trim();
+                    
+                    if (confirm(`Are you sure you want to delete the category "${name.replace(/^\s*\S+\s*/, '').trim()}"?`)) {
+                        categoryItem.remove();
+                    }
+                });
+            });
+            
+            // Category item click handler (for filtering)
+            const categoryItems = document.querySelectorAll('.category-item');
+            categoryItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    // Remove active class from all items
+                    categoryItems.forEach(i => i.classList.remove('active'));
+                    
+                    // Add active class to clicked item
+                    this.classList.add('active');
+                    
+                    // Here you would typically filter the resources based on the selected category
+                    alert('Category selected! In a real application, this would filter the displayed resources.');
+                });
+            });
+        });
+    </script>
+{% endblock  %}

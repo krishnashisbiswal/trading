@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arthavidya Community</title>
+    <link rel="stylesheet" href="{% static 'css/style.css'%}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<style>
+    / Community Page Specific Styles /
+    .community-section {
+        padding: 60px 0;
+        background-color: #f9f9f9;
+    }
+    
+    .community-section-title {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+    
+    .community-section-title h2 {
+        color: #0a3d7c;
+        font-size: 32px;
+        margin-bottom: 15px;
+        font-weight: 700;
+        position: relative;
+        display: inline-block;
+    }
+
+    
+    .community-section-title h2:after {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80px;
+        height: 3px;
+        background-color: #d1003a;
+    }
+    
+    .community-section-title p {
+        color: #555;
+        font-size: 18px;
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    
+    .community-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 30px;
+        margin-top: 50px;
+    }
+    
+    .community-card {
+        background-color: #fff;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+    }
+    
+    .community-card:hover {
+        transform: translateY(-10px);
+    }
+    
+    .community-card-img {
+        height: 200px;
+        overflow: hidden;
+    }
+    
+    .community-card-img img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+    }
+    
+    .community-card:hover .community-card-img img {
+        transform: scale(1.1);
+    }
+    
+    .community-card-content {
+        padding: 25px;
+    }
+    
+    .community-card-title {
+        font-size: 20px;
+        font-weight: 600;
+        color: #0a3d7c;
+        margin-bottom: 15px;
+    }
+    
+    .community-card-text {
+        color: #555;
+        font-size: 16px;
+        line-height: 1.6;
+        margin-bottom: 20px;
+    }
+    
+    .community-card-meta {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        color: #777;
+        font-size: 14px;
+    }
+    
+    .community-card-date {
+        display: flex;
+        align-items: center;
+    }
+    
+    .community-card-date i {
+        margin-right: 5px;
+        color: #d1003a;
+    }
+    
+    .community-btn {
+        display: inline-block;
+        background-color: #0a3d7c;
+        color: #fff;
+        padding: 10px 25px;
+        border-radius: 5px;
+        font-weight: 500;
+        text-decoration: none;
+        transition: background-color 0.3s ease;
+        margin-top: 10px;
+    }
+    
+    .community-btn:hover {
+        background-color: #d1003a;
+    }
+    
+    .community-testimonials {
+        background-color: #0a3d7c;
+        padding: 80px 0;
+        color: #fff;
+    }
+    
+    .community-testimonial-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 30px;
+        margin-top: 50px;
+    }
+    
+    .community-testimonial-card {
+        background-color: rgba(255, 255, 255, 0.1);
+        padding: 30px;
+        border-radius: 8px;
+        position: relative;
+    }
+    
+    .community-testimonial-quote {
+        font-size: 16px;
+        line-height: 1.7;
+        margin-bottom: 20px;
+    }
+    
+    .community-testimonial-author {
+        display: flex;
+        align-items: center;
+    }
+    
+    .community-testimonial-img {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        overflow: hidden;
+        margin-right: 15px;
+    }
+    
+    .community-testimonial-img img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .community-testimonial-info h4 {
+        font-size: 18px;
+        margin-bottom: 5px;
+    }
+    
+    .community-testimonial-info p {
+        font-size: 14px;
+        opacity: 0.8;
+    }
+    
+    .community-join-section {
+        text-align: center;
+        padding: 80px 0;
+        background: linear-gradient(rgba(10, 61, 124, 0.9), rgba(209, 0, 58, 0.8)), url('../assets/images/pattern-bg.jpg') center/cover;
+        color: #fff;
+    }
+    
+    .community-join-content {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    
+    .community-join-title {
+        font-size: 36px;
+        font-weight: 700;
+        margin-bottom: 20px;
+    }
+    
+    .community-join-text {
+        font-size: 18px;
+        line-height: 1.6;
+        margin-bottom: 30px;
+    }
+    
+    .community-btn-white {
+        display: inline-block;
+        background-color: #fff;
+        color: #0a3d7c;
+        padding: 12px 30px;
+        border-radius: 5px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        margin: 10px;
+    }
+    
+    .community-btn-white:hover {
+        background-color: #d1003a;
+        color: #fff;
+    }
+    
+    @media (max-width: 768px) {
+        .community-grid, 
+        .community-testimonial-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .community-section-title h2 {
+            font-size: 28px;
+        }
+        
+        .community-join-title {
+            font-size: 30px;
+        }
+    }
+</style>
+<body>
+    <!-- Header Section -->
+    <header class="main-header">
+        <div class="container">
+            <div class="header-inner">
+                <div class="logo">
+                    <img src="{% static 'images/logo.png' %}" alt="Arthavidya Trading Community">
+                    <div class="logo-text">
+                        <h1>Arthavidya Trading Community</h1>
+                        <p>Building A Wealthy Nation</p>
+                    </div>
+                </div>
+                <nav class="main-nav">
+                    <ul>
+                        <li><a href="{% url "home" %}" >Home</a></li>
+                        <li><a href="{% url "about" %}">About Us</a></li>
+                        <li><a href="{% url "programs" %}">Our Programs</a></li>
+                        <li><a href="{% url "community"%}"class="active">Community</a></li>
+                        <li><a href="{% url "blog" %}">Blog</a></li>
+                        <li><a href="{% url "student_form" %}" class="register-btn">Register</a></li>
+                        <li><a href="{% url "login" %}" class="login-btn">Login</a></li>
+                    </ul>
+                </nav>
+                <div class="mobile-menu-toggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </div>
+    </header>
+    <!-- Footer Section -->
+    <section class="community-section">
+        <div class="container">
+            <div class="community-section-title">
+                <h2>Our Trading Community</h2>
+                <p>Join a supportive network of traders working together toward financial independence and growth</p>
+            </div>
+            
+            <div class="community-grid">
+                <div class="community-card">
+                    <div class="community-card-img">
+                        <img src="{%static 'images/community/Community Events.png'%}" alt="Community Events">
+                    </div>
+                    <div class="community-card-content">
+                        <h3 class="community-card-title">Weekly Webinars</h3>
+                        <p class="community-card-text">Participate in our weekly live webinars where we discuss market trends, trading strategies, and answer your questions in real-time.</p>
+                        <div class="community-card-meta">
+                            <span class="community-card-date"><i class="far fa-calendar-alt"></i> Every Saturday</span>
+                        </div>
+                        <a href="#" class="community-btn">Join Next Webinar</a>
+                    </div>
+                </div>
+                
+                <div class="community-card">
+                    <div class="community-card-img">
+                        <img src="{%static 'images/community/Discussion Forums.jpeg'%}" alt="Discussion Forums">
+                    </div>
+                    <div class="community-card-content">
+                        <h3 class="community-card-title">Discussion Forums</h3>
+                        <p class="community-card-text">Connect with fellow traders, share insights, discuss strategies, and learn from each other's experiences in our active online forums.</p>
+                        <div class="community-card-meta">
+                            <span class="community-card-date"><i class="fas fa-users"></i> 5000+ Active Members</span>
+                        </div>
+                        <a href="#" class="community-btn">Browse Forums</a>
+                    </div>
+                </div>
+                
+                <div class="community-card">
+                    <div class="community-card-img">
+                        <img src="{%static 'images/community/Mentorship Program.png'%}" alt="Mentorship Program">
+                    </div>
+                    <div class="community-card-content">
+                        <h3 class="community-card-title">Mentorship Program</h3>
+                        <p class="community-card-text">Get personalized guidance from experienced traders who will help you develop your trading skills and achieve your financial goals.</p>
+                        <div class="community-card-meta">
+                            <span class="community-card-date"><i class="fas fa-user-graduate"></i> Limited Slots Available</span>
+                        </div>
+                        <a href="#" class="community-btn">Apply Now</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Testimonials Section -->
+    <section class="community-testimonials">
+        <div class="container">
+            <div class="community-section-title">
+                <h2 style="Color:#fff;">Community Success Stories</h2>
+                <p>Hear from our community members who have transformed their trading journey with Arthavidya</p>
+            </div>
+            
+            <div class="community-testimonial-grid">
+                <div class="community-testimonial-card">
+                    <p class="community-testimonial-quote">"Joining the Arthavidya community was the best decision for my trading career. The support and knowledge sharing from fellow traders helped me become consistent and profitable."</p>
+                    <div class="community-testimonial-author">
+                        <div class="community-testimonial-img">
+                            <img src="{%static 'images/community/profile.jpg'%}" alt="Community Member">
+                        </div>
+                        <div class="community-testimonial-info">
+                            <h4>Rahul Sharma</h4>
+                            <p>Member since 2023</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="community-testimonial-card">
+                    <p class="community-testimonial-quote">"The weekly webinars and market analysis sessions have given me insights that I couldn't find anywhere else. My trading results have improved significantly since joining."</p>
+                    <div class="community-testimonial-author">
+                        <div class="community-testimonial-img">
+                            <img src="{%static 'images/community/profile.jpg'%}" alt="Community Member">
+                        </div>
+                        <div class="community-testimonial-info">
+                            <h4>Priya Patel</h4>
+                            <p>Member since 2022</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="community-testimonial-card">
+                    <p class="community-testimonial-quote">"Being part of this community has not only improved my trading skills but also connected me with like-minded individuals passionate about financial markets."</p>
+                    <div class="community-testimonial-author">
+                        <div class="community-testimonial-img">
+                            <img src="{%static 'images/community/profile.jpg'%}" alt="Community Member">
+                        </div>
+                        <div class="community-testimonial-info">
+                            <h4>Amit Kumar</h4>
+                            <p>Member since 2024</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Community Activities -->
+    <section class="community-section">
+        <div class="container">
+            <div class="community-section-title">
+                <h2>Community Activities</h2>
+                <p>Explore the various activities and resources available to our community members</p>
+            </div>
+            
+            <div class="community-grid">
+                <div class="community-card">
+                    <div class="community-card-img">
+                        <img src="{%static 'images/community/Trading Challenges.jpeg'%}" alt="Trading Challenges">
+                    </div>
+                    <div class="community-card-content">
+                        <h3 class="community-card-title">Trading Challenges</h3>
+                        <p class="community-card-text">Participate in monthly trading challenges to test your skills, compete with fellow traders, and win exciting prizes.</p>
+                        <a href="#" class="community-btn">View Challenges</a>
+                    </div>
+                </div>
+                
+                <div class="community-card">
+                    <div class="community-card-img">
+                        <img src="{%static 'images/community/Study Groups.jpeg'%}" alt="Study Groups">
+                    </div>
+                    <div class="community-card-content">
+                        <h3 class="community-card-title">Study Groups</h3>
+                        <p class="community-card-text">Join specialized study groups focused on different trading strategies, market segments, or financial instruments.</p>
+                        <a href="#" class="community-btn">Find a Group</a>
+                    </div>
+                </div>
+                
+                <div class="community-card">
+                    <div class="community-card-img">
+                        <img src="{%static 'images/community/Resource Library.jpeg'%}" alt="Resource Library">
+                    </div>
+                    <div class="community-card-content">
+                        <h3 class="community-card-title">Resource Library</h3>
+                        <p class="community-card-text">Access our extensive library of trading resources, including e-books, video tutorials, market analysis, and trading templates.</p>
+                        <a href="#" class="community-btn">Browse Resources</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Join Community CTA -->
+    <section class="community-join-section">
+        <div class="container">
+            <div class="community-join-content">
+                <h2 class="community-join-title">Join Our Trading Family Today</h2>
+                <p class="community-join-text">Become part of a supportive community dedicated to helping each other succeed in the financial markets. Whether you're a beginner or experienced trader, there's a place for you in our community.</p>
+                <div>
+                    <a href="../dashboard/student/studentfrom.html" class="community-btn-white">Register Now</a>
+                    <a href="#" class="community-btn-white">Learn More</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer Section -->
+    <footer class="main-footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="contact-info">
+                    <a href="mailto:arthavidyacommunity@gmail.com" class="contact-item">
+                        <i class="fas fa-envelope"></i>
+                        <mailto:span>arthavidyacommunity@gmail.com</span>
+                    </a>
+                    <a href="tel:+917854933728" class="contact-item">
+                        <i class="fas fa-phone"></i>
+                        <span>+91 7854933728</span>
+                    </a>
+                </div>
+                
+                <div class="social-links">
+                    <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-youtube"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+            
+            <div class="footer-links">
+                <a href="{% url "terms_and_condition" %}">Shipping policy</a>
+                <a href="{% url "terms_and_condition" %}">Return Policy</a>
+                <a href="{% url "terms_and_condition" %}">Refund Policy</a>
+            </div>
+            
+            <div class="copyright">
+                <p>Arthavidya Trading Community Pvt Ltd © All Rights Reserved - 2025</p>
+                <p>Design and Developed by Arthavidya Trading Community</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Script -->
+    <script src="{% static 'js/main.js' %}"></script>
+    <script>
+        
+        // Add this script at the end of your body tag or in your JS file
+        document.addEventListener('DOMContentLoaded', function() {
+            // Clone the partner logos to create the infinite effect
+            const partnersGrid = document.querySelector('.partners-grid');
+            const partnerLogos = document.querySelectorAll('.partner-logo');
+            
+            // Create a clone of each logo
+            partnerLogos.forEach(logo => {
+                const clone = logo.cloneNode(true);
+                partnersGrid.appendChild(clone);
+            });
+            
+            // Add the necessary CSS for sliding animation
+            const style = document.createElement('style');
+            style.textContent = `
+                .partners-grid {
+                    display: flex;
+                    justify-content: flex-start;
+                    align-items: center;
+                    flex-wrap: nowrap;
+                    gap: 30px;
+                    animation: slideLogos 20s linear infinite;
+                    width: auto;
+                    overflow: visible;
+                }
+                
+                @keyframes slideLogos {
+                    0% {
+                        transform: translateX(0);
+                    }
+                    100% {
+                        transform: translateX(calc(-100% / 2));
+                    }
+                }
+                
+                .partners-section {
+                    overflow: hidden;
+                }
+                
+                / Pause animation on hover /
+                .partners-grid:hover {
+                    animation-play-state: paused;
+                }
+                
+                .partner-logo {
+                    flex: 0 0 auto;
+                    min-width: 150px;
+                }
+            `;
+            
+            document.head.appendChild(style);
+        });
+            </script>
+</body>
+</html>

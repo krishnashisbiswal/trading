@@ -1,0 +1,1183 @@
+{% extends 'base.html' %}
+{% load static %}   
+{% block title %}Payments{% endblock %}
+{% block content %}
+    <style>
+        /* Payment specific styles */
+        .payment-method-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .payment-method-card {
+            background-color: rgba(0, 123, 255, 0.1);
+            color: #007bff;
+        }
+        
+        .payment-method-upi {
+            background-color: rgba(75, 192, 192, 0.1);
+            color: #4bc0c0;
+        }
+        
+        .payment-method-bank {
+            background-color: rgba(153, 102, 255, 0.1);
+            color: #9966ff;
+        }
+        
+        .payment-method-paypal {
+            background-color: rgba(54, 162, 235, 0.1);
+            color: #36a2eb;
+        }
+        
+        .payment-method-cash {
+            background-color: rgba(255, 159, 64, 0.1);
+            color: #ff9f40;
+        }
+        
+        .payment-amount {
+            font-weight: 600;
+            color: var(--dark-blue);
+        }
+        
+        .payment-modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            overflow: auto;
+        }
+        
+        .modal-content {
+            background-color: var(--bg-white);
+            margin: 50px auto;
+            padding: 0;
+            width: 80%;
+            max-width: 800px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow-lg);
+            animation: modalFadeIn 0.3s;
+        }
+        
+        .modal-header {
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border-light);
+        }
+        
+        .modal-header h2 {
+            margin: 0;
+            font-size: 20px;
+            color: var(--dark-blue);
+        }
+        
+        .close-modal {
+            color: var(--text-muted);
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            background: none;
+            border: none;
+            transition: var(--transition);
+        }
+        
+        .close-modal:hover {
+            color: var(--danger-color);
+        }
+        
+        .modal-body {
+            padding: 20px;
+        }
+        
+        .payment-detail-row {
+            display: flex;
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--border-light);
+            padding-bottom: 15px;
+        }
+        
+        .payment-detail-label {
+            width: 180px;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+        
+        .payment-detail-value {
+            flex: 1;
+            color: var(--text-medium);
+        }
+        
+        .modal-footer {
+            padding: 15px 20px;
+            border-top: 1px solid var(--border-light);
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        
+        .btn-secondary {
+            padding: 10px 15px;
+            background-color: var(--bg-light);
+            border: 1px solid var(--border-light);
+            border-radius: 5px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .btn-secondary:hover {
+            background-color: var(--border-light);
+        }
+        
+        .btn-primary {
+            padding: 10px 15px;
+            background-color: var(--primary-blue);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-blue-dark);
+        }
+        
+        .btn-danger {
+            padding: 10px 15px;
+            background-color: var(--danger-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+        
+        /* Payment stats cards */
+        .stats-cards.payment-stats {
+            margin-bottom: 25px;
+        }
+        
+        .stats-card.total-revenue {
+            border-left: 4px solid var(--success-color);
+        }
+        
+        .stats-card.monthly-revenue {
+            border-left: 4px solid var(--primary-blue);
+        }
+        
+        .stats-card.pending-payments {
+            border-left: 4px solid var(--warning-color);
+        }
+        
+        .stats-card.success-rate {
+            border-left: 4px solid var(--info-color);
+        }
+        
+        /* Charts section */
+        .charts-container {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+        
+        .chart-card {
+            flex: 1;
+            background-color: var(--bg-white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow-sm);
+            padding: 20px;
+        }
+        
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .chart-title {
+            font-size: 16px;
+            color: var(--dark-blue);
+            font-weight: 600;
+            margin: 0;
+        }
+        
+        .chart-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .chart-filter {
+            padding: 5px 10px;
+            border: 1px solid var(--border-light);
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        
+        .chart-container {
+            height: 250px;
+            position: relative;
+        }
+        
+        /* Add payment form */
+        .add-payment-form {
+            display: none;
+            background-color: var(--bg-white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow-sm);
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+        
+        .form-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-light);
+        }
+        
+        .form-title {
+            font-size: 18px;
+            color: var(--dark-blue);
+            margin: 0;
+        }
+        
+        .form-close {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 18px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .form-close:hover {
+            color: var(--danger-color);
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            flex: 1;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-dark);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border-light);
+            border-radius: 5px;
+            font-size: 14px;
+            transition: var(--transition);
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 2px rgba(11, 87, 164, 0.1);
+            outline: none;
+        }
+        
+        .form-text {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 5px;
+        }
+        
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .btn-cancel {
+            padding: 10px 20px;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            border: 1px solid var(--border-light);
+            border-radius: 5px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .btn-cancel:hover {
+            background-color: var(--bg-white);
+        }
+        
+        .btn-save {
+            padding: 10px 20px;
+            background-color: var(--primary-blue);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .btn-save:hover {
+            background-color: var(--primary-blue-dark);
+        }
+        
+        @keyframes modalFadeIn {
+            from {opacity: 0; transform: translateY(-20px);}
+            to {opacity: 1; transform: translateY(0);}
+        }
+        
+        @media (max-width: 992px) {
+            .charts-container {
+                flex-direction: column;
+            }
+            
+            .chart-card {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body class="admin-body">
+        <!-- Main Content Area -->
+        <main class="admin-main">
+            <!-- Page Header -->
+            <section class="page-header">
+                <div class="header-content">
+                    <div class="page-title">
+                        <h1>Payments</h1>
+                        <p>Manage all payment transactions</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Payment Stats Cards -->
+            <section class="stats-cards payment-stats">
+                <div class="row">
+                    <div class="stats-card total-revenue">
+                        <div class="stats-icon">
+                            <i class="fas fa-rupee-sign"></i>
+                        </div>
+                        <div class="stats-info">
+                            <h3>Total Revenue</h3>
+                            <div class="stats-numbers">
+                                <span class="stats-value">₹1.72Cr</span>
+                                <span class="stats-change positive">
+                                    <i class="fas fa-arrow-up"></i> 18%
+                                </span>
+                            </div>
+                            <p class="stats-period">Lifetime revenue</p>
+                        </div>
+                    </div>
+                    <div class="stats-card monthly-revenue">
+                        <div class="stats-icon">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <div class="stats-info">
+                            <h3>Monthly Revenue</h3>
+                            <div class="stats-numbers">
+                                <span class="stats-value">₹12.6L</span>
+                                <span class="stats-change positive">
+                                    <i class="fas fa-arrow-up"></i> 8.3%
+                                </span>
+                            </div>
+                            <p class="stats-period">vs. previous month</p>
+                        </div>
+                    </div>
+                    <div class="stats-card pending-payments">
+                        <div class="stats-icon">
+                            <i class="fas fa-hourglass-half"></i>
+                        </div>
+                        <div class="stats-info">
+                            <h3>Pending Payments</h3>
+                            <div class="stats-numbers">
+                                <span class="stats-value">₹1.8L</span>
+                                <span class="stats-change negative">
+                                    <i class="fas fa-arrow-up"></i> 5.2%
+                                </span>
+                            </div>
+                            <p class="stats-period">22 transactions</p>
+                        </div>
+                    </div>
+                    <div class="stats-card success-rate">
+                        <div class="stats-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="stats-info">
+                            <h3>Success Rate</h3>
+                            <div class="stats-numbers">
+                                <span class="stats-value">94.2%</span>
+                                <span class="stats-change positive">
+                                    <i class="fas fa-arrow-up"></i> 1.5%
+                                </span>
+                            </div>
+                            <p class="stats-period">968 of 1028 successful</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Charts Section -->
+            <section class="charts-container">
+                <!-- Payment Trends Chart -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3 class="chart-title">Payment Trends</h3>
+                        <div class="chart-actions">
+                            <select class="chart-filter" id="payment-trend-filter">
+                                <option value="30">Last 30 Days</option>
+                                <option value="90">Last 90 Days</option>
+                                <option value="180">Last 6 Months</option>
+                                <option value="365">Last Year</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="paymentTrendChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Payment Methods Chart -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3 class="chart-title">Payment Methods</h3>
+                        <div class="chart-actions">
+                            <select class="chart-filter" id="payment-method-filter">
+                                <option value="30">Last 30 Days</option>
+                                <option value="90">Last 90 Days</option>
+                                <option value="180">Last 6 Months</option>
+                                <option value="365">Last Year</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="paymentMethodChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Add Payment Form (Hidden by default) -->
+            <section class="add-payment-form" id="add-payment-form">
+                <div class="form-header">
+                    <h3 class="form-title">Record New Payment</h3>
+                    <button class="form-close" id="close-form"><i class="fas fa-times"></i></button>
+                </div>
+                <form id="payment-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="student" class="form-label">Student</label>
+                            <select id="student" name="student" class="form-control" required>
+                                <option value="">Select Student</option>
+                                <option value="1">Rahul Sharma (ID: ATC010125)</option>
+                                <option value="2">Priya Patel (ID: ATC010126)</option>
+                                <option value="3">Amit Kumar (ID: ATC010127)</option>
+                                <option value="4">Neha Singh (ID: ATC010128)</option>
+                                <option value="5">Rajesh Verma (ID: ATC010129)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="program" class="form-label">Program</label>
+                            <select id="program" name="program" class="form-control" required>
+                                <option value="">Select Program</option>
+                                <option value="ctp">Complete Trading Program (₹19,999)</option>
+                                <option value="amp">Arthavidya Mentorship Program (₹39,999)</option>
+                                <option value="gmp">Growth Mindset Program (₹7,999)</option>
+                                <option value="sip">Smart Income Program (₹11,999)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="amount" class="form-label">Amount (₹)</label>
+                            <input type="number" id="amount" name="amount" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="payment_date" class="form-label">Payment Date</label>
+                            <input type="date" id="payment_date" name="payment_date" class="form-control" value="2025-04-09" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="payment_method" class="form-label">Payment Method</label>
+                            <select id="payment_method" name="payment_method" class="form-control" required>
+                                <option value="">Select Payment Method</option>
+                                <option value="card">Credit/Debit Card</option>
+                                <option value="upi">UPI</option>
+                                <option value="bank">Bank Transfer</option>
+                                <option value="paypal">PayPal</option>
+                                <option value="cash">Cash</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="transaction_id" class="form-label">Transaction ID</label>
+                            <input type="text" id="transaction_id" name="transaction_id" class="form-control">
+                            <div class="form-text">Enter payment gateway transaction ID if available</div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="payment_status" class="form-label">Payment Status</label>
+                            <select id="payment_status" name="payment_status" class="form-control" required>
+                                <option value="completed">Completed</option>
+                                <option value="pending">Pending</option>
+                                <option value="failed">Failed</option>
+                                <option value="refunded">Refunded</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="invoice_number" class="form-label">Invoice Number</label>
+                            <input type="text" id="invoice_number" name="invoice_number" class="form-control">
+                            <div class="form-text">Leave empty to auto-generate</div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="notes" class="form-label">Notes</label>
+                        <textarea id="notes" name="notes" class="form-control" rows="3" placeholder="Additional payment notes or remarks"></textarea>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn-cancel" id="cancel-payment">Cancel</button>
+                        <button type="submit" class="btn-save">Record Payment</button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- Payments Table Section -->
+            <section class="table-container">
+                <!-- Bulk Actions Bar -->
+                <div class="bulk-actions" id="bulk-actions">
+                    <div class="bulk-selected">
+                        <span id="selected-count">0</span> payments selected
+                    </div>
+                    <div class="bulk-buttons">
+                        <button class="bulk-btn assign"><i class="fas fa-file-export"></i> Export</button>
+                        <button class="bulk-btn delete"><i class="fas fa-trash-alt"></i> Delete</button>
+                    </div>
+                </div>
+                
+                <!-- Table Header with Search and Actions -->
+                <div class="table-header">
+                    <h2 class="table-title">All Payments</h2>
+                    <div class="table-actions">
+                        <div class="search-container">
+                            <i class="fas fa-search search-icon"></i>
+                            <input type="text" class="search-input" placeholder="Search transactions...">
+                        </div>
+                        <div class="filter-container">
+                            <button class="filter-btn" id="filter-btn">
+                                <i class="fas fa-filter"></i>
+                                <span>Filter</span>
+                            </button>
+                            <div class="filter-dropdown" id="filter-dropdown">
+                                <div class="filter-group">
+                                    <label class="filter-label">Date Range</label>
+                                    <select class="filter-select">
+                                        <option value="">All Time</option>
+                                        <option value="today">Today</option>
+                                        <option value="week">This Week</option>
+                                        <option value="month">This Month</option>
+                                        <option value="quarter">This Quarter</option>
+                                        <option value="year">This Year</option>
+                                    </select>
+                                </div>
+                                <div class="filter-group">
+                                    <label class="filter-label">Status</label>
+                                    <select class="filter-select">
+                                        <option value="">All Status</option>
+                                        <option value="completed">Completed</option>
+                                        <option value="pending">Pending</option>
+                                        <option value="failed">Failed</option>
+                                        <option value="refunded">Refunded</option>
+                                    </select>
+                                </div>
+                                <div class="filter-group">
+                                    <label class="filter-label">Payment Method</label>
+                                    <select class="filter-select">
+                                        <option value="">All Methods</option>
+                                        <option value="card">Credit/Debit Card</option>
+                                        <option value="upi">UPI</option>
+                                        <option value="bank">Bank Transfer</option>
+                                        <option value="paypal">PayPal</option>
+                                        <option value="cash">Cash</option>
+                                    </select>
+                                </div>
+                                <div class="filter-group">
+                                    <label class="filter-label">Amount Range</label>
+                                    <select class="filter-select">
+                                        <option value="">All Amounts</option>
+                                        <option value="0-10000">₹0 - ₹10,000</option>
+                                        <option value="10001-20000">₹10,001 - ₹20,000</option>
+                                        <option value="20001-40000">₹20,001 - ₹40,000</option>
+                                        <option value="40001+">Above ₹40,000</option>
+                                    </select>
+                                </div>
+                                <div class="filter-actions">
+                                    <button class="btn-reset">Reset</button>
+                                    <button class="btn-apply">Apply Filters</button>
+                                </div>
+                            </div>
+                        </div>
+                        <button id="add-payment-btn" class="btn-add">
+                            <i class="fas fa-plus"></i>
+                            <span>Add Payment</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Payments Table -->
+                <div class="table-responsive">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th class="checkbox-cell">
+                                    <label class="custom-checkbox">
+                                        <input type="checkbox" id="select-all">
+                                        <span class="checkmark"></span>
+                                    </label>
+                                </th>
+                                <th>Transaction ID</th>
+                                <th>Student</th>
+                                <th>Program</th>
+                                <th>Amount</th>
+                                <th>Date</th>
+                                <th>Payment Method</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="checkbox-cell">
+                                    <label class="custom-checkbox">
+                                        <input type="checkbox" class="row-checkbox">
+                                        <span class="checkmark"></span>
+                                    </label>
+                                </td>
+                                <td>TXN-25040905</td>
+                                <td>
+                                    <div class="user-info">
+                                        <img src="{% static 'images/student-avatar-1.jpg' %}" alt="Student" class="user-avatar">
+                                        <div class="user-details">
+                                            <h4>Rahul Sharma</h4>
+                                            <p>ID: ATC010125</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>Complete Trading Program (CTP)</td>
+                                <td class="payment-amount">₹19,999</td>
+                                <td>Apr 9, 2025</td>
+                                <td><span class="payment-method-badge payment-method-card">Credit Card</span></td>
+                                <td><span class="status-badge status-success">Completed</span></td>
+                                <td>
+                                    <div class="row-actions">
+                                        <button class="action-btn view view-payment" title="View Details" data-id="1">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="action-btn edit" title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="action-btn download" title="Download Invoice">
+                                            <i class="fas fa-download"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="checkbox-cell">
+                                    <label class="custom-checkbox">
+                                        <input type="checkbox" class="row-checkbox">
+                                        <span class="checkmark"></span>
+                                    </label>
+                                </td>
+                                <td>TXN-25040870</td>
+                                <td>
+                                    <div class="user-info">
+                                        <img src="{% static 'images/student-avatar-2.jpg' %}" alt="Student" class="user-avatar">
+                                        <div class="user-details">
+                                            <h4>Amit Kumar</h4>
+                                            <p>ID: ATC010127</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>Growth Mindset Program (GMP)</td>
+                                <td class="payment-amount">₹7,999</td>
+                                <td>Apr 8, 2025</td>
+                                <td><span class="payment-method-badge payment-method-upi">UPI</span></td>
+                                <td><span class="status-badge status-warning">Pending</span></td>
+                                <td>
+                                    <div class="row-actions">
+                                        <button class="action-btn view view-payment" title="View Details" data-id="2">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="action-btn edit" title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="action-btn download" title="Download Invoice">
+                                            <i class="fas fa-download"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="checkbox-cell">
+                                    <label class="custom-checkbox">
+                                        <input type="checkbox" class="row-checkbox">
+                                        <span class="checkmark"></span>
+                                    </label>
+                                </td>
+                                <td>TXN-25040863</td>
+                                <td>
+                                    <div class="user-info">
+                                        <img src="{% static 'images/student-avatar-3.jpg' %}" alt="Student" class="user-avatar">
+                                        <div class="user-details">
+                                            <h4>Priya Patel</h4>
+                                            <p>ID: ATC010126</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>Arthavidya Mentorship Program (AMP)</td>
+                                <td class="payment-amount">₹39,999</td>
+                                <td>Apr 7, 2025</td>
+                                <td><span class="payment-method-badge payment-method-bank">Bank Transfer</span></td>
+                                <td><span class="status-badge status-success">Completed</span></td>
+                                <td>
+                                    <div class="row-actions">
+                                        <button class="action-btn view view-payment" title="View Details" data-id="3">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="action-btn edit" title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="action-btn download" title="Download Invoice">
+                                            <i class="fas fa-download"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="checkbox-cell">
+                                    <label class="custom-checkbox">
+                                        <input type="checkbox" class="row-checkbox">
+                                        <span class="checkmark"></span>
+                                    </label>
+                                </td>
+                                <td>TXN-25040832</td>
+                                <td>
+                                    <div class="user-info">
+                                        <img src="{% static 'images/student-avatar-4.jpg' %}" alt="Student" class="user-avatar">
+                                        <div class="user-details">
+                                            <h4>Neha Singh</h4>
+                                            <p>ID: ATC010128</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>Smart Income Program (SIP)</td>
+                                <td class="payment-amount">₹11,999</td>
+                                <td>Apr 6, 2025</td>
+                                <td><span class="payment-method-badge payment-method-card">Debit Card</span></td>
+                                <td><span class="status-badge status-success">Completed</span></td>
+                                <td>
+                                    <div class="row-actions">
+                                        <button class="action-btn view view-payment" title="View Details" data-id="4">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="action-btn edit" title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="action-btn download" title="Download Invoice">
+                                            <i class="fas fa-download"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="checkbox-cell">
+                                    <label class="custom-checkbox">
+                                        <input type="checkbox" class="row-checkbox">
+                                        <span class="checkmark"></span>
+                                    </label>
+                                </td>
+                                <td>TXN-25040798</td>
+                                <td>
+                                    <div class="user-info">
+                                        <img src="{% static 'images/student-avatar-5.jpg' %}" alt="Student" class="user-avatar">
+                                        <div class="user-details">
+                                            <h4>Rajesh Verma</h4>
+                                            <p>ID: ATC010129</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>Complete Trading Program (CTP)</td>
+                                <td class="payment-amount">₹19,999</td>
+                                <td>Apr 5, 2025</td>
+                                <td><span class="payment-method-badge payment-method-paypal">PayPal</span></td>
+                                <td><span class="status-badge status-danger">Failed</span></td>
+                                <td>
+                                    <div class="row-actions">
+                                        <button class="action-btn view view-payment" title="View Details" data-id="5">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="action-btn edit" title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="action-btn delete" title="Delete">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Table Footer with Pagination -->
+                <div class="table-footer">
+                    <div class="page-info">
+                        Showing 1 to 5 of 1028 entries
+                    </div>
+                    <div class="pagination">
+                        <button class="page-btn disabled">
+                            <i class="fas fa-angle-double-left"></i>
+                        </button>
+                        <button class="page-btn disabled">
+                            <i class="fas fa-angle-left"></i>
+                        </button>
+                        <button class="page-btn active">1</button>
+                        <button class="page-btn">2</button>
+                        <button class="page-btn">3</button>
+                        <button class="page-btn">4</button>
+                        <button class="page-btn">5</button>
+                        <button class="page-btn">
+                            <i class="fas fa-angle-right"></i>
+                        </button>
+                        <button class="page-btn">
+                            <i class="fas fa-angle-double-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Payment Details Modal -->
+    <div class="payment-modal" id="payment-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Payment Details</h2>
+                <button class="close-modal" id="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="payment-detail-row">
+                    <div class="payment-detail-label">Transaction ID:</div>
+                    <div class="payment-detail-value" id="modal-txn-id">TXN-25040905</div>
+                </div>
+                <div class="payment-detail-row">
+                    <div class="payment-detail-label">Student:</div>
+                    <div class="payment-detail-value" id="modal-student">Rahul Sharma (ID: ATC010125)</div>
+                </div>
+                <div class="payment-detail-row">
+                    <div class="payment-detail-label">Program:</div>
+                    <div class="payment-detail-value" id="modal-program">Complete Trading Program (CTP)</div>
+                </div>
+                <div class="payment-detail-row">
+                    <div class="payment-detail-label">Amount:</div>
+                    <div class="payment-detail-value" id="modal-amount">₹19,999</div>
+                </div>
+                <div class="payment-detail-row">
+                    <div class="payment-detail-label">Payment Date:</div>
+                    <div class="payment-detail-value" id="modal-date">April 9, 2025</div>
+                </div>
+                <div class="payment-detail-row">
+                    <div class="payment-detail-label">Payment Method:</div>
+                    <div class="payment-detail-value" id="modal-method">Credit Card</div>
+                </div>
+                <div class="payment-detail-row">
+                    <div class="payment-detail-label">Card/UPI Details:</div>
+                    <div class="payment-detail-value" id="modal-card-details">Visa **** **** **** 4321</div>
+                </div>
+                <div class="payment-detail-row">
+                    <div class="payment-detail-label">Gateway Transaction ID:</div>
+                    <div class="payment-detail-value" id="modal-gateway-id">RZP123456789012</div>
+                </div>
+                <div class="payment-detail-row">
+                    <div class="payment-detail-label">Status:</div>
+                    <div class="payment-detail-value" id="modal-status"><span class="status-badge status-success">Completed</span></div>
+                </div>
+                <div class="payment-detail-row">
+                    <div class="payment-detail-label">Invoice Number:</div>
+                    <div class="payment-detail-value" id="modal-invoice">INV-25040905</div>
+                </div>
+                <div class="payment-detail-row">
+                    <div class="payment-detail-label">Notes:</div>
+                    <div class="payment-detail-value" id="modal-notes">Payment received for CTP April 2025 batch enrollment. Student requested GST invoice.</div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" id="modal-close-btn">Close</button>
+                <button class="btn-primary" id="modal-edit-btn">Edit Payment</button>
+                <button class="btn-primary" id="modal-download-btn">Download Invoice</button>
+                <button class="btn-danger" id="modal-refund-btn">Process Refund</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="{% static 'js/admin.js' %}"></script>
+    <script src="{% static 'js/admin-sidebar.js' %}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Filter dropdown toggle
+            const filterBtn = document.getElementById('filter-btn');
+            const filterDropdown = document.getElementById('filter-dropdown');
+            
+            filterBtn.addEventListener('click', function() {
+                filterDropdown.classList.toggle('show');
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(event) {
+                if (!filterBtn.contains(event.target) && !filterDropdown.contains(event.target)) {
+                    filterDropdown.classList.remove('show');
+                }
+            });
+            
+            // Select all checkbox functionality
+            const selectAllCheckbox = document.getElementById('select-all');
+            const rowCheckboxes = document.querySelectorAll('.row-checkbox');
+            const bulkActions = document.getElementById('bulk-actions');
+            const selectedCount = document.getElementById('selected-count');
+            
+            selectAllCheckbox.addEventListener('change', function() {
+                rowCheckboxes.forEach(checkbox => {
+                    checkbox.checked = this.checked;
+                });
+                
+                updateBulkActions();
+            });
+            
+            rowCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    updateBulkActions();
+                    
+                    // Update select all checkbox
+                    if (!this.checked) {
+                        selectAllCheckbox.checked = false;
+                    } else {
+                        const allChecked = Array.from(rowCheckboxes).every(c => c.checked);
+                        selectAllCheckbox.checked = allChecked;
+                    }
+                });
+            });
+            
+            function updateBulkActions() {
+                const checkedCount = document.querySelectorAll('.row-checkbox:checked').length;
+                
+                if (checkedCount > 0) {
+                    bulkActions.classList.add('show');
+                    selectedCount.textContent = checkedCount;
+                } else {
+                    bulkActions.classList.remove('show');
+                }
+            }
+            
+            // Initialize charts
+            initializeCharts();
+            
+            // Payment Details Modal
+            const viewButtons = document.querySelectorAll('.view-payment');
+            const paymentModal = document.getElementById('payment-modal');
+            const closeModalBtn = document.getElementById('close-modal');
+            const modalCloseBtn = document.getElementById('modal-close-btn');
+            
+            viewButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const paymentId = this.getAttribute('data-id');
+                    // In a real application, you would fetch payment data by ID
+                    paymentModal.style.display = 'block';
+                });
+            });
+            
+            closeModalBtn.addEventListener('click', function() {
+                paymentModal.style.display = 'none';
+            });
+            
+            modalCloseBtn.addEventListener('click', function() {
+                paymentModal.style.display = 'none';
+            });
+            
+            // Close modal when clicking outside
+            window.addEventListener('click', function(event) {
+                if (event.target === paymentModal) {
+                    paymentModal.style.display = 'none';
+                }
+            });
+            
+            // Add Payment Form Toggle
+            const addPaymentBtn = document.getElementById('add-payment-btn');
+            const addPaymentForm = document.getElementById('add-payment-form');
+            const closeFormBtn = document.getElementById('close-form');
+            const cancelPaymentBtn = document.getElementById('cancel-payment');
+            
+            addPaymentBtn.addEventListener('click', function() {
+                addPaymentForm.style.display = 'block';
+            });
+            
+            closeFormBtn.addEventListener('click', function() {
+                addPaymentForm.style.display = 'none';
+            });
+            
+            cancelPaymentBtn.addEventListener('click', function() {
+                addPaymentForm.style.display = 'none';
+            });
+            
+            // Form submission
+            const paymentForm = document.getElementById('payment-form');
+            
+            paymentForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // In a real application, you would submit the form data to the server
+                alert('Payment recorded successfully!');
+                
+                // Reset form and hide it
+                paymentForm.reset();
+                addPaymentForm.style.display = 'none';
+            });
+            
+            // Automatically update amount based on program selection
+            const programSelect = document.getElementById('program');
+            const amountInput = document.getElementById('amount');
+            
+            programSelect.addEventListener('change', function() {
+                const selectedProgram = this.value;
+                let amount = '';
+                
+                switch (selectedProgram) {
+                    case 'ctp':
+                        amount = '19999';
+                        break;
+                    case 'amp':
+                        amount = '39999';
+                        break;
+                    case 'gmp':
+                        amount = '7999';
+                        break;
+                    case 'sip':
+                        amount = '11999';
+                        break;
+                }
+                
+                amountInput.value = amount;
+            });
+        });
+        
+        function initializeCharts() {
+            // Payment Trends Chart
+            const paymentTrendCtx = document.getElementById('paymentTrendChart').getContext('2d');
+            const paymentTrendChart = new Chart(paymentTrendCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Mar 10', 'Mar 15', 'Mar 20', 'Mar 25', 'Mar 30', 'Apr 5', 'Apr 9'],
+                    datasets: [{
+                        label: 'Revenue (₹)',
+                        data: [320000, 290000, 340000, 380000, 410000, 360000, 420000],
+                        borderColor: '#0b57a4',
+                        backgroundColor: 'rgba(11, 87, 164, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '₹' + value / 1000 + 'K';
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return '₹' + context.parsed.y.toLocaleString();
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Payment Methods Chart
+            const paymentMethodCtx = document.getElementById('paymentMethodChart').getContext('2d');
+            const paymentMethodChart = new Chart(paymentMethodCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Credit/Debit Card', 'UPI', 'Bank Transfer', 'PayPal', 'Cash'],
+                    datasets: [{
+                        data: [45, 25, 15, 10, 5],
+                        backgroundColor: [
+                            '#007bff',
+                            '#4bc0c0',
+                            '#9966ff',
+                            '#36a2eb',
+                            '#ff9f40'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right'
+                        }
+                    },
+                    cutout: '60%'
+                }
+            });
+            
+            // Update charts when filter changes
+            document.getElementById('payment-trend-filter').addEventListener('change', function() {
+                // This would normally fetch new data based on the selected time period
+                // For demo purposes, we'll just show an alert
+                alert('Chart would update with data for the last ' + this.value + ' days');
+            });
+            
+            document.getElementById('payment-method-filter').addEventListener('change', function() {
+                // This would normally fetch new data based on the selected time period
+                // For demo purposes, we'll just show an alert
+                alert('Chart would update with data for the last ' + this.value + ' days');
+            });
+        }
+    </script>
+{% endblock content %}

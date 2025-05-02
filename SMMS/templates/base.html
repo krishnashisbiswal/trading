@@ -1,0 +1,257 @@
+<!-- for admin page only  -->
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Arthavidya Trading Community</title>
+    <link rel="stylesheet" href="{%static 'css/admin-style.css' %}">
+    <link rel="stylesheet" href="{%static 'css/admin-tables.css' %}">
+    <link rel="stylesheet" href="{% static "css/admin-sidebar.css" %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="admin-body">
+    <!-- Admin Header -->
+    <header class="admin-header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo-area">
+                    <img src="{%static 'images/logo.png'%}" alt="Arthavidya Trading Community">
+                    <div class="welcome-text">
+                        <h4>Admin Panel</h4>
+                        <h2>Andaz Aaron</h2>
+                    </div>
+                </div>
+                <div class="user-actions">
+                    <div class="notifications">
+                        <button class="notification-btn">
+                            <i class="fas fa-bell"></i>
+                            <span class="badge">5</span>
+                        </button>
+                        <div class="dropdown-menu notification-menu">
+                            <div class="dropdown-header">
+                                <h3>Notifications</h3>
+                                <a href="#" class="mark-all-read">Mark all as read</a>
+                            </div>
+                            <div class="notification-list">
+                                <a href="#" class="notification-item unread">
+                                    <div class="notification-icon user-icon">
+                                        <i class="fas fa-user-plus"></i>
+                                    </div>
+                                    <div class="notification-content">
+                                        <p class="notification-text">New student registration: Rahul Sharma</p>
+                                        <p class="notification-time">5 minutes ago</p>
+                                    </div>
+                                </a>
+                                <a href="#" class="notification-item unread">
+                                    <div class="notification-icon payment-icon">
+                                        <i class="fas fa-rupee-sign"></i>
+                                    </div>
+                                    <div class="notification-content">
+                                        <p class="notification-text">Payment received: ₹19,999 from Priya Patel</p>
+                                        <p class="notification-time">25 minutes ago</p>
+                                    </div>
+                                </a>
+                                <a href="#" class="notification-item">
+                                    <div class="notification-icon message-icon">
+                                        <i class="fas fa-envelope"></i>
+                                    </div>
+                                    <div class="notification-content">
+                                        <p class="notification-text">New support request from Amit Kumar</p>
+                                        <p class="notification-time">1 hour ago</p>
+                                    </div>
+                                </a>
+                                <a href="#" class="notification-item">
+                                    <div class="notification-icon system-icon">
+                                        <i class="fas fa-server"></i>
+                                    </div>
+                                    <div class="notification-content">
+                                        <p class="notification-text">System maintenance completed successfully</p>
+                                        <p class="notification-time">3 hours ago</p>
+                                    </div>
+                                </a>
+                                <a href="#" class="notification-item">
+                                    <div class="notification-icon partner-icon">
+                                        <i class="fas fa-handshake"></i>
+                                    </div>
+                                    <div class="notification-content">
+                                        <p class="notification-text">New partner application: Neha Singh</p>
+                                        <p class="notification-time">Yesterday</p>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="dropdown-footer">
+                                <a href="admin-notifications.html">View All Notifications</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="user-profile">
+                        <button class="profile-btn">
+                            <img src="{% static 'images/admin-avatar.jpg'%}" alt="Admin Profile">
+                            <span>Andaz Aaron</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="dropdown-menu profile-menu">
+                            <a href="admin-profile.html"><i class="fas fa-user"></i> My Profile</a>
+                            <a href="admin-settings.html"><i class="fas fa-cog"></i> Settings</a>
+                            <a href="{% url 'home' %}"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Admin Main Content -->
+    <div class="admin-container">
+        <!-- Sidebar Navigation -->
+        <aside class="admin-sidebar">
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="active">
+                        <a href="{% url 'admin_dashboard' %}">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="submenu-toggle">
+                            <i class="fas fa-user-graduate"></i>
+                            <span>Students</span>
+                            <i class="fas fa-chevron-right submenu-indicator"></i>
+                        </a>
+                        <ul class="submenu">
+                            <li><a href="{% url 'personal_info_view' %}">All Students</a></li>
+                            <li><a href="{% url 'admin_student_add' %}">Add New Student</a></li>
+                           <li><a href="{% url 'admin_batch' %}">Batch Management</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="#" class="submenu-toggle">
+                            <i class="fas fa-chalkboard-teacher"></i>
+                            <span>Trainers</span>
+                            <i class="fas fa-chevron-right submenu-indicator"></i>
+                        </a>
+                        <ul class="submenu">
+                            <li><a href="{% url 'admin_trainers' %}">All Trainers</a></li>
+                            <li><a href="{% url 'admin_trainer_add' %}">Add New Trainer</a></li>
+                            <li><a href="{% url 'admin_trainer_schedule' %}">Trainer Schedule</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="#" class="submenu-toggle">
+                            <i class="fas fa-graduation-cap"></i>
+                            <span>Programs</span>
+                            <i class="fas fa-chevron-right submenu-indicator"></i>
+                        </a>
+                        <ul class="submenu">
+                            <li><a href="{% url 'admin_program' %}">All Programs</a></li>
+                            <li><a href="{% url 'admin_program_add' %}">Add New Program</a></li>
+                            <li><a href="{% url 'admin_program_categories' %}">Program Categories</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="#" class="submenu-toggle">
+                            <i class="fas fa-calendar-alt"></i>
+                            <span>Classes</span>
+                            <i class="fas fa-chevron-right submenu-indicator"></i>
+                        </a>
+                        <ul class="submenu">
+                            <li><a href="{% url 'admin_classes' %}">All Classes</a></li>
+                            <li><a href="{% url 'admin_class_add' %}">Schedule New Class</a></li>
+                            <li><a href="{% url 'admin_class_recordings' %}">Class Recordings</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="#" class="submenu-toggle">
+                            <i class="fas fa-tasks"></i>
+                            <span>Assessments</span>
+                            <i class="fas fa-chevron-right submenu-indicator"></i>
+                        </a>
+                        <ul class="submenu">
+                            <li><a href="{% url 'admin_quiz' %}">Quizzes</a></li>
+                            {% comment %} <li><a href="{% url 'admin_classes' %}admin-assignments.html">Assignments</a></li> {% endcomment %}
+                            <li><a href="{% url 'admin_exams' %}">Exams</a></li>
+                            <li><a href="{% url 'admin_results' %}">Results</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="#" class="submenu-toggle">
+                            <i class="fas fa-handshake"></i>
+                            <span>Partners</span>
+                            <i class="fas fa-chevron-right submenu-indicator"></i>
+                        </a>
+                        <ul class="submenu">
+                            <li><a href="{% url 'admin_partners' %}">All Partners</a></li>
+                            {% comment %} <li><a href="admin-partner-applications.html">Applications</a></li> {% endcomment %}
+                            <li><a href="{% url 'commissions' %}">Commissions</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="#" class="submenu-toggle">
+                            <i class="fas fa-rupee-sign"></i>
+                            <span>Finance</span>
+                            <i class="fas fa-chevron-right submenu-indicator"></i>
+                        </a>
+                        <ul class="submenu">
+                            <li><a href="{% url 'admin_payments' %}">Payments</a></li>
+                            <li><a href="{% url 'invoices' %}">Invoices</a></li>
+                            <li><a href="{% url 'revenue' %}">Revenue Reports</a></li>
+                            <li><a href="{% url 'refunds' %}">Refunds</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="{% url 'admin_resources' %}">
+                            <i class="fas fa-book"></i>
+                            <span>Resources</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="submenu-toggle">
+                            <i class="fas fa-envelope"></i>
+                            <span>Communication</span>
+                            <i class="fas fa-chevron-right submenu-indicator"></i>
+                        </a>
+                        <ul class="submenu">
+                            <li><a href="{% url 'admin_announcements' %}">Announcements</a></li>
+                            <li><a href="{% url 'admin_payments' %}admin-email-campaigns.html">Email Campaigns</a></li>
+                            <li><a href="{% url 'support_ticket' %}">Support Tickets</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="#" class="submenu-toggle">
+                            <i class="fas fa-cog"></i>
+                            <span>Settings</span>
+                            <i class="fas fa-chevron-right submenu-indicator"></i>
+                        </a>
+                        <ul class="submenu">
+                            <li><a href="admin-general-settings.html">General Settings</a></li>
+                            <li><a href="{% url "admin_user" %}">User Management</a></li>
+                            <li><a href="admin-site-settings.html">Site Settings</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="{% url 'home' %}" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </aside>
+
+{% block content %}
+{%endblock content %} 
+
+<!-- Footer -->
+<footer class="admin-footer">
+    <div class="container">
+        <div class="footer-content">
+            <p class="copyright">Arthavidya Trading Community Pvt Ltd © All Rights Reserved - 2025</p>
+            <p class="version">Admin Dashboard v1.0</p>
+        </div>
+    </div>
+</footer>
+</body>
+</html>

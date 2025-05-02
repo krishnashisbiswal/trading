@@ -1,0 +1,684 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Admin commissions{% endblock %}
+{% block content %}
+    <style>
+        /* Modal Form Styles */
+        .modal-form {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-form.active {
+            display: flex;
+        }
+        
+        .form-container {
+            background-color: var(--bg-white);
+            border-radius: var(--border-radius);
+            width: 90%;
+            max-width: 700px;
+            box-shadow: var(--box-shadow-lg);
+            overflow: hidden;
+        }
+        
+        .form-header {
+            padding: 20px;
+            background-color: var(--primary-blue-lighter);
+            color: var(--primary-blue);
+            font-weight: 600;
+            font-size: 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-light);
+        }
+        
+        .form-header .close-btn {
+            cursor: pointer;
+            font-size: 20px;
+            color: var(--text-muted);
+            transition: var(--transition);
+        }
+        
+        .form-header .close-btn:hover {
+            color: var(--danger-color);
+            transform: rotate(90deg);
+        }
+        
+        .form-body {
+            padding: 20px;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+        
+        .form-row {
+            margin-bottom: 20px;
+        }
+        
+        .form-row label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-dark);
+        }
+        
+        .form-row input, 
+        .form-row select, 
+        .form-row textarea {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid var(--border-medium);
+            border-radius: var(--border-radius);
+            font-size: 14px;
+            transition: var(--transition);
+        }
+        
+        .form-row input:focus, 
+        .form-row select:focus, 
+        .form-row textarea:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(11, 87, 164, 0.1);
+            outline: none;
+        }
+        
+        .form-row textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+        
+        .form-footer {
+            padding: 20px;
+            border-top: 1px solid var(--border-light);
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+        }
+        
+        .cancel-btn {
+            padding: 10px 20px;
+            border: 1px solid var(--border-medium);
+            border-radius: var(--border-radius);
+            background-color: var(--bg-white);
+            color: var(--text-medium);
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .cancel-btn:hover {
+            background-color: var(--bg-light);
+        }
+        
+        .submit-btn {
+            padding: 10px 25px;
+            border-radius: var(--border-radius);
+            background-color: var(--primary-blue);
+            color: var(--text-light);
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: var(--transition);
+        }
+        
+        .submit-btn:hover {
+            background-color: var(--primary-blue-dark);
+        }
+        
+        /* Commission Dashboard Stats */
+        .stats-cards {
+            margin-bottom: 25px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        
+        .stat-card {
+            background-color: var(--bg-white);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: var(--box-shadow-sm);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--box-shadow-md);
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background-color: var(--primary-blue);
+        }
+        
+        .stat-title {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 5px;
+        }
+        
+        .stat-change {
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .stat-change.positive {
+            color: var(--success-color);
+        }
+        
+        .stat-change.negative {
+            color: var(--danger-color);
+        }
+        
+        .stat-change i {
+            margin-right: 5px;
+        }
+        
+        /* Processing Fee */
+        .process-fee-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 5px;
+        }
+        
+        .process-fee-badge.yes {
+            background-color: var(--danger-light);
+            color: var(--danger-color);
+        }
+        
+        .process-fee-badge.no {
+            background-color: var(--success-light);
+            color: var(--success-color);
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body class="admin-body">
+    <!-- Admin Container -->
+    <div class="admin-container">
+        <!-- Main Content Area -->
+        <main class="admin-main">
+            <!-- Page Header -->
+            <section class="page-header">
+                <div class="header-content">
+                    <div class="page-title">
+                        <h1>Commissions Management</h1>
+                        <p>Manage and process referral commissions for partners</p>
+                    </div>
+                    <div class="header-actions">
+                        <button class="btn-add" id="addCommissionBtn">
+                            <i class="fas fa-plus"></i> Add Manual Commission
+                        </button>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Stats Cards -->
+            <section class="stats-cards">
+                <div class="stat-card">
+                    <div class="stat-title">Total Commission Paid</div>
+                    <div class="stat-value">₹18.4L</div>
+                    <div class="stat-change positive">
+                        <i class="fas fa-arrow-up"></i> 12.5% vs last month
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-title">Pending Commissions</div>
+                    <div class="stat-value">₹3.6L</div>
+                    <div class="stat-change negative">
+                        <i class="fas fa-arrow-up"></i> 8.2% vs last month
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-title">Active Partners</div>
+                    <div class="stat-value">48</div>
+                    <div class="stat-change positive">
+                        <i class="fas fa-arrow-up"></i> 5 new this month
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-title">Commission Rate</div>
+                    <div class="stat-value">₹3,000</div>
+                    <div class="stat-change">
+                        <i class="fas fa-equals"></i> No change
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Main Table Section -->
+            <section class="table-section">
+                <div class="table-container">
+                    <div class="table-header">
+                        <h3 class="table-title">Commission Transactions</h3>
+                        <div class="table-actions">
+                            <div class="search-container">
+                                <i class="fas fa-search search-icon"></i>
+                                <input type="text" class="search-input" id="searchInput" placeholder="Search transactions...">
+                            </div>
+                            <div class="filter-container">
+                                <button class="filter-btn" id="filterBtn">
+                                    <i class="fas fa-filter"></i> Filter
+                                </button>
+                                <div class="filter-dropdown" id="filterDropdown">
+                                    <div class="filter-group">
+                                        <label class="filter-label">Partner</label>
+                                        <select class="filter-select" id="partnerFilter">
+                                            <option value="">All Partners</option>
+                                            <option value="1">Vikash Mishra</option>
+                                            <option value="2">Suman Rao</option>
+                                            <option value="3">Deepak Sharma</option>
+                                            <option value="4">Anjali Reddy</option>
+                                        </select>
+                                    </div>
+                                    <div class="filter-group">
+                                        <label class="filter-label">Status</label>
+                                        <select class="filter-select" id="statusFilter">
+                                            <option value="">All Status</option>
+                                            <option value="pending">Pending</option>
+                                            <option value="processing">Processing</option>
+                                            <option value="completed">Completed</option>
+                                            <option value="cancelled">Cancelled</option>
+                                        </select>
+                                    </div>
+                                    <div class="filter-group">
+                                        <label class="filter-label">Date Range</label>
+                                        <div style="display: flex; gap: 10px;">
+                                            <input type="date" class="filter-select" id="startDateFilter">
+                                            <input type="date" class="filter-select" id="endDateFilter">
+                                        </div>
+                                    </div>
+                                    <div class="filter-actions">
+                                        <button class="btn-reset" id="resetFilterBtn">Reset</button>
+                                        <button class="btn-apply" id="applyFilterBtn">Apply</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Bulk Actions -->
+                    <div class="bulk-actions" id="bulkActions">
+                        <div class="bulk-selected">
+                            <span id="selectedCount">0</span> items selected
+                        </div>
+                        <div class="bulk-buttons">
+                            <button class="bulk-btn assign">Process Payments</button>
+                            <button class="bulk-btn delete">Cancel</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Table Content -->
+                    <div class="table-responsive">
+                        <table class="admin-table" id="commissionsTable">
+                            <thead>
+                                <tr>
+                                    <th class="checkbox-cell">
+                                        <label class="custom-checkbox">
+                                            <input type="checkbox" id="selectAll">
+                                            <span class="checkmark"></span>
+                                        </label>
+                                    </th>
+                                    <th>Transaction ID</th>
+                                    <th>Partner</th>
+                                    <th>Referred Student</th>
+                                    <th>Program</th>
+                                    <th>Amount</th>
+                                    <th>Processing Fee</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Sample data rows -->
+                                <tr data-id="COM25040001">
+                                    <td class="checkbox-cell">
+                                        <label class="custom-checkbox">
+                                            <input type="checkbox" class="rowCheckbox">
+                                            <span class="checkmark"></span>
+                                        </label>
+                                    </td>
+                                    <td>COM25040001</td>
+                                    <td>
+                                        <div class="user-info">
+                                            <img src="{% static 'images/partner-avatar-1.jpg'%}" alt="Partner" class="user-avatar">
+                                            <div class="user-details">
+                                                <h4>Vikash Mishra</h4>
+                                                <p>Partner ID: PAR2401001</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>Rahul Sharma</td>
+                                    <td>Complete Trading Program</td>
+                                    <td>₹3,000</td>
+                                    <td>₹0 <span class="process-fee-badge no">No Fee</span></td>
+                                    <td>Apr 5, 2025</td>
+                                    <td><span class="status-badge status-warning">Pending</span></td>
+                                    <td>
+                                        <div class="row-actions">
+                                            <button class="action-btn view" title="View Details">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="action-btn edit" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="action-btn process" title="Process">
+                                                <i class="fas fa-check"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr data-id="COM25040002">
+                                    <td class="checkbox-cell">
+                                        <label class="custom-checkbox">
+                                            <input type="checkbox" class="rowCheckbox">
+                                            <span class="checkmark"></span>
+                                        </label>
+                                    </td>
+                                    <td>COM25040002</td>
+                                    <td>
+                                        <div class="user-info">
+                                            <img src="{% static 'images/partner-avatar-2.jpg'%}" alt="Partner" class="user-avatar">
+                                            <div class="user-details">
+                                                <h4>Suman Rao</h4>
+                                                <p>Partner ID: PAR2403001</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>Priya Patel</td>
+                                    <td>Arthavidya Mentorship Program</td>
+                                    <td>₹3,000</td>
+                                    <td>₹150 <span class="process-fee-badge yes">With Fee</span></td>
+                                    <td>Apr 4, 2025</td>
+                                    <td><span class="status-badge status-info">Processing</span></td>
+                                    <td>
+                                        <div class="row-actions">
+                                            <button class="action-btn view" title="View Details">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="action-btn edit" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="action-btn process" title="Process">
+                                                <i class="fas fa-check"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr data-id="COM25040003">
+                                    <td class="checkbox-cell">
+                                        <label class="custom-checkbox">
+                                            <input type="checkbox" class="rowCheckbox">
+                                            <span class="checkmark"></span>
+                                        </label>
+                                    </td>
+                                    <td>COM25040003</td>
+                                    <td>
+                                        <div class="user-info">
+                                            <img src="{% static 'images/partner-avatar-3.jpg'%}" alt="Partner" class="user-avatar">
+                                            <div class="user-details">
+                                                <h4>Deepak Sharma</h4>
+                                                <p>Partner ID: PAR2402001</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>Amit Kumar</td>
+                                    <td>Growth Mindset Program</td>
+                                    <td>₹3,000</td>
+                                    <td>₹150 <span class="process-fee-badge yes">With Fee</span></td>
+                                    <td>Apr 3, 2025</td>
+                                    <td><span class="status-badge status-success">Completed</span></td>
+                                    <td>
+                                        <div class="row-actions">
+                                            <button class="action-btn view" title="View Details">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="action-btn receipt" title="Receipt">
+                                                <i class="fas fa-file-invoice"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr data-id="COM25040004">
+                                    <td class="checkbox-cell">
+                                        <label class="custom-checkbox">
+                                            <input type="checkbox" class="rowCheckbox">
+                                            <span class="checkmark"></span>
+                                        </label>
+                                    </td>
+                                    <td>COM25040004</td>
+                                    <td>
+                                        <div class="user-info">
+                                            <img src="{% static 'images/partner-avatar-4.jpg' %}" alt="Partner" class="user-avatar">
+                                            <div class="user-details">
+                                                <h4>Anjali Reddy</h4>
+                                                <p>Partner ID: PAR2312002</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>Neha Singh</td>
+                                    <td>Smart Income Program</td>
+                                    <td>₹3,000</td>
+                                    <td>₹0 <span class="process-fee-badge no">No Fee</span></td>
+                                    <td>Apr 2, 2025</td>
+                                    <td><span class="status-badge status-warning">Pending</span></td>
+                                    <td>
+                                        <div class="row-actions">
+                                            <button class="action-btn view" title="View Details">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="action-btn edit" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="action-btn process" title="Process">
+                                                <i class="fas fa-check"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Table Footer with Pagination -->
+                    <div class="table-footer">
+                        <div class="page-info">
+                            Showing <span id="startRange">1</span> to <span id="endRange">10</span> of <span id="totalItems">48</span> entries
+                        </div>
+                        <div class="pagination">
+                            <button class="page-btn" id="prevPage" disabled>
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <button class="page-btn active">1</button>
+                            <button class="page-btn">2</button>
+                            <button class="page-btn">3</button>
+                            <button class="page-btn">4</button>
+                            <button class="page-btn">5</button>
+                            <button class="page-btn" id="nextPage">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    
+    <!-- Modal Form for Adding/Editing Commission -->
+    <div class="modal-form" id="commissionForm">
+        <div class="form-container">
+            <div class="form-header">
+                <span id="formTitle">Add Manual Commission</span>
+                <i class="fas fa-times close-btn" id="closeForm"></i>
+            </div>
+            <form id="commissionDataForm">
+                <div class="form-body">
+                    <input type="hidden" id="commissionId" name="commissionId">
+                    <input type="hidden" id="formAction" name="formAction" value="add">
+                    
+                    <div class="form-row">
+                        <label for="transactionId">Transaction ID</label>
+                        <input type="text" id="transactionId" name="transactionId" readonly value="COM2505xxxx">
+                        <small>Auto-generated on creation</small>
+                    </div>
+                    
+                    <div class="form-row">
+                        <label for="partner">Partner <span class="required">*</span></label>
+                        <select id="partner" name="partner" required>
+                            <option value="">Select Partner</option>
+                            <option value="1">Vikash Mishra</option>
+                            <option value="2">Suman Rao</option>
+                            <option value="3">Deepak Sharma</option>
+                            <option value="4">Anjali Reddy</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-grid">
+                        <div class="form-row">
+                            <label for="referredStudent">Referred Student <span class="required">*</span></label>
+                            <select id="referredStudent" name="referredStudent" required>
+                                <option value="">Select Student</option>
+                                <option value="1">Rahul Sharma</option>
+                                <option value="2">Priya Patel</option>
+                                <option value="3">Amit Kumar</option>
+                                <option value="4">Neha Singh</option>
+                            </select>
+                        </div>
+                        <div class="form-row">
+                            <label for="program">Program <span class="required">*</span></label>
+                            <select id="program" name="program" required>
+                                <option value="">Select Program</option>
+                                <option value="CTP">Complete Trading Program</option>
+                                <option value="AMP">Arthavidya Mentorship Program</option>
+                                <option value="GMP">Growth Mindset Program</option>
+                                <option value="SIP">Smart Income Program</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-grid">
+                        <div class="form-row">
+                            <label for="amount">Commission Amount (₹) <span class="required">*</span></label>
+                            <input type="number" id="amount" name="amount" min="0" step="100" required value="3000">
+                        </div>
+                        <div class="form-row">
+                            <label for="processingFee">Processing Fee (₹)</label>
+                            <input type="number" id="processingFee" name="processingFee" min="0" value="0">
+                        </div>
+                    </div>
+                    
+                    <div class="form-grid">
+                        <div class="form-row">
+                            <label for="date">Date <span class="required">*</span></label>
+                            <input type="date" id="date" name="date" required>
+                        </div>
+                        <div class="form-row">
+                            <label for="status">Status <span class="required">*</span></label>
+                            <select id="status" name="status" required>
+                                <option value="pending">Pending</option>
+                                <option value="processing">Processing</option>
+                                <option value="completed">Completed</option>
+                                <option value="cancelled">Cancelled</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <label for="notes">Notes</label>
+                        <textarea id="notes" name="notes" placeholder="Any additional information about this commission"></textarea>
+                    </div>
+                </div>
+                
+                <div class="form-footer">
+                    <button type="button" class="cancel-btn" id="cancelForm">Cancel</button>
+                    <button type="submit" class="submit-btn">Save Commission</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+{% block footer %} {% endblock %}
+    <!-- Include the common form handling JavaScript -->
+    <script src="{% static 'js/admin.js' %}"></script>
+    <script src="{% static 'js/admin-forms.js' %}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Process commission button handler
+            const processButtons = document.querySelectorAll('.action-btn.process');
+            processButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const row = this.closest('tr');
+                    const transactionId = row.cells[1].textContent;
+                    const partnerName = row.querySelector('.user-details h4').textContent;
+                    
+                    if (confirm(`Are you sure you want to process the commission payment of ${row.cells[5].textContent} for ${partnerName}?`)) {
+                        // Here you would typically send a request to your backend
+                        alert(`Commission processing initiated for Transaction ID: ${transactionId}`);
+                        
+                        // Update status (for demonstration)
+                        const statusCell = row.cells[8];
+                        statusCell.innerHTML = '<span class="status-badge status-info">Processing</span>';
+                    }
+                });
+            });
+            
+            // Receipt button handler
+            const receiptButtons = document.querySelectorAll('.action-btn.receipt');
+            receiptButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const transactionId = this.closest('tr').cells[1].textContent;
+                    alert(`Generating receipt for Transaction ID: ${transactionId}. In a real application, this would download the receipt.`);
+                });
+            });
+            
+            // Set current date in form
+            const dateInput = document.getElementById('date');
+            if (dateInput) {
+                const today = new Date();
+                dateInput.value = today.toISOString().split('T')[0];
+            }
+        });
+    </script>
+{% endblock %}

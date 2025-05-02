@@ -1,0 +1,1056 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Admin student{% endblock %}
+{% block content %}
+<style>
+    /* Form Container Styles */
+    .form-container {
+        background-color: var(--bg-white);
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow-sm);
+        padding: 30px;
+        margin-bottom: 30px;
+    }
+    
+    .form-header {
+        margin-bottom: 25px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid var(--border-light);
+    }
+    
+    .form-title {
+        font-size: 18px;
+        color: var(--dark-blue);
+        margin: 0;
+    }
+    
+    /* Form Section Styles */
+    .form-section {
+        margin-bottom: 40px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid var(--border-light);
+    }
+    
+    .form-section:last-child {
+        margin-bottom: 0;
+        padding-bottom: 0;
+        border-bottom: none;
+    }
+    
+    .section-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--dark-blue);
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+    }
+    
+    .section-title i {
+        margin-right: 10px;
+        color: var(--primary-blue);
+    }
+    
+    /* Form Row and Groups */
+    .form-row {
+        display: flex;
+        gap: 20px;
+        margin-bottom: 20px;
+    }
+    
+    .form-group {
+        flex: 1;
+        margin-bottom: 20px;
+    }
+    
+    .form-row .form-group {
+        margin-bottom: 0;
+    }
+    
+    /* Form Controls */
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+        color: var(--text-dark);
+    }
+    
+    .required {
+        color: var(--danger-color);
+    }
+    
+    .form-control {
+        width: 100%;
+        padding: 12px 15px;
+        border: 1px solid var(--border-light);
+        border-radius: var(--border-radius);
+        font-size: 14px;
+        transition: var(--transition);
+    }
+    
+    .form-control:focus {
+        border-color: var(--primary-blue);
+        box-shadow: 0 0 0 2px rgba(11, 87, 164, 0.1);
+        outline: none;
+    }
+    
+    .form-text {
+        font-size: 12px;
+        color: var(--text-muted);
+        margin-top: 5px;
+    }
+    
+    /* Checkboxes */
+    .form-check {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 10px;
+    }
+    
+    .form-check input {
+        margin-right: 10px;
+        margin-top: 3px;
+    }
+    
+    /* Form Actions */
+    .form-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 15px;
+        margin-top: 30px;
+    }
+    
+    .btn-cancel {
+        padding: 12px 24px;
+        background-color: var(--bg-light);
+        color: var(--text-dark);
+        border: 1px solid var(--border-light);
+        border-radius: 5px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: var(--transition);
+    }
+    
+    .btn-cancel:hover {
+        background-color: var(--bg-white);
+    }
+    
+    .btn-preview {
+        padding: 12px 24px;
+        background-color: var(--info-color);
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: var(--transition);
+    }
+    
+    .btn-preview:hover {
+        background-color: #138496;
+    }
+    
+    .btn-save {
+        padding: 12px 24px;
+        background-color: var(--primary-blue);
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: var(--transition);
+    }
+    
+    .btn-save:hover {
+        background-color: var(--primary-blue-dark);
+    }
+    
+    /* Preview Modal */
+    .student-preview-modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        overflow: auto;
+    }
+    
+    .modal-content {
+        background-color: var(--bg-white);
+        margin: 50px auto;
+        padding: 0;
+        width: 80%;
+        max-width: 800px;
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow-lg);
+        animation: modalFadeIn 0.3s;
+    }
+    
+    .modal-header {
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid var(--border-light);
+    }
+    
+    .modal-header h2 {
+        margin: 0;
+        font-size: 20px;
+        color: var(--dark-blue);
+    }
+    
+    .modal-close {
+        color: var(--text-muted);
+        font-size: 24px;
+        font-weight: bold;
+        cursor: pointer;
+        background: none;
+        border: none;
+        transition: var(--transition);
+    }
+    
+    .modal-close:hover {
+        color: var(--danger-color);
+    }
+    
+    .modal-body {
+        padding: 20px;
+        max-height: 70vh;
+        overflow-y: auto;
+    }
+    
+    .preview-section {
+        margin-bottom: 25px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid var(--border-light);
+    }
+    
+    .preview-section:last-child {
+        margin-bottom: 0;
+        padding-bottom: 0;
+        border-bottom: none;
+    }
+    
+    .preview-section h3 {
+        font-size: 16px;
+        color: var(--dark-blue);
+        margin-bottom: 15px;
+    }
+    
+    .preview-row {
+        display: flex;
+        margin-bottom: 10px;
+    }
+    
+    .preview-label {
+        width: 150px;
+        font-weight: 600;
+        color: var(--text-dark);
+    }
+    
+    .preview-value {
+        flex: 1;
+        color: var(--text-medium);
+    }
+    
+    .modal-footer {
+        padding: 15px 20px;
+        border-top: 1px solid var(--border-light);
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+    }
+    
+    .btn-secondary {
+        padding: 10px 15px;
+        background-color: var(--bg-light);
+        color: var(--text-dark);
+        border: 1px solid var(--border-light);
+        border-radius: 5px;
+        cursor: pointer;
+        transition: var(--transition);
+    }
+    
+    .btn-secondary:hover {
+        background-color: var(--border-light);
+    }
+    
+    .btn-primary {
+        padding: 10px 15px;
+        background-color: var(--primary-blue);
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: var(--transition);
+    }
+    
+    .btn-primary:hover {
+        background-color: var(--primary-blue-dark);
+    }
+    
+    @keyframes modalFadeIn {
+        from {opacity: 0; transform: translateY(-20px);}
+        to {opacity: 1; transform: translateY(0);}
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 992px) {
+        .form-row {
+            flex-direction: column;
+            gap: 0;
+        }
+        
+        .form-row .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .preview-row {
+            flex-direction: column;
+            margin-bottom: 15px;
+        }
+        
+        .preview-label {
+            width: 100%;
+            margin-bottom: 5px;
+        }
+    }
+</style>
+
+<body class="admin-body">
+<!-- Main Content Area (Without Header and Sidebar) -->
+<main class="admin-main">
+    <!-- Page Header -->
+    <section class="page-header">
+        <div class="header-content">
+            <div class="page-title">
+                <h1>Add New Student</h1>
+                <p>Register a new student to the system</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Student Registration Form -->
+    <section class="form-container">
+        <div class="form-header">
+            <h2 class="form-title">Student Information</h2>
+        </div>
+        
+        <form id="student-registration-form">
+            <!-- Personal Information Section -->
+            <div class="form-section">
+                <h3 class="section-title"><i class="fas fa-user"></i> Personal Information</h3>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="first_name">First Name <span class="required">*</span></label>
+                        <input type="text" id="first_name" name="first_name" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="last_name">Last Name <span class="required">*</span></label>
+                        <input type="text" id="last_name" name="last_name" class="form-control" required>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="email">Email Address <span class="required">*</span></label>
+                        <input type="email" id="email" name="email" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Phone Number <span class="required">*</span></label>
+                        <input type="tel" id="phone" name="phone" class="form-control" placeholder="+91 XXXXX XXXXX" required>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="dob">Date of Birth</label>
+                        <input type="date" id="dob" name="dob" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="gender">Gender</label>
+                        <select id="gender" name="gender" class="form-control">
+                            <option value="">Select Gender</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                            <option value="other">Other</option>
+                            <option value="prefer_not_to_say">Prefer not to say</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Address Information Section -->
+            <div class="form-section">
+                <h3 class="section-title"><i class="fas fa-map-marker-alt"></i> Address Information</h3>
+                
+                <div class="form-group">
+                    <label for="address_line1">Address Line 1</label>
+                    <input type="text" id="address_line1" name="address_line1" class="form-control">
+                </div>
+                
+                <div class="form-group">
+                    <label for="address_line2">Address Line 2</label>
+                    <input type="text" id="address_line2" name="address_line2" class="form-control">
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="city">City</label>
+                        <input type="text" id="city" name="city" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="state">State</label>
+                        <input type="text" id="state" name="state" class="form-control">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="postal_code">Postal Code</label>
+                        <input type="text" id="postal_code" name="postal_code" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="country">Country</label>
+                        <select id="country" name="country" class="form-control">
+                            <option value="">Select Country</option>
+                            <option value="IN">India</option>
+                            <option value="US">United States</option>
+                            <option value="UK">United Kingdom</option>
+                            <option value="SG">Singapore</option>
+                            <option value="AE">United Arab Emirates</option>
+                            <!-- More countries would be added in a real implementation -->
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Program Information Section -->
+            <div class="form-section">
+                <h3 class="section-title"><i class="fas fa-graduation-cap"></i> Program Information</h3>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="program">Program <span class="required">*</span></label>
+                        <select id="program" name="program" class="form-control" required>
+                            <option value="">Select Program</option>
+                            <option value="ctp">Complete Trading Program (CTP)</option>
+                            <option value="amp">Arthavidya Mentorship Program (AMP)</option>
+                            <option value="gmp">Growth Mindset Program (GMP)</option>
+                            <option value="sip">Smart Income Program (SIP)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="batch">Batch <span class="required">*</span></label>
+                        <select id="batch" name="batch" class="form-control" required>
+                            <option value="">Select Batch</option>
+                            <option value="apr-2025">April 2025</option>
+                            <option value="mar-2025">March 2025</option>
+                            <option value="feb-2025">February 2025</option>
+                            <option value="jan-2025">January 2025</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="referral_source">Referral Source</label>
+                    <select id="referral_source" name="referral_source" class="form-control">
+                        <option value="">Select Referral Source</option>
+                        <option value="website">Website</option>
+                        <option value="social_media">Social Media</option>
+                        <option value="friend">Friend or Family</option>
+                        <option value="search_engine">Search Engine</option>
+                        <option value="partner">Partner</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                
+                <div id="partner_referral_container" class="form-group" style="display: none;">
+                    <label for="partner_referral">Referred by Partner</label>
+                    <select id="partner_referral" name="partner_referral" class="form-control">
+                        <option value="">Select Partner</option>
+                        <option value="1">Vikash Mishra</option>
+                        <option value="2">Suman Rao</option>
+                        <option value="3">Deepak Sharma</option>
+                        <option value="4">Anjali Reddy</option>
+                        <option value="5">Rahul Chopra</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="notes">Additional Notes</label>
+                    <textarea id="notes" name="notes" class="form-control" rows="3" placeholder="Enter any additional information about the student"></textarea>
+                </div>
+            </div>
+            
+            <!-- Payment Information Section -->
+            <div class="form-section">
+                <h3 class="section-title"><i class="fas fa-rupee-sign"></i> Payment Information</h3>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="payment_status">Payment Status <span class="required">*</span></label>
+                        <select id="payment_status" name="payment_status" class="form-control" required>
+                            <option value="">Select Status</option>
+                            <option value="paid">Paid</option>
+                            <option value="pending">Pending</option>
+                            <option value="partial">Partial Payment</option>
+                            <option value="waived">Fee Waived</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="payment_method">Payment Method</label>
+                        <select id="payment_method" name="payment_method" class="form-control">
+                            <option value="">Select Method</option>
+                            <option value="card">Credit/Debit Card</option>
+                            <option value="upi">UPI</option>
+                            <option value="bank">Bank Transfer</option>
+                            <option value="cash">Cash</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div id="payment_details_container">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="amount_paid">Amount Paid (₹)</label>
+                            <input type="number" id="amount_paid" name="amount_paid" class="form-control" step="0.01">
+                        </div>
+                        <div class="form-group">
+                            <label for="transaction_id">Transaction ID</label>
+                            <input type="text" id="transaction_id" name="transaction_id" class="form-control">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="payment_date">Payment Date</label>
+                            <input type="date" id="payment_date" name="payment_date" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="invoice_number">Invoice Number</label>
+                            <input type="text" id="invoice_number" name="invoice_number" class="form-control" placeholder="Auto-generated if left blank">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Account Information Section -->
+            <div class="form-section">
+                <h3 class="section-title"><i class="fas fa-user-lock"></i> Account Information</h3>
+                
+                <div class="form-group">
+                    <div class="form-check">
+                        <input type="checkbox" id="create_account" name="create_account" checked>
+                        <label for="create_account">Create Student Portal Account</label>
+                    </div>
+                    <div class="form-text">A welcome email with login instructions will be sent to the student's email address</div>
+                </div>
+                
+                <div id="account_details_container">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="username">Username <span class="required">*</span></label>
+                            <input type="text" id="username" name="username" class="form-control" required>
+                            <div class="form-text">Will be auto-filled based on email address</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Password</label>
+                            <input type="password" id="password" name="password" class="form-control">
+                            <div class="form-text">Leave blank to auto-generate a secure password</div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="form-check">
+                            <input type="checkbox" id="send_welcome_email" name="send_welcome_email" checked>
+                            <label for="send_welcome_email">Send Welcome Email</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Form Actions -->
+            <div class="form-actions">
+                <button type="button" class="btn-cancel" onclick="window.location.href='admin-students.html'">Cancel</button>
+                <button type="button" class="btn-preview" id="preview-student">Preview</button>
+                <button type="submit" class="btn-save">Register Student</button>
+            </div>
+        </form>
+    </section>
+
+    <!-- Student Preview Modal -->
+    <div class="student-preview-modal" id="student-preview-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Student Registration Preview</h2>
+                <button type="button" class="modal-close" id="close-preview-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="preview-section">
+                    <h3>Personal Information</h3>
+                    <div class="preview-row">
+                        <div class="preview-label">Full Name:</div>
+                        <div class="preview-value" id="preview-name">John Doe</div>
+                    </div>
+                    <div class="preview-row">
+                        <div class="preview-label">Email:</div>
+                        <div class="preview-value" id="preview-email">john.doe@example.com</div>
+                    </div>
+                    <div class="preview-row">
+                        <div class="preview-label">Phone:</div>
+                        <div class="preview-value" id="preview-phone">+91 98765 43210</div>
+                    </div>
+                    <div class="preview-row">
+                        <div class="preview-label">Date of Birth:</div>
+                        <div class="preview-value" id="preview-dob">15 Jan 1995</div>
+                    </div>
+                    <div class="preview-row">
+                        <div class="preview-label">Gender:</div>
+                        <div class="preview-value" id="preview-gender">Male</div>
+                    </div>
+                </div>
+                
+                <div class="preview-section">
+                    <h3>Address Information</h3>
+                    <div class="preview-row">
+                        <div class="preview-label">Address:</div>
+                        <div class="preview-value" id="preview-address">123 Main Street, Apartment 4B</div>
+                    </div>
+                    <div class="preview-row">
+                        <div class="preview-label">City, State:</div>
+                        <div class="preview-value" id="preview-city-state">Mumbai, Maharashtra</div>
+                    </div>
+                    <div class="preview-row">
+                        <div class="preview-label">Postal Code:</div>
+                        <div class="preview-value" id="preview-postal">400001</div>
+                    </div>
+                    <div class="preview-row">
+                        <div class="preview-label">Country:</div>
+                        <div class="preview-value" id="preview-country">India</div>
+                    </div>
+                </div>
+                
+                <div class="preview-section">
+                    <h3>Program Information</h3>
+                    <div class="preview-row">
+                        <div class="preview-label">Program:</div>
+                        <div class="preview-value" id="preview-program">Complete Trading Program (CTP)</div>
+                    </div>
+                    <div class="preview-row">
+                        <div class="preview-label">Batch:</div>
+                        <div class="preview-value" id="preview-batch">April 2025</div>
+                    </div>
+                    <div class="preview-row">
+                        <div class="preview-label">Referral Source:</div>
+                        <div class="preview-value" id="preview-referral">Partner - Vikash Mishra</div>
+                    </div>
+                </div>
+                
+                <div class="preview-section">
+                    <h3>Payment Information</h3>
+                    <div class="preview-row">
+                        <div class="preview-label">Status:</div>
+                        <div class="preview-value" id="preview-payment-status">Paid</div>
+                    </div>
+                    <div class="preview-row">
+                        <div class="preview-label">Method:</div>
+                        <div class="preview-value" id="preview-payment-method">Credit/Debit Card</div>
+                    </div>
+                    <div class="preview-row">
+                        <div class="preview-label">Amount:</div>
+                        <div class="preview-value" id="preview-amount">₹19,999</div>
+                    </div>
+                    <div class="preview-row">
+                        <div class="preview-label">Transaction ID:</div>
+                        <div class="preview-value" id="preview-transaction">TXN-25040912</div>
+                    </div>
+                </div>
+                
+                <div class="preview-section">
+                    <h3>Account Information</h3>
+                    <div class="preview-row">
+                        <div class="preview-label">Username:</div>
+                        <div class="preview-value" id="preview-username">john.doe</div>
+                    </div>
+                    <div class="preview-row">
+                        <div class="preview-label">Password:</div>
+                        <div class="preview-value" id="preview-password">●●●●●●●●● (Auto-generated)</div>
+                    </div>
+                    <div class="preview-row">
+                        <div class="preview-label">Welcome Email:</div>
+                        <div class="preview-value" id="preview-welcome-email">Will be sent upon registration</div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" id="close-preview">Close Preview</button>
+                <button type="button" class="btn-primary" id="edit-after-preview">Edit</button>
+                <button type="button" class="btn-save" id="register-after-preview">Register Student</button>
+            </div>
+        </div>
+    </div>
+</main>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.1/chart.min.js"></script>
+<script src="{% static 'js/admin.js' %}"></script>  
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Toggle partner referral field based on referral source
+        const referralSourceSelect = document.getElementById('referral_source');
+        const partnerReferralContainer = document.getElementById('partner_referral_container');
+        
+        referralSourceSelect.addEventListener('change', function() {
+            if (this.value === 'partner') {
+                partnerReferralContainer.style.display = 'block';
+            } else {
+                partnerReferralContainer.style.display = 'none';
+            }
+        });
+        
+        // Toggle payment details based on payment status
+        const paymentStatusSelect = document.getElementById('payment_status');
+        const paymentDetailsContainer = document.getElementById('payment_details_container');
+        
+        paymentStatusSelect.addEventListener('change', function() {
+            if (this.value === 'paid' || this.value === 'partial') {
+                paymentDetailsContainer.style.display = 'block';
+            } else {
+                paymentDetailsContainer.style.display = 'none';
+            }
+        });
+        
+        // Toggle account details based on create account checkbox
+        const createAccountCheckbox = document.getElementById('create_account');
+        const accountDetailsContainer = document.getElementById('account_details_container');
+        
+        createAccountCheckbox.addEventListener('change', function() {
+            if (this.checked) {
+                accountDetailsContainer.style.display = 'block';
+            } else {
+                accountDetailsContainer.style.display = 'none';
+            }
+        });
+        
+        // Auto-generate username from email
+        const emailInput = document.getElementById('email');
+        const usernameInput = document.getElementById('username');
+        
+        emailInput.addEventListener('blur', function() {
+            if (this.value && !usernameInput.value) {
+                // Get everything before @ symbol
+                const emailParts = this.value.split('@');
+                if (emailParts.length > 0) {
+                    let username = emailParts[0].toLowerCase();
+                    
+                    // Remove special characters and replace spaces with dots
+                    username = username.replace(/[^\w\s]/gi, '').replace(/\s+/g, '.');
+                    
+                    usernameInput.value = username;
+                }
+            }
+        });
+        
+        // Set amount based on program selection
+        const programSelect = document.getElementById('program');
+        const amountInput = document.getElementById('amount_paid');
+        
+        programSelect.addEventListener('change', function() {
+            const selectedProgram = this.value;
+            let amount = '';
+            
+            switch (selectedProgram) {
+                case 'ctp':
+                    amount = '19999';
+                    break;
+                case 'amp':
+                    amount = '39999';
+                    break;
+                case 'gmp':
+                    amount = '7999';
+                    break;
+                case 'sip':
+                    amount = '11999';
+                    break;
+            }
+            
+            amountInput.value = amount;
+        });
+        
+        // Set current date for payment date
+        const paymentDateInput = document.getElementById('payment_date');
+        const today = new Date().toISOString().split('T')[0];
+        paymentDateInput.value = today;
+        
+        // Preview Modal Functionality
+        const previewBtn = document.getElementById('preview-student');
+        const previewModal = document.getElementById('student-preview-modal');
+        const closePreviewBtn = document.getElementById('close-preview-modal');
+        const closePreviewModalBtn = document.getElementById('close-preview');
+        const editAfterPreviewBtn = document.getElementById('edit-after-preview');
+        const registerAfterPreviewBtn = document.getElementById('register-after-preview');
+        
+        previewBtn.addEventListener('click', function() {
+            // Populate preview with form data
+            populatePreview();
+            
+            // Show the modal
+            previewModal.style.display = 'block';
+        });
+        
+        closePreviewBtn.addEventListener('click', function() {
+            previewModal.style.display = 'none';
+        });
+        
+        closePreviewModalBtn.addEventListener('click', function() {
+            previewModal.style.display = 'none';
+        });
+        
+        editAfterPreviewBtn.addEventListener('click', function() {
+            previewModal.style.display = 'none';
+            // Keep form open for editing
+        });
+        
+        registerAfterPreviewBtn.addEventListener('click', function() {
+            document.getElementById('student-registration-form').submit();
+        });
+        
+        // Close modal when clicking outside
+        window.addEventListener('click', function(event) {
+            if (event.target === previewModal) {
+                previewModal.style.display = 'none';
+            }
+        });
+        
+        // Function to populate the preview modal with form data
+        function populatePreview() {
+            // Personal information
+            const firstName = document.getElementById('first_name').value;
+            const lastName = document.getElementById('last_name').value;
+            document.getElementById('preview-name').textContent = firstName + ' ' + lastName;
+            
+            document.getElementById('preview-email').textContent = document.getElementById('email').value;
+            document.getElementById('preview-phone').textContent = document.getElementById('phone').value;
+            
+            const dobInput = document.getElementById('dob');
+            if (dobInput.value) {
+                const dobDate = new Date(dobInput.value);
+                const options = { day: 'numeric', month: 'short', year: 'numeric' };
+                document.getElementById('preview-dob').textContent = dobDate.toLocaleDateString('en-IN', options);
+            } else {
+                document.getElementById('preview-dob').textContent = 'Not specified';
+            }
+            
+            const genderSelect = document.getElementById('gender');
+            document.getElementById('preview-gender').textContent = genderSelect.value ? 
+                genderSelect.options[genderSelect.selectedIndex].text : 'Not specified';
+            
+            // Address information
+            const addressLine1 = document.getElementById('address_line1').value;
+            const addressLine2 = document.getElementById('address_line2').value;
+            let fullAddress = addressLine1;
+            if (addressLine2) {
+                fullAddress += ', ' + addressLine2;
+            }
+            document.getElementById('preview-address').textContent = fullAddress || 'Not specified';
+            
+            const city = document.getElementById('city').value;
+            const state = document.getElementById('state').value;
+            document.getElementById('preview-city-state').textContent = 
+                (city && state) ? city + ', ' + state : (city || state || 'Not specified');
+            
+            document.getElementById('preview-postal').textContent = 
+                document.getElementById('postal_code').value || 'Not specified';
+                
+            const countrySelect = document.getElementById('country');
+            document.getElementById('preview-country').textContent = countrySelect.value ? 
+                countrySelect.options[countrySelect.selectedIndex].text : 'Not specified';
+            
+            // Program information
+            const programSelect = document.getElementById('program');
+            document.getElementById('preview-program').textContent = programSelect.value ? 
+                programSelect.options[programSelect.selectedIndex].text : 'Not selected';
+                
+            const batchSelect = document.getElementById('batch');
+            document.getElementById('preview-batch').textContent = batchSelect.value ? 
+                batchSelect.options[batchSelect.selectedIndex].text : 'Not selected';
+            
+            // Referral information
+            const referralSourceSelect = document.getElementById('referral_source');
+            let referralText = referralSourceSelect.value ? 
+                referralSourceSelect.options[referralSourceSelect.selectedIndex].text : 'Not specified';
+                
+            if (referralSourceSelect.value === 'partner') {
+                const partnerSelect = document.getElementById('partner_referral');
+                if (partnerSelect.value) {
+                    referralText += ' - ' + partnerSelect.options[partnerSelect.selectedIndex].text;
+                }
+            }
+            document.getElementById('preview-referral').textContent = referralText;
+            
+            // Payment information
+            const paymentStatusSelect = document.getElementById('payment_status');
+            document.getElementById('preview-payment-status').textContent = paymentStatusSelect.value ? 
+                paymentStatusSelect.options[paymentStatusSelect.selectedIndex].text : 'Not selected';
+                
+            const paymentMethodSelect = document.getElementById('payment_method');
+            document.getElementById('preview-payment-method').textContent = paymentMethodSelect.value ? 
+                paymentMethodSelect.options[paymentMethodSelect.selectedIndex].text : 'Not specified';
+            
+            const amountPaid = document.getElementById('amount_paid').value;
+            document.getElementById('preview-amount').textContent = amountPaid ? 
+                '₹' + parseInt(amountPaid).toLocaleString('en-IN') : 'Not specified';
+                
+            document.getElementById('preview-transaction').textContent = 
+                document.getElementById('transaction_id').value || 'Will be generated';
+            
+            // Account information
+            document.getElementById('preview-username').textContent = 
+                document.getElementById('username').value || 'Will be auto-generated';
+                
+            const passwordInput = document.getElementById('password');
+            document.getElementById('preview-password').textContent = passwordInput.value ? 
+                '●●●●●●●●● (Custom)' : '●●●●●●●●● (Auto-generated)';
+                
+            const sendWelcomeEmail = document.getElementById('send_welcome_email').checked;
+            document.getElementById('preview-welcome-email').textContent = sendWelcomeEmail ? 
+                'Will be sent upon registration' : 'Will not be sent';
+        }
+        
+        // Form validation and submission
+        const registrationForm = document.getElementById('student-registration-form');
+        
+        registrationForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Perform validation
+            if (!validateForm()) {
+                return false;
+            }
+            
+            // In a real application, you would submit the form data to the server
+            alert('Student registered successfully!');
+            
+            // Redirect to students list
+            window.location.href = 'admin-students.html';
+        });
+        
+        function validateForm() {
+            // Required fields validation
+            const requiredFields = [
+                'first_name', 'last_name', 'email', 'phone', 
+                'program', 'batch', 'payment_status'
+            ];
+            
+            let isValid = true;
+            
+            requiredFields.forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                if (!field.value.trim()) {
+                    isValid = false;
+                    field.classList.add('is-invalid');
+                    
+                    // Add error message if it doesn't exist
+                    if (!document.getElementById(`${fieldId}-error`)) {
+                        const errorMsg = document.createElement('div');
+                        errorMsg.id = `${fieldId}-error`;
+                        errorMsg.className = 'error-message';
+                        errorMsg.textContent = 'This field is required';
+                        field.parentNode.appendChild(errorMsg);
+                    }
+                } else {
+                    field.classList.remove('is-invalid');
+                    
+                    // Remove error message if it exists
+                    const errorMsg = document.getElementById(`${fieldId}-error`);
+                    if (errorMsg) {
+                        errorMsg.remove();
+                    }
+                }
+            });
+            
+            // Email validation
+            const emailField = document.getElementById('email');
+            if (emailField.value && !isValidEmail(emailField.value)) {
+                isValid = false;
+                emailField.classList.add('is-invalid');
+                
+                if (!document.getElementById('email-error')) {
+                    const errorMsg = document.createElement('div');
+                    errorMsg.id = 'email-error';
+                    errorMsg.className = 'error-message';
+                    errorMsg.textContent = 'Please enter a valid email address';
+                    emailField.parentNode.appendChild(errorMsg);
+                }
+            }
+            
+            // Phone validation
+            const phoneField = document.getElementById('phone');
+            if (phoneField.value && !isValidPhone(phoneField.value)) {
+                isValid = false;
+                phoneField.classList.add('is-invalid');
+                
+                if (!document.getElementById('phone-error')) {
+                    const errorMsg = document.createElement('div');
+                    errorMsg.id = 'phone-error';
+                    errorMsg.className = 'error-message';
+                    errorMsg.textContent = 'Please enter a valid phone number';
+                    phoneField.parentNode.appendChild(errorMsg);
+                }
+            }
+            
+            // If create account is checked, username is required
+            if (document.getElementById('create_account').checked) {
+                const usernameField = document.getElementById('username');
+                if (!usernameField.value.trim()) {
+                    isValid = false;
+                    usernameField.classList.add('is-invalid');
+                    
+                    if (!document.getElementById('username-error')) {
+                        const errorMsg = document.createElement('div');
+                        errorMsg.id = 'username-error';
+                        errorMsg.className = 'error-message';
+                        errorMsg.textContent = 'Username is required when creating an account';
+                        usernameField.parentNode.appendChild(errorMsg);
+                    }
+                }
+            }
+            
+            return isValid;
+        }
+        
+        function isValidEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+        
+        function isValidPhone(phone) {
+            // Accept multiple phone formats
+            const phoneRegex = /^(\+\d{1,3}[-\s]?)?\d{3,4}[-\s]?\d{3,4}[-\s]?\d{3,4}$/;
+            return phoneRegex.test(phone);
+        }
+        
+        // Add style for validation errors
+        const style = document.createElement('style');
+        style.textContent = `
+            .is-invalid {
+                border-color: var(--danger-color) !important;
+            }
+            
+            .error-message {
+                color: var(--danger-color);
+                font-size: 12px;
+                margin-top: 5px;
+            }
+        `;
+        document.head.appendChild(style);
+    });
+</script>
+{% block footer %}
+{% endblock %}
+
+{% endblock %}

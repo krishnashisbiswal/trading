@@ -1,0 +1,657 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Admin Exams{% endblock %}
+{% block content %}
+    <style>
+        /* Modal Form Styles */
+        .modal-form {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-form.active {
+            display: flex;
+        }
+        
+        .form-container {
+            background-color: var(--bg-white);
+            border-radius: var(--border-radius);
+            width: 90%;
+            max-width: 700px;
+            box-shadow: var(--box-shadow-lg);
+            overflow: hidden;
+        }
+        
+        .form-header {
+            padding: 20px;
+            background-color: var(--primary-blue-lighter);
+            color: var(--primary-blue);
+            font-weight: 600;
+            font-size: 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-light);
+        }
+        
+        .form-header .close-btn {
+            cursor: pointer;
+            font-size: 20px;
+            color: var(--text-muted);
+            transition: var(--transition);
+        }
+        
+        .form-header .close-btn:hover {
+            color: var(--danger-color);
+            transform: rotate(90deg);
+        }
+        
+        .form-body {
+            padding: 20px;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+        
+        .form-row {
+            margin-bottom: 20px;
+        }
+        
+        .form-row label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-dark);
+        }
+        
+        .form-row input, 
+        .form-row select, 
+        .form-row textarea {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid var(--border-medium);
+            border-radius: var(--border-radius);
+            font-size: 14px;
+            transition: var(--transition);
+        }
+        
+        .form-row input:focus, 
+        .form-row select:focus, 
+        .form-row textarea:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(11, 87, 164, 0.1);
+            outline: none;
+        }
+        
+        .form-row textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+        
+        .form-footer {
+            padding: 20px;
+            border-top: 1px solid var(--border-light);
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+        }
+        
+        .cancel-btn {
+            padding: 10px 20px;
+            border: 1px solid var(--border-medium);
+            border-radius: var(--border-radius);
+            background-color: var(--bg-white);
+            color: var(--text-medium);
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .cancel-btn:hover {
+            background-color: var(--bg-light);
+        }
+        
+        .submit-btn {
+            padding: 10px 25px;
+            border-radius: var(--border-radius);
+            background-color: var(--primary-blue);
+            color: var(--text-light);
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: var(--transition);
+        }
+        
+        .submit-btn:hover {
+            background-color: var(--primary-blue-dark);
+        }
+        
+        /* Question Styles */
+        .question-container {
+            margin-top: 25px;
+            border-top: 1px solid var(--border-light);
+            padding-top: 20px;
+        }
+        
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .question-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--dark-blue);
+        }
+        
+        .add-question-btn {
+            display: flex;
+            align-items: center;
+            padding: 8px 15px;
+            background-color: var(--primary-blue-lighter);
+            color: var(--primary-blue);
+            border: none;
+            border-radius: var(--border-radius);
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .add-question-btn:hover {
+            background-color: var(--primary-blue);
+            color: var(--text-light);
+        }
+        
+        .add-question-btn i {
+            margin-right: 8px;
+        }
+        
+        .question-item {
+            background-color: var(--bg-light);
+            border-radius: var(--border-radius);
+            padding: 15px;
+            margin-bottom: 15px;
+            position: relative;
+        }
+        
+        .question-item .question-text {
+            font-weight: 500;
+            margin-bottom: 10px;
+        }
+        
+        .question-item .options-container {
+            margin-top: 10px;
+        }
+        
+        .question-item .option-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .question-item .option-item input[type="radio"] {
+            margin-right: 10px;
+        }
+        
+        .question-item .question-actions {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            display: flex;
+            gap: 8px;
+        }
+        
+        .question-item .action-btn {
+            width: 28px;
+            height: 28px;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body class="admin-body">
+    <!-- Admin Container -->
+    <div class="admin-container">
+        <!-- Main Content Area -->
+        <main class="admin-main">
+            <!-- Page Header -->
+            <section class="page-header">
+                <div class="header-content">
+                    <div class="page-title">
+                        <h1>Exams Management</h1>
+                        <p>Create and manage exams for all programs</p>
+                    </div>
+                    <div class="header-actions">
+                        <button class="btn-add" id="addExamBtn">
+                            <i class="fas fa-plus"></i> Create New Exam
+                        </button>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Main Table Section -->
+            <section class="table-section">
+                <div class="table-container">
+                    <div class="table-header">
+                        <h3 class="table-title">All Exams</h3>
+                        <div class="table-actions">
+                            <div class="search-container">
+                                <i class="fas fa-search search-icon"></i>
+                                <input type="text" class="search-input" id="searchInput" placeholder="Search exams...">
+                            </div>
+                            <div class="filter-container">
+                                <button class="filter-btn" id="filterBtn">
+                                    <i class="fas fa-filter"></i> Filter
+                                </button>
+                                <div class="filter-dropdown" id="filterDropdown">
+                                    <div class="filter-group">
+                                        <label class="filter-label">Program</label>
+                                        <select class="filter-select" id="programFilter">
+                                            <option value="">All Programs</option>
+                                            <option value="CTP">Complete Trading Program</option>
+                                            <option value="AMP">Arthavidya Mentorship Program</option>
+                                            <option value="GMP">Growth Mindset Program</option>
+                                            <option value="SIP">Smart Income Program</option>
+                                        </select>
+                                    </div>
+                                    <div class="filter-group">
+                                        <label class="filter-label">Status</label>
+                                        <select class="filter-select" id="statusFilter">
+                                            <option value="">All Status</option>
+                                            <option value="active">Active</option>
+                                            <option value="drafted">Draft</option>
+                                            <option value="completed">Completed</option>
+                                        </select>
+                                    </div>
+                                    <div class="filter-actions">
+                                        <button class="btn-reset" id="resetFilterBtn">Reset</button>
+                                        <button class="btn-apply" id="applyFilterBtn">Apply</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Table Content -->
+                    <div class="table-responsive">
+                        <table class="admin-table" id="examsTable">
+                            <thead>
+                                <tr>
+                                    <th>Exam Title</th>
+                                    <th>Program</th>
+                                    <th>Module</th>
+                                    <th>Duration</th>
+                                    <th>Questions</th>
+                                    <th>Passing Score</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Sample data rows -->
+                                <tr>
+                                    <td>Market Structure Final Exam</td>
+                                    <td>Complete Trading Program</td>
+                                    <td>Market Structure</td>
+                                    <td>60 mins</td>
+                                    <td>25</td>
+                                    <td>70%</td>
+                                    <td><span class="status-badge status-success">Active</span></td>
+                                    <td>
+                                        <div class="row-actions">
+                                            <button class="action-btn view" title="View">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="action-btn edit" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="action-btn delete" title="Delete">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Risk Management Assessment</td>
+                                    <td>Arthavidya Mentorship Program</td>
+                                    <td>Advanced Risk Management</td>
+                                    <td>45 mins</td>
+                                    <td>20</td>
+                                    <td>75%</td>
+                                    <td><span class="status-badge status-success">Active</span></td>
+                                    <td>
+                                        <div class="row-actions">
+                                            <button class="action-btn view" title="View">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="action-btn edit" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="action-btn delete" title="Delete">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Trading Psychology Test</td>
+                                    <td>Growth Mindset Program</td>
+                                    <td>Emotional Intelligence</td>
+                                    <td>30 mins</td>
+                                    <td>15</td>
+                                    <td>60%</td>
+                                    <td><span class="status-badge status-warning">Draft</span></td>
+                                    <td>
+                                        <div class="row-actions">
+                                            <button class="action-btn view" title="View">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="action-btn edit" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="action-btn delete" title="Delete">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Asset Allocation Strategies Quiz</td>
+                                    <td>Smart Income Program</td>
+                                    <td>Asset Allocation</td>
+                                    <td>40 mins</td>
+                                    <td>18</td>
+                                    <td>65%</td>
+                                    <td><span class="status-badge status-success">Active</span></td>
+                                    <td>
+                                        <div class="row-actions">
+                                            <button class="action-btn view" title="View">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="action-btn edit" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="action-btn delete" title="Delete">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Table Footer with Pagination -->
+                    <div class="table-footer">
+                        <div class="page-info">
+                            Showing <span id="startRange">1</span> to <span id="endRange">10</span> of <span id="totalItems">25</span> entries
+                        </div>
+                        <div class="pagination">
+                            <button class="page-btn" id="prevPage" disabled>
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <button class="page-btn active">1</button>
+                            <button class="page-btn">2</button>
+                            <button class="page-btn">3</button>
+                            <button class="page-btn" id="nextPage">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    
+    <!-- Modal Form for Adding/Editing Exam -->
+    <div class="modal-form" id="examForm">
+        <div class="form-container">
+            <div class="form-header">
+                <span id="formTitle">Create New Exam</span>
+                <i class="fas fa-times close-btn" id="closeForm"></i>
+            </div>
+            <form id="examDataForm">
+                <div class="form-body">
+                    <input type="hidden" id="examId" name="examId">
+                    <input type="hidden" id="formAction" name="formAction" value="add">
+                    
+                    <div class="form-row">
+                        <label for="examTitle">Exam Title <span class="required">*</span></label>
+                        <input type="text" id="examTitle" name="examTitle" required>
+                    </div>
+                    
+                    <div class="form-grid">
+                        <div class="form-row">
+                            <label for="program">Program <span class="required">*</span></label>
+                            <select id="program" name="program" required>
+                                <option value="">Select Program</option>
+                                <option value="CTP">Complete Trading Program</option>
+                                <option value="AMP">Arthavidya Mentorship Program</option>
+                                <option value="GMP">Growth Mindset Program</option>
+                                <option value="SIP">Smart Income Program</option>
+                            </select>
+                        </div>
+                        <div class="form-row">
+                            <label for="module">Module <span class="required">*</span></label>
+                            <select id="module" name="module" required>
+                                <option value="">Select Module</option>
+                                <option value="1">Market Structure</option>
+                                <option value="2">Advanced Risk Management</option>
+                                <option value="3">Emotional Intelligence</option>
+                                <option value="4">Asset Allocation</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-grid">
+                        <div class="form-row">
+                            <label for="duration">Duration (minutes) <span class="required">*</span></label>
+                            <input type="number" id="duration" name="duration" min="5" required>
+                        </div>
+                        <div class="form-row">
+                            <label for="passingScore">Passing Score (%) <span class="required">*</span></label>
+                            <input type="number" id="passingScore" name="passingScore" min="1" max="100" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-grid">
+                        <div class="form-row">
+                            <label for="attemptsAllowed">Attempts Allowed <span class="required">*</span></label>
+                            <input type="number" id="attemptsAllowed" name="attemptsAllowed" min="1" value="1" required>
+                        </div>
+                        <div class="form-row">
+                            <label for="status">Status <span class="required">*</span></label>
+                            <select id="status" name="status" required>
+                                <option value="active">Active</option>
+                                <option value="draft">Draft</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <label for="description">Description</label>
+                        <textarea id="description" name="description"></textarea>
+                    </div>
+                    
+                    <div class="question-container">
+                        <div class="question-header">
+                            <h3 class="question-title">Questions</h3>
+                            <button type="button" class="add-question-btn" id="addQuestionBtn">
+                                <i class="fas fa-plus"></i> Add Question
+                            </button>
+                        </div>
+                        
+                        <div id="questionsContainer">
+                            <!-- Sample question 1 -->
+                            <div class="question-item" data-question-id="1">
+                                <div class="question-actions">
+                                    <button type="button" class="action-btn edit">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button type="button" class="action-btn delete">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                                <div class="question-text">What is the most important aspect of risk management in trading?</div>
+                                <div class="options-container">
+                                    <div class="option-item">
+                                        <input type="radio" checked disabled name="q1" id="q1_1">
+                                        <label for="q1_1">Position Sizing</label>
+                                    </div>
+                                    <div class="option-item">
+                                        <input type="radio" disabled name="q1" id="q1_2">
+                                        <label for="q1_2">Technical Analysis</label>
+                                    </div>
+                                    <div class="option-item">
+                                        <input type="radio" disabled name="q1" id="q1_3">
+                                        <label for="q1_3">Market Timing</label>
+                                    </div>
+                                    <div class="option-item">
+                                        <input type="radio" disabled name="q1" id="q1_4">
+                                        <label for="q1_4">Price Prediction</label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Sample question 2 -->
+                            <div class="question-item" data-question-id="2">
+                                <div class="question-actions">
+                                    <button type="button" class="action-btn edit">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button type="button" class="action-btn delete">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                                <div class="question-text">Which of the following best describes market structure?</div>
+                                <div class="options-container">
+                                    <div class="option-item">
+                                        <input type="radio" disabled name="q2" id="q2_1">
+                                        <label for="q2_1">The psychological aspect of trading</label>
+                                    </div>
+                                    <div class="option-item">
+                                        <input type="radio" checked disabled name="q2" id="q2_2">
+                                        <label for="q2_2">The patterns of highs and lows that form in the market</label>
+                                    </div>
+                                    <div class="option-item">
+                                        <input type="radio" disabled name="q2" id="q2_3">
+                                        <label for="q2_3">The indicators used in technical analysis</label>
+                                    </div>
+                                    <div class="option-item">
+                                        <input type="radio" disabled name="q2" id="q2_4">
+                                        <label for="q2_4">The fundamental analysis of a company</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-footer">
+                    <button type="button" class="cancel-btn" id="cancelForm">Cancel</button>
+                    <button type="submit" class="submit-btn">Save Exam</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Question Form Modal -->
+    <div class="modal-form" id="questionForm">
+        <div class="form-container">
+            <div class="form-header">
+                <span id="questionFormTitle">Add New Question</span>
+                <i class="fas fa-times close-btn" id="closeQuestionForm"></i>
+            </div>
+            <form id="questionDataForm">
+                <div class="form-body">
+                    <input type="hidden" id="questionId" name="questionId">
+                    
+                    <div class="form-row">
+                        <label for="questionText">Question <span class="required">*</span></label>
+                        <textarea id="questionText" name="questionText" required></textarea>
+                    </div>
+                    
+                    <div class="form-row">
+                        <label for="questionType">Question Type <span class="required">*</span></label>
+                        <select id="questionType" name="questionType" required>
+                            <option value="multiple">Multiple Choice</option>
+                            <option value="truefalse">True/False</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-row">
+                        <label for="points">Points <span class="required">*</span></label>
+                        <input type="number" id="points" name="points" min="1" value="1" required>
+                    </div>
+                    
+                    <div id="optionsContainer">
+                        <label>Options <span class="required">*</span></label>
+                        <div id="multipleChoiceOptions">
+                            <div class="option-row" style="display: flex; align-items: center; margin-bottom: 10px;">
+                                <input type="radio" name="correctOption" id="option1Correct" value="0" checked style="width: auto; margin-right: 10px;">
+                                <input type="text" name="optionText[]" placeholder="Option 1" required style="flex: 1;">
+                            </div>
+                            <div class="option-row" style="display: flex; align-items: center; margin-bottom: 10px;">
+                                <input type="radio" name="correctOption" id="option2Correct" value="1" style="width: auto; margin-right: 10px;">
+                                <input type="text" name="optionText[]" placeholder="Option 2" required style="flex: 1;">
+                            </div>
+                            <div class="option-row" style="display: flex; align-items: center; margin-bottom: 10px;">
+                                <input type="radio" name="correctOption" id="option3Correct" value="2" style="width: auto; margin-right: 10px;">
+                                <input type="text" name="optionText[]" placeholder="Option 3" required style="flex: 1;">
+                            </div>
+                            <div class="option-row" style="display: flex; align-items: center; margin-bottom: 10px;">
+                                <input type="radio" name="correctOption" id="option4Correct" value="3" style="width: auto; margin-right: 10px;">
+                                <input type="text" name="optionText[]" placeholder="Option 4" required style="flex: 1;">
+                            </div>
+                        </div>
+                        
+                        <div id="trueFalseOptions" style="display: none;">
+                            <div class="option-row" style="display: flex; align-items: center; margin-bottom: 10px;">
+                                <input type="radio" name="tfCorrectOption" id="trueCorrect" value="true" checked style="width: auto; margin-right: 10px;">
+                                <label for="trueCorrect">True</label>
+                            </div>
+                            <div class="option-row" style="display: flex; align-items: center; margin-bottom: 10px;">
+                                <input type="radio" name="tfCorrectOption" id="falseCorrect" value="false" style="width: auto; margin-right: 10px;">
+                                <label for="falseCorrect">False</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <label for="explanation">Explanation</label>
+                        <textarea id="explanation" name="explanation"></textarea>
+                    </div>
+                </div>
+                
+                <div class="form-footer">
+                    <button type="button" class="cancel-btn" id="cancelQuestionForm">Cancel</button>
+                    <button type="submit" class="submit-btn">Save Question</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    {% block footer %}{% endblock footer %}
+    <!-- Include the common form handling JavaScript -->
+    <script src="{% static 'js/admin.js' %}"></script>
+    <script src="{% static 'admin-forms.js'%}"></script>
+{% endblock %}

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DdlMappings">
+    <mapping uuid="051cd948-4684-4972-94a9-51ddb9180ba3" name="Django default Mapping">
+      <data-sources db="734625ac-5f1b-4e20-b3ba-3fb4e2706b89" />
+      <scope>
+        <node negative="1">
+          <node kind="database" negative="1">
+            <node kind="schema" negative="1" />
+          </node>
+          <node kind="schema">
+            <name qname="information_schema" />
+            <name qname="msksomim_" />
+            <name qname="performance_schema" />
+          </node>
+        </node>
+      </scope>
+    </mapping>
+  </component>
+</project>

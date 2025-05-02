@@ -1,0 +1,697 @@
+{% extends "base.html" %}
+{% block title %}Admin Programs{% endblock %}
+{% load static %}
+{% block content %}
+    <style>
+        /* Additional styles specific to programs page */
+        .program-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            background-color: var(--primary-blue-lighter);
+            color: var(--primary-blue);
+        }
+        
+        .program-badge i {
+            font-size: 10px;
+        }
+        
+        .program-badge.featured {
+            background-color: var(--gold-light);
+            color: var(--gold);
+        }
+        
+        .program-card {
+            display: flex;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: var(--box-shadow-sm);
+            background-color: var(--bg-white);
+            margin-bottom: 20px;
+            transition: var(--transition);
+        }
+        
+        .program-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--box-shadow-md);
+        }
+        
+        .program-image {
+            width: 120px;
+            height: 120px;
+            border-radius: 10px;
+            overflow: hidden;
+            flex-shrink: 0;
+            margin-right: 20px;
+        }
+        
+        .program-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .program-info {
+            flex: 1;
+        }
+        
+        .program-title-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .program-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--dark-blue);
+            margin: 0;
+        }
+        
+        .program-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .program-meta {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+        
+        .meta-item i {
+            color: var(--primary-blue);
+            font-size: 14px;
+        }
+        
+        .program-description {
+            color: var(--text-dark);
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+        
+        .program-stats {
+            display: flex;
+            gap: 15px;
+            margin-top: auto;
+        }
+        
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            min-width: 80px;
+        }
+        
+        .stat-value {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--dark-blue);
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        
+        .price-tag {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--accent-red);
+        }
+        
+        /* View toggle buttons */
+        .view-toggle {
+            display: flex;
+            gap: 10px;
+            margin-left: auto;
+        }
+        
+        .view-btn {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            background-color: var(--bg-light);
+            color: var(--text-muted);
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .view-btn.active {
+            background-color: var(--primary-blue);
+            color: white;
+        }
+        
+        /* Card view container */
+        .card-view {
+            display: none;
+        }
+        
+        .card-view.active {
+            display: block;
+        }
+        
+        .table-view {
+            display: none;
+        }
+        
+        .table-view.active {
+            display: block;
+        }
+    </style>
+</head>
+<body class="admin-body">
+        <!-- Main Content Area -->
+        <main class="admin-main">
+            <!-- Page Header -->
+            <section class="page-header">
+                <div class="header-content">
+                    <div class="page-title">
+                        <h1>Programs</h1>
+                        <p>Manage all educational programs and courses</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Programs Section -->
+            <section class="table-container">
+                <!-- Table Header with Search and Actions -->
+                <div class="table-header">
+                    <h2 class="table-title">All Programs</h2>
+                    <div class="table-actions">
+                        <div class="search-container">
+                            <i class="fas fa-search search-icon"></i>
+                            <input type="text" class="search-input" placeholder="Search programs...">
+                        </div>
+                        <div class="filter-container">
+                            <button class="filter-btn" id="filter-btn">
+                                <i class="fas fa-filter"></i>
+                                <span>Filter</span>
+                            </button>
+                            <div class="filter-dropdown" id="filter-dropdown">
+                                <div class="filter-group">
+                                    <label class="filter-label">Category</label>
+                                    <select class="filter-select">
+                                        <option value="">All Categories</option>
+                                        <option value="trading">Trading</option>
+                                        <option value="investing">Investing</option>
+                                        <option value="mindset">Mindset</option>
+                                    </select>
+                                </div>
+                                <div class="filter-group">
+                                    <label class="filter-label">Status</label>
+                                    <select class="filter-select">
+                                        <option value="">All Status</option>
+                                        <option value="active">Active</option>
+                                        <option value="draft">Draft</option>
+                                        <option value="archived">Archived</option>
+                                    </select>
+                                </div>
+                                <div class="filter-group">
+                                    <label class="filter-label">Price Range</label>
+                                    <select class="filter-select">
+                                        <option value="">All Prices</option>
+                                        <option value="0-10000">₹0 - ₹10,000</option>
+                                        <option value="10000-20000">₹10,000 - ₹20,000</option>
+                                        <option value="20000+">Above ₹20,000</option>
+                                    </select>
+                                </div>
+                                <div class="filter-actions">
+                                    <button class="btn-reset">Reset</button>
+                                    <button class="btn-apply">Apply Filters</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="view-toggle">
+                            <button class="view-btn" id="table-view-btn" title="Table View">
+                                <i class="fas fa-list"></i>
+                            </button>
+                            <button class="view-btn active" id="card-view-btn" title="Card View">
+                                <i class="fas fa-th-large"></i>
+                            </button>
+                        </div>
+                        <a href="{% url 'admin_program_add' %}" class="btn-add">
+                            <i class="fas fa-plus"></i>
+                            <span>Add Program</span>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Programs Card View (Default) -->
+                <div class="card-view active" id="card-view">
+                    <!-- Program 1 -->
+                    <div class="program-card">
+                        <div class="program-image">
+                            <img src="{% static 'images/ctp-program.jpg' %}" alt="Complete Trading Program">
+                        </div>
+                        <div class="program-info">
+                            <div class="program-title-row">
+                                <h3 class="program-name">Complete Trading Program (CTP)</h3>
+                                <div class="program-actions">
+                                    <button class="action-btn edit" title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="action-btn delete" title="Delete">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="program-meta">
+                                <span class="program-badge featured"><i class="fas fa-star"></i> Featured</span>
+                                <span class="meta-item"><i class="fas fa-clock"></i> 3 Months</span>
+                                <span class="meta-item"><i class="fas fa-calendar-alt"></i> 24 Classes</span>
+                                <span class="meta-item"><i class="fas fa-users"></i> 852 Students</span>
+                                <span class="price-tag">₹19,999</span>
+                            </div>
+                            <p class="program-description">The Ultimate Trading Program to Make You Profitable. Covers basics to advanced concepts with personalized mentorship.</p>
+                            <div class="program-stats">
+                                <div class="stat-item">
+                                    <span class="stat-value">4.8</span>
+                                    <span class="stat-label">Rating</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-value">92%</span>
+                                    <span class="stat-label">Completion</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-value">₹42.6L</span>
+                                    <span class="stat-label">Revenue</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="status-badge status-success">Active</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Program 2 -->
+                    <div class="program-card">
+                        <div class="program-image">
+                            <img src="{% static 'images/amp-program.jpg' %}" alt="Arthavidya Mentorship Program">
+                        </div>
+                        <div class="program-info">
+                            <div class="program-title-row">
+                                <h3 class="program-name">Arthavidya Mentorship Program (AMP)</h3>
+                                <div class="program-actions">
+                                    <button class="action-btn edit" title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="action-btn delete" title="Delete">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="program-meta">
+                                <span class="program-badge featured"><i class="fas fa-star"></i> Featured</span>
+                                <span class="meta-item"><i class="fas fa-clock"></i> 3 Months</span>
+                                <span class="meta-item"><i class="fas fa-calendar-alt"></i> 12 Sessions</span>
+                                <span class="meta-item"><i class="fas fa-users"></i> 124 Students</span>
+                                <span class="price-tag">₹39,999</span>
+                            </div>
+                            <p class="program-description">Personalized Guidance for Serious Traders. One-on-one mentoring sessions with experienced traders and custom strategy development.</p>
+                            <div class="program-stats">
+                                <div class="stat-item">
+                                    <span class="stat-value">4.9</span>
+                                    <span class="stat-label">Rating</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-value">88%</span>
+                                    <span class="stat-label">Completion</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-value">₹37.2L</span>
+                                    <span class="stat-label">Revenue</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="status-badge status-success">Active</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Program 3 -->
+                    <div class="program-card">
+                        <div class="program-image">
+                            <img src="{% static 'images/gmp-program.jpg'%}" alt="Growth Mindset Program">
+                        </div>
+                        <div class="program-info">
+                            <div class="program-title-row">
+                                <h3 class="program-name">Growth Mindset Program (GMP)</h3>
+                                <div class="program-actions">
+                                    <button class="action-btn edit" title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="action-btn delete" title="Delete">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="program-meta">
+                                <span class="meta-item"><i class="fas fa-clock"></i> 1 Month</span>
+                                <span class="meta-item"><i class="fas fa-calendar-alt"></i> 8 Sessions</span>
+                                <span class="meta-item"><i class="fas fa-users"></i> 215 Students</span>
+                                <span class="price-tag">₹7,999</span>
+                            </div>
+                            <p class="program-description">Master the Psychology of Successful Trading. Intensive workshop on trading psychology and mindset development for consistent results.</p>
+                            <div class="program-stats">
+                                <div class="stat-item">
+                                    <span class="stat-value">4.6</span>
+                                    <span class="stat-label">Rating</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-value">81%</span>
+                                    <span class="stat-label">Completion</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-value">₹8.6L</span>
+                                    <span class="stat-label">Revenue</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="status-badge status-success">Active</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Program 4 -->
+                    <div class="program-card">
+                        <div class="program-image">
+                            <img src="{% static 'images/sip-program.jpg'%}" alt="Smart Income Program">
+                        </div>
+                        <div class="program-info">
+                            <div class="program-title-row">
+                                <h3 class="program-name">Smart Income Program (SIP)</h3>
+                                <div class="program-actions">
+                                    <button class="action-btn edit" title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="action-btn delete" title="Delete">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="program-meta">
+                                <span class="meta-item"><i class="fas fa-clock"></i> 2 Months</span>
+                                <span class="meta-item"><i class="fas fa-calendar-alt"></i> 16 Sessions</span>
+                                <span class="meta-item"><i class="fas fa-users"></i> 386 Students</span>
+                                <span class="price-tag">₹11,999</span>
+                            </div>
+                            <p class="program-description">Build Consistent Returns Through Strategic Investing. Focus on long-term wealth creation and investment strategies for sustainable returns.</p>
+                            <div class="program-stats">
+                                <div class="stat-item">
+                                    <span class="stat-value">4.7</span>
+                                    <span class="stat-label">Rating</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-value">79%</span>
+                                    <span class="stat-label">Completion</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-value">₹23.2L</span>
+                                    <span class="stat-label">Revenue</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="status-badge status-success">Active</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Programs Table View (Hidden by default) -->
+                <div class="table-view" id="table-view">
+                    <div class="table-responsive">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th class="checkbox-cell">
+                                        <label class="custom-checkbox">
+                                            <input type="checkbox" id="select-all-table">
+                                            <span class="checkmark"></span>
+                                        </label>
+                                    </th>
+                                    <th>Program</th>
+                                    <th>Price</th>
+                                    <th>Duration</th>
+                                    <th>Students</th>
+                                    <th>Revenue</th>
+                                    <th>Rating</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="checkbox-cell">
+                                        <label class="custom-checkbox">
+                                            <input type="checkbox" class="row-checkbox">
+                                            <span class="checkmark"></span>
+                                        </label>
+                                    </td>
+                                    <td>
+                                        <div class="user-info">
+                                            <img src="{% static 'images/ctp-program.jpg'%}" alt="Program" class="user-avatar">
+                                            <div class="user-details">
+                                                <h4>Complete Trading Program (CTP)</h4>
+                                                <p>Trading</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>₹19,999</td>
+                                    <td>3 Months</td>
+                                    <td>852</td>
+                                    <td>₹42.6L</td>
+                                    <td>4.8/5</td>
+                                    <td><span class="status-badge status-success">Active</span></td>
+                                    <td>
+                                        <div class="row-actions">
+                                            <button class="action-btn view" title="View Details">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="action-btn edit" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="action-btn delete" title="Delete">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="checkbox-cell">
+                                        <label class="custom-checkbox">
+                                            <input type="checkbox" class="row-checkbox">
+                                            <span class="checkmark"></span>
+                                        </label>
+                                    </td>
+                                    <td>
+                                        <div class="user-info">
+                                            <img src="{% static 'images/amp-program.jpg'%}" alt="Program" class="user-avatar">
+                                            <div class="user-details">
+                                                <h4>Arthavidya Mentorship Program (AMP)</h4>
+                                                <p>Mentorship</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>₹39,999</td>
+                                    <td>3 Months</td>
+                                    <td>124</td>
+                                    <td>₹37.2L</td>
+                                    <td>4.9/5</td>
+                                    <td><span class="status-badge status-success">Active</span></td>
+                                    <td>
+                                        <div class="row-actions">
+                                            <button class="action-btn view" title="View Details">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="action-btn edit" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="action-btn delete" title="Delete">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="checkbox-cell">
+                                        <label class="custom-checkbox">
+                                            <input type="checkbox" class="row-checkbox">
+                                            <span class="checkmark"></span>
+                                        </label>
+                                    </td>
+                                    <td>
+                                        <div class="user-info">
+                                            <img src="{% static 'images/gmp-program.jpg'%}" alt="Program" class="user-avatar">
+                                            <div class="user-details">
+                                                <h4>Growth Mindset Program (GMP)</h4>
+                                                <p>Psychology</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>₹7,999</td>
+                                    <td>1 Month</td>
+                                    <td>215</td>
+                                    <td>₹8.6L</td>
+                                    <td>4.6/5</td>
+                                    <td><span class="status-badge status-success">Active</span></td>
+                                    <td>
+                                        <div class="row-actions">
+                                            <button class="action-btn view" title="View Details">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="action-btn edit" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="action-btn delete" title="Delete">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="checkbox-cell">
+                                        <label class="custom-checkbox">
+                                            <input type="checkbox" class="row-checkbox">
+                                            <span class="checkmark"></span>
+                                        </label>
+                                    </td>
+                                    <td>
+                                        <div class="user-info">
+                                            <img src="{% static 'images/sip-program.jpg'%}" alt="Program" class="user-avatar">
+                                            <div class="user-details">
+                                                <h4>Smart Income Program (SIP)</h4>
+                                                <p>Investing</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>₹11,999</td>
+                                    <td>2 Months</td>
+                                    <td>386</td>
+                                    <td>₹23.2L</td>
+                                    <td>4.7/5</td>
+                                    <td><span class="status-badge status-success">Active</span></td>
+                                    <td>
+                                        <div class="row-actions">
+                                            <button class="action-btn view" title="View Details">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="action-btn edit" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="action-btn delete" title="Delete">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Table Footer with Pagination -->
+                    <div class="table-footer">
+                        <div class="page-info">
+                            Showing 1 to 4 of 4 entries
+                        </div>
+                        <div class="pagination">
+                            <button class="page-btn disabled">
+                                <i class="fas fa-angle-double-left"></i>
+                            </button>
+                            <button class="page-btn disabled">
+                                <i class="fas fa-angle-left"></i>
+                            </button>
+                            <button class="page-btn active">1</button>
+                            <button class="page-btn disabled">
+                                <i class="fas fa-angle-right"></i>
+                            </button>
+                            <button class="page-btn disabled">
+                                <i class="fas fa-angle-double-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="{% static 'js/admin.js' %}"></script>
+    <script src="{% static 'js/admin-main.js' %}"></script>
+    <script>
+        // Filter dropdown toggle
+        const filterBtn = document.getElementById('filter-btn');
+        const filterDropdown = document.getElementById('filter-dropdown');
+        
+        filterBtn.addEventListener('click', function() {
+            filterDropdown.classList.toggle('show');
+        });
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            if (!filterBtn.contains(event.target) && !filterDropdown.contains(event.target)) {
+                filterDropdown.classList.remove('show');
+            }
+        });
+        
+        // View toggle functionality
+        const tableViewBtn = document.getElementById('table-view-btn');
+        const cardViewBtn = document.getElementById('card-view-btn');
+        const tableView = document.getElementById('table-view');
+        const cardView = document.getElementById('card-view');
+        
+        tableViewBtn.addEventListener('click', function() {
+            tableViewBtn.classList.add('active');
+            cardViewBtn.classList.remove('active');
+            tableView.classList.add('active');
+            cardView.classList.remove('active');
+        });
+        
+        cardViewBtn.addEventListener('click', function() {
+            cardViewBtn.classList.add('active');
+            tableViewBtn.classList.remove('active');
+            cardView.classList.add('active');
+            tableView.classList.remove('active');
+        });
+        
+        // Select all checkbox functionality for table view
+        const selectAllTable = document.getElementById('select-all-table');
+        const rowCheckboxesTable = document.querySelectorAll('.table-view .row-checkbox');
+        
+        selectAllTable.addEventListener('change', function() {
+            rowCheckboxesTable.forEach(checkbox => {
+                checkbox.checked = this.checked;
+            });
+        });
+        
+        rowCheckboxesTable.forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                // Update select all checkbox
+                if (!this.checked) {
+                    selectAllTable.checked = false;
+                } else {
+                    const allChecked = Array.from(rowCheckboxesTable).every(c => c.checked);
+                    selectAllTable.checked = allChecked;
+                }
+            });
+        });
+    </script>
+{% endblock %}

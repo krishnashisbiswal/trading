@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration - Arthavidya Trading Community</title>
+    <link rel="stylesheet" href="{% static "css/style.css" %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Form specific styles */
+        .registration-container {
+            max-width: 800px;
+            margin: 40px auto;
+            background-color: #ffffff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .form-header {
+            background: linear-gradient(135deg, #0b57a4, #191f45);
+            color: #fff;
+            padding: 20px 30px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .form-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url("../assets/images/pattern-bg.png");
+            background-size: cover;
+            opacity: 0.05;
+            z-index: 0;
+        }
+        
+        .form-header h2 {
+            font-size: 24px;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .form-header p {
+            font-size: 16px;
+            opacity: 0.9;
+            margin: 0;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .form-body {
+            padding: 30px;
+        }
+        
+        .step-indicators {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        
+        .step-indicators::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 10%;
+            right: 10%;
+            height: 2px;
+            background-color: #e9ecef;
+            transform: translateY(-50%);
+            z-index: 1;
+        }
+        
+        .step {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #e9ecef;
+            color: #6c757d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .step.active {
+            background-color: #0b57a4;
+            color: #ffffff;
+        }
+        
+        .step.completed {
+            background-color: #28a745;
+            color: #ffffff;
+        }
+        
+        .step-content {
+            display: none;
+        }
+        
+        .step-content.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #333;
+        }
+        
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .form-row .form-group {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            font-size: 16px;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            transition: all 0.3s;
+        }
+        
+        .form-control:focus {
+            border-color: #0b57a4;
+            box-shadow: 0 0 0 2px rgba(11, 87, 164, 0.2);
+            outline: none;
+        }
+        
+        .form-text {
+            margin-top: 5px;
+            font-size: 12px;
+            color: #6c757d;
+        }
+        
+        .program-card {
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .program-card:hover {
+            border-color: #0b57a4;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .program-card.selected {
+            border-color: #0b57a4;
+            background-color: rgba(11, 87, 164, 0.05);
+        }
+        
+        .program-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .program-card h3 {
+            margin: 0;
+            font-size: 18px;
+            color: #0b57a4;
+        }
+        
+        .program-price {
+            font-weight: 600;
+            color: #cb0a3c;
+        }
+        
+        .program-card p {
+            margin: 0;
+            font-size: 14px;
+            color: #6c757d;
+        }
+        
+        .payment-option {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .payment-option:hover {
+            border-color: #0b57a4;
+        }
+        
+        .payment-option.selected {
+            border-color: #0b57a4;
+            background-color: rgba(11, 87, 164, 0.05);
+        }
+        
+        .payment-option input {
+            margin-right: 15px;
+        }
+        
+        .payment-option-info {
+            flex: 1;
+        }
+        
+        .payment-option h4 {
+            margin: 0;
+            font-size: 16px;
+        }
+        
+        .payment-option p {
+            margin: 5px 0 0;
+            font-size: 14px;
+            color: #6c757d;
+        }
+        
+        .payment-option-icon {
+            width: 40px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .form-footer {
+            display: flex;
+            justify-content: space-between;
+            padding-top: 20px;
+            border-top: 1px solid #e9ecef;
+            margin-top: 30px;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-weight: 600;
+            transition: all 0.3s;
+            cursor: pointer;
+            border: none;
+            font-size: 16px;
+        }
+        
+        .btn-previous {
+            background-color: #f8f9fa;
+            color: #6c757d;
+            border: 1px solid #dee2e6;
+        }
+        
+        .btn-previous:hover {
+            background-color: #e9ecef;
+        }
+        
+        .btn-next {
+            background-color: #0b57a4;
+            color: #ffffff;
+        }
+        
+        .btn-next:hover {
+            background-color: #084785;
+            transform: translateY(-2px);
+        }
+        
+        .btn-submit {
+            background-color: #28a745;
+            color: #ffffff;
+        }
+        
+        .btn-submit:hover {
+            background-color: #218838;
+            transform: translateY(-2px);
+        }
+        
+        /* Referral Code Section */
+        .referral-section {
+            background-color: #f8f9fa;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px dashed #dee2e6;
+        }
+        
+        .referral-section h3 {
+            font-size: 16px;
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: #0b57a4;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .form-body {
+                padding: 20px;
+            }
+            
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+            
+            .step-indicators::before {
+                left: 20%;
+                right: 20%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Section -->
+    <header class="main-header">
+        <div class="container">
+            <div class="header-inner">
+                <div class="logo">
+                    <img src="{% static "images/logo.png" %}" alt="Arthavidya Trading Community">
+                    <div class="logo-text">
+                        <h1>Arthavidya Trading Community</h1>
+                        <p>Building A Wealthy Nation</p>
+                    </div>
+                </div>
+                <nav class="main-nav">
+                    <ul>
+                        <li><a href="{% url "home" %}" >Home</a></li>
+                        <li><a href="{% url "about" %}">About Us</a></li>
+                        <li><a href="{% url "programs" %}">Our Programs</a></li>
+                        <li><a href="{% url "community"%}">Community</a></li>
+                        <li><a href="{% url "blog" %}">Blog</a></li>
+                        <li><a href="{% url "student_form" %}" class="register-btn">Register</a></li>
+                        <li><a href="{% url "login" %}" class="login-btn">Login</a></li>
+                    </ul>
+                </nav>
+                <div class="mobile-menu-toggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <div class="container">
+            <div class="registration-container">
+                <div class="form-header">
+                    <h2>Start Your Trading Journey Today</h2>
+                    <p>Complete the registration to join Arthavidya Trading Community</p>
+                </div>
+                <div class="form-body">
+                    <div class="step-indicators">
+                        <div class="step active">1</div>
+                        <div class="step">2</div>
+                        <div class="step">3</div>
+                        <div class="step">4</div>
+                    </div>
+                    
+                    <form id="registration-form" action="#" method="post">
+                        <!-- Step 1: Personal Information -->
+                        <div class="step-content active" id="step1">
+                            <h3>Personal Information</h3>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="first_name">First Name</label>
+                                    <input type="text" id="first_name" name="first_name" class="form-control" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="last_name">Last Name</label>
+                                    <input type="text" id="last_name" name="last_name" class="form-control" required>
+                                </div>
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="email">Email Address</label>
+                                    <input type="email" id="email" name="email" class="form-control" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="phone">Phone Number</label>
+                                    <input type="tel" id="phone" name="phone" class="form-control" required>
+                                </div>
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="dob">Date of Birth</label>
+                                    <input type="date" id="dob" name="dob" class="form-control" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="gender">Gender</label>
+                                    <select id="gender" name="gender" class="form-control" required>
+                                        <option value="">Select Gender</option>
+                                        <option value="male">Male</option>
+                                        <option value="female">Female</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="referral-section">
+                                <h3><i class="fas fa-user-plus"></i> Referral Information (Optional)</h3>
+                                <div class="form-group">
+                                    <label for="referral_code">Referral Code (if any)</label>
+                                    <input type="text" id="referral_code" name="referral_code" class="form-control">
+                                    <div class="form-text">If someone referred you, enter their referral code to receive a 10% discount.</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Step 2: Contact Information -->
+                        <div class="step-content" id="step2">
+                            <h3>Contact Information</h3>
+                            <div class="form-group">
+                                <label for="address">Address</label>
+                                <input type="text" id="address" name="address" class="form-control" required>
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="city">City</label>
+                                    <input type="text" id="city" name="city" class="form-control" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="state">State</label>
+                                    <input type="text" id="state" name="state" class="form-control" required>
+                                </div>
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="postal_code">Postal Code</label>
+                                    <input type="text" id="postal_code" name="postal_code" class="form-control" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="country">Country</label>
+                                    <select id="country" name="country" class="form-control" required>
+                                        <option value="">Select Country</option>
+                                        <option value="india" selected>India</option>
+                                        <option value="usa">United States</option>
+                                        <option value="uk">United Kingdom</option>
+                                        <option value="canada">Canada</option>
+                                        <option value="australia">Australia</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="occupation">Occupation</label>
+                                <select id="occupation" name="occupation" class="form-control" required>
+                                    <option value="">Select Occupation</option>
+                                    <option value="student">Student</option>
+                                    <option value="employed">Employed</option>
+                                    <option value="self-employed">Self-Employed</option>
+                                    <option value="business-owner">Business Owner</option>
+                                    <option value="retired">Retired</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <!-- Step 3: Program Selection -->
+                        <div class="step-content" id="step3">
+                            <h3>Select Your Program</h3>
+                            <p>Choose the program that best fits your learning goals:</p>
+                            
+                            <div class="program-card" data-program="ctp">
+                                <div class="program-card-header">
+                                    <h3>Complete Trading Program (CTP)</h3>
+                                    <div class="program-price">₹19,999</div>
+                                </div>
+                                <p>The Ultimate Trading Program to Make You Profitable. Covers basics to advanced concepts with personalized mentorship.</p>
+                            </div>
+                            
+                            <div class="program-card" data-program="amp">
+                                <div class="program-card-header">
+                                    <h3>Arthavidya Mentorship Program (AMP)</h3>
+                                    <div class="program-price">₹39,999</div>
+                                </div>
+                                <p>Personalized Guidance for Serious Traders. One-on-one mentoring sessions with experienced traders.</p>
+                            </div>
+                            
+                            <div class="program-card" data-program="gmp">
+                                <div class="program-card-header">
+                                    <h3>Growth Mindset Program (GMP)</h3>
+                                    <div class="program-price">₹7,999</div>
+                                </div>
+                                <p>Master the Psychology of Successful Trading. Intensive workshop on trading psychology and mindset.</p>
+                            </div>
+                            
+                            <div class="program-card" data-program="sip">
+                                <div class="program-card-header">
+                                    <h3>Smart Income Program (SIP)</h3>
+                                    <div class="program-price">₹11,999</div>
+                                </div>
+                                <p>Build Consistent Returns Through Strategic Investing. Focus on long-term wealth creation and investment strategies.</p>
+                            </div>
+                            
+                            <input type="hidden" id="selected_program" name="selected_program" required>
+                        </div>
+                        
+                        <!-- Step 4: Payment Information -->
+                        <div class="step-content" id="step4">
+                            <h3>Payment Information</h3>
+                            <p>Select your preferred payment method:</p>
+                            
+                            <div class="payment-options">
+                                <div class="payment-option">
+                                    <input type="radio" id="payment_upi" name="payment_method" value="upi" required>
+                                    <div class="payment-option-info">
+                                        <h4>UPI Payment</h4>
+                                        <p>Pay using any UPI app like Google Pay, PhonePe, Paytm, etc.</p>
+                                    </div>
+                                    <div class="payment-option-icon">
+                                        <i class="fas fa-mobile-alt"></i>
+                                    </div>
+                                </div>
+                                
+                                <div class="payment-option">
+                                    <input type="radio" id="payment_card" name="payment_method" value="card" required>
+                                    <div class="payment-option-info">
+                                        <h4>Debit/Credit Card</h4>
+                                        <p>Pay securely using your debit or credit card.</p>
+                                    </div>
+                                    <div class="payment-option-icon">
+                                        <i class="fas fa-credit-card"></i>
+                                    </div>
+                                </div>
+                                
+                                <div class="payment-option">
+                                    <input type="radio" id="payment_netbanking" name="payment_method" value="netbanking" required>
+                                    <div class="payment-option-info">
+                                        <h4>Net Banking</h4>
+                                        <p>Pay directly from your bank account.</p>
+                                    </div>
+                                    <div class="payment-option-icon">
+                                        <i class="fas fa-university"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="coupon_code">Coupon Code (if any)</label>
+                                <input type="text" id="coupon_code" name="coupon_code" class="form-control">
+                            </div>
+                            
+                            <div class="order-summary">
+                                <h4>Order Summary</h4>
+                                <div id="program-details">
+                                    <!-- This will be filled via JavaScript -->
+                                    <p>Please select a program to see details</p>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <div class="form-check">
+                                    <input type="checkbox" id="terms_agree" name="terms_agree" required>
+                                    <label for="terms_agree">I agree to the <a href="#">Terms and Conditions</a> and <a href="#">Privacy Policy</a>.</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Form Navigation -->
+                        <div class="form-footer">
+                            <button type="button" id="prev-btn" class="btn btn-previous" style="display: none;">Previous</button>
+                            <button type="button" id="next-btn" class="btn btn-next">Next</button>
+                            <button type="submit" id="submit-btn" class="btn btn-submit" style="display: none;">Complete Registration</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="contact-info">
+                    <a href="mailto:arthavidyacommunity@gmail.com" class="contact-item">
+                        <i class="fas fa-envelope"></i>
+                        <span>arthavidyacommunity@gmail.com</span>
+                    </a>
+                    <a href="tel:+917854933728" class="contact-item">
+                        <i class="fas fa-phone"></i>
+                        <span>+91 7854933728</span>
+                    </a>
+                </div>
+                
+                <div class="social-links">
+                    <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-youtube"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+            
+            <div class="footer-links">
+                <a href="{% url "terms_and_condition" %}">Shipping policy</a>
+                <a href="{% url "terms_and_condition" %}">Return Policy</a>
+                <a href="{% url "terms_and_condition" %}">Refund Policy</a>
+            </div>
+            
+            <div class="copyright">
+                <p>Arthavidya Trading Community Pvt Ltd © All Rights Reserved - 2025</p>
+                <p>Design and Developed by Arthavidya Trading Community</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Script -->
+    <script src="{% static 'js/admin.js' %}"></script>  
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Form step navigation
+            const steps = document.querySelectorAll('.step-content');
+            const stepIndicators = document.querySelectorAll('.step');
+            const nextBtn = document.getElementById('next-btn');
+            const prevBtn = document.getElementById('prev-btn');
+            const submitBtn = document.getElementById('submit-btn');
+            
+            let currentStep = 0;
+            
+            // Show initial step
+            showStep(currentStep);
+            
+            // Next button click handler
+            nextBtn.addEventListener('click', function() {
+                if (validateStep(currentStep)) {
+                    currentStep++;
+                    showStep(currentStep);
+                }
+            });
+            
+            // Previous button click handler
+            prevBtn.addEventListener('click', function() {
+                currentStep--;
+                showStep(currentStep);
+            });
+            
+            // Show step function
+            function showStep(stepIndex) {
+                // Hide all steps
+                steps.forEach(step => step.classList.remove('active'));
+                
+                // Show current step
+                steps[stepIndex].classList.add('active');
+                
+                // Update step indicators
+                stepIndicators.forEach((indicator, index) => {
+                    indicator.classList.remove('active', 'completed');
+                    
+                    if (index < stepIndex) {
+                        indicator.classList.add('completed');
+                    } else if (index === stepIndex) {
+                        indicator.classList.add('active');
+                    }
+                });
+                
+                // Show/hide navigation buttons
+                if (stepIndex === 0) {
+                    prevBtn.style.display = 'none';
+                } else {
+                    prevBtn.style.display = 'block';
+                }
+                
+                if (stepIndex === steps.length - 1) {
+                    nextBtn.style.display = 'none';
+                    submitBtn.style.display = 'block';
+                } else {
+                    nextBtn.style.display = 'block';
+                    submitBtn.style.display = 'none';
+                }
+            }
+            
+            // Validate step function (basic validation)
+            function validateStep(stepIndex) {
+                const currentStepElement = steps[stepIndex];
+                const requiredFields = currentStepElement.querySelectorAll('[required]');
+                
+                let isValid = true;
+                
+                requiredFields.forEach(field => {
+                    if (!field.value.trim()) {
+                        isValid = false;
+                        field.classList.add('invalid');
+                    } else {
+                        field.classList.remove('invalid');
+                    }
+                });
+                
+                // Special validation for step 3 (program selection)
+                if (stepIndex === 2) {
+                    const selectedProgram = document.getElementById('selected_program').value;
+                    if (!selectedProgram) {
+                        isValid = false;
+                        alert('Please select a program to continue.');
+                    }
+                }
+                
+                return isValid;
+            }
+            
+            // Program selection
+            const programCards = document.querySelectorAll('.program-card');
+            const selectedProgramInput = document.getElementById('selected_program');
+            
+            programCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    // Remove selection from all cards
+                    programCards.forEach(c => c.classList.remove('selected'));
+                    
+                    // Add selection to clicked card
+                    this.classList.add('selected');
+                    
+                    // Store selected program
+                    selectedProgramInput.value = this.dataset.program;
+                    
+                    // Update program details in summary
+                    const programName = this.querySelector('h3').textContent;
+                    const programPrice = this.querySelector('.program-price').textContent;
+                    
+                    const programDetailsElement = document.getElementById('program-details');
+                    programDetailsElement.innerHTML = `
+                        <div class="program-summary">
+                            <p><strong>Program:</strong> ${programName}</p>
+                            <p><strong>Price:</strong> ${programPrice}</p>
+                            <p><strong>Total Amount:</strong> ${programPrice}</p>
+                        </div>
+                    `;
+                });
+            });
+            
+            // Payment method selection
+            const paymentOptions = document.querySelectorAll('.payment-option');
+            
+            paymentOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    const radioInput = this.querySelector('input[type="radio"]');
+                    radioInput.checked = true;
+                    
+                    // Remove selection from all options
+                    paymentOptions.forEach(o => o.classList.remove('selected'));
+                    
+                    // Add selection to clicked option
+                    this.classList.add('selected');
+                });
+            });
+            
+            // Form submission
+            document.getElementById('registration-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Validate final step
+                if (validateStep(currentStep)) {
+                    // Here you would typically send the form data to your server
+                    alert('Registration completed successfully! We\'ll redirect you to payment gateway.');
+                    // Redirect or show success message
+                    // window.location.href = 'payment-gateway.html';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

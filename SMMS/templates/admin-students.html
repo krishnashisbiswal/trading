@@ -1,0 +1,250 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Admin student{% endblock %}
+{% block content %}
+<body class="admin-body">
+        <!-- Main Content Area -->
+        <main class="admin-main">
+            <!-- Page Header -->
+            <section class="page-header">
+                <div class="header-content">
+                    <div class="page-title">
+                        <h1>Students</h1>
+                        <p>Manage all student accounts and enrollments</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Students Table Section -->
+            <section class="table-container">
+                <!-- Bulk Actions Bar (Hidden by default, shown when items are selected) -->
+                <div class="bulk-actions" id="bulk-actions">
+                    <div class="bulk-selected">
+                        <span id="selected-count">0</span> students selected
+                    </div>
+                    <div class="bulk-buttons">
+                        <button class="bulk-btn assign"><i class="fas fa-user-tag"></i> Assign to Batch</button>
+                        <button class="bulk-btn delete"><i class="fas fa-trash-alt"></i> Delete</button>
+                    </div>
+                </div>
+                
+                <!-- Table Header with Search and Actions -->
+                <div class="table-header">
+                    <h2 class="table-title">All Students</h2>
+                    <div class="table-actions">
+                        <div class="search-container">
+                            <i class="fas fa-search search-icon"></i>
+                            <input type="text" class="search-input" placeholder="Search students...">
+                        </div>
+                        <div class="filter-container">
+                            <button class="filter-btn" id="filter-btn">
+                                <i class="fas fa-filter"></i>
+                                <span>Filter</span>
+                            </button>
+                            <div class="filter-dropdown" id="filter-dropdown">
+                                <div class="filter-group">
+                                    <label class="filter-label">Program</label>
+                                    <select class="filter-select">
+                                        <option value="">All Programs</option>
+                                        <option value="ctp">Complete Trading Program (CTP)</option>
+                                        <option value="amp">Arthavidya Mentorship Program (AMP)</option>
+                                        <option value="gmp">Growth Mindset Program (GMP)</option>
+                                        <option value="sip">Smart Income Program (SIP)</option>
+                                    </select>
+                                </div>
+                                <div class="filter-group">
+                                    <label class="filter-label">Batch</label>
+                                    <select class="filter-select">
+                                        <option value="">All Batches</option>
+                                        <option value="apr-2025">April 2025</option>
+                                        <option value="mar-2025">March 2025</option>
+                                        <option value="feb-2025">February 2025</option>
+                                    </select>
+                                </div>
+                                <div class="filter-group">
+                                    <label class="filter-label">Status</label>
+                                    <select class="filter-select">
+                                        <option value="">All Status</option>
+                                        <option value="active">Active</option>
+                                        <option value="inactive">Inactive</option>
+                                        <option value="completed">Completed</option>
+                                    </select>
+                                </div>
+                                <div class="filter-actions">
+                                    <button class="btn-reset">Reset</button>
+                                    <button class="btn-apply">Apply Filters</button>
+                                </div>
+                            </div>
+                        </div>
+                        <a href="{% url "admin_student_add"%}" class="btn-add">
+                            <i class="fas fa-plus"></i>
+                            <span>Add Student</span>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Students Table -->
+                <div class="table-responsive">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th class="checkbox-cell">
+                                    <label class="custom-checkbox">
+                                        <input type="checkbox" id="select-all">
+                                        <span class="checkmark"></span>
+                                    </label>
+                                </th>
+                                <th>Student</th>
+                                <th>Program & Batch</th>
+                                <th>Contact</th>
+                                <th>Enrolled On</th>
+                                <th>Status</th>
+                                <th>Progress</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                          {% for student in personal_infos %}
+                            <tr>
+                                <td class="checkbox-cell">
+                                    <label class="custom-checkbox">
+                                        <input type="checkbox" class="row-checkbox">
+                                        <span class="checkmark"></span>
+                                    </label>
+                                </td>
+                                <td>
+                                    <div class="user-info">
+                                        <img src="{% static 'images/student-avatar-1.jpg' %}" alt="Student" class="user-avatar">
+                                        <div class="user-details">
+                                            <h4>{{ student.first_name }}</h4>
+                                            <p>ID: ATC010125</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        <strong>Complete Trading Program (CTP)</strong>
+                                        <p>April 2025 Batch</p>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        <p>{{ student.email }}</p>
+                                        <p>{{ student.phone }}</p>
+                                    </div>
+                                </td>
+                                <td>April 1, 2025</td>
+                                <td><span class="status-badge status-success">Active</span></td>
+                                <td>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: 40%"></div>
+                                    </div>
+                                    <p>40% Complete</p>
+                                </td>
+                                <td>
+                                    <div class="row-actions">
+                                        <button class="action-btn view" title="View Profile">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="action-btn edit" title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="action-btn delete" title="Delete">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                         {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Table Footer with Pagination -->
+                <div class="table-footer">
+                    <div class="page-info">
+                        Showing 1 to 5 of 150 entries
+                    </div>
+                    <div class="pagination">
+                        <button class="page-btn disabled">
+                            <i class="fas fa-angle-double-left"></i>
+                        </button>
+                        <button class="page-btn disabled">
+                            <i class="fas fa-angle-left"></i>
+                        </button>
+                        <button class="page-btn active">1</button>
+                        <button class="page-btn">2</button>
+                        <button class="page-btn">3</button>
+                        <button class="page-btn">4</button>
+                        <button class="page-btn">5</button>
+                        <button class="page-btn">
+                            <i class="fas fa-angle-right"></i>
+                        </button>
+                        <button class="page-btn">
+                            <i class="fas fa-angle-double-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="{% static 'js/admin.js' %}"></script>
+    <script src="{% static 'js/admin-main.js' %}"></script>
+    <script>
+        // Filter dropdown toggle
+        const filterBtn = document.getElementById('filter-btn');
+        const filterDropdown = document.getElementById('filter-dropdown');
+        
+        filterBtn.addEventListener('click', function() {
+            filterDropdown.classList.toggle('show');
+        });
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            if (!filterBtn.contains(event.target) && !filterDropdown.contains(event.target)) {
+                filterDropdown.classList.remove('show');
+            }
+        });
+        
+        // Select all checkbox functionality
+        const selectAllCheckbox = document.getElementById('select-all');
+        const rowCheckboxes = document.querySelectorAll('.row-checkbox');
+        const bulkActions = document.getElementById('bulk-actions');
+        const selectedCount = document.getElementById('selected-count');
+        
+        selectAllCheckbox.addEventListener('change', function() {
+            rowCheckboxes.forEach(checkbox => {
+                checkbox.checked = this.checked;
+            });
+            
+            updateBulkActions();
+        });
+        
+        rowCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                updateBulkActions();
+                
+                // Update select all checkbox
+                if (!this.checked) {
+                    selectAllCheckbox.checked = false;
+                } else {
+                    const allChecked = Array.from(rowCheckboxes).every(c => c.checked);
+                    selectAllCheckbox.checked = allChecked;
+                }
+            });
+        });
+        
+        function updateBulkActions() {
+            const checkedCount = document.querySelectorAll('.row-checkbox:checked').length;
+            
+            if (checkedCount > 0) {
+                bulkActions.classList.add('show');
+                selectedCount.textContent = checkedCount;
+            } else {
+                bulkActions.classList.remove('show');
+            }
+        }
+    </script>
+{% endblock %}

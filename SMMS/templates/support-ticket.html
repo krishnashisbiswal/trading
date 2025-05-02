@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Support Ticket{% endblock title %}
+{% block content %}
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f1f5f9;
+      margin: 0;
+    }
+    .color {
+      background-color: #0b57a4;
+ 
+      padding: 25px 0;
+    }
+    .box {
+      padding: 30px;
+    }
+    h1 {
+      font-size: 26px;
+      font-weight: 700;
+      color: #ffffff;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #374151;
+      font-size: 14px;
+    }
+    input, select, textarea {
+      width: 100%;
+      padding: 10px 14px;
+      font-size: 14px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      background-color: #f9fafb;
+      color: #111827;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: #2563eb;
+    }
+    textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+    .row {
+      display: flex;
+      gap: 20px;
+    }
+    .row .form-group {
+      flex: 1;
+    }
+    .actions {
+      text-align: center;
+      margin-top: 30px;
+    }
+    button {
+      background-color: #0b5ed7;
+      color: #ffffff;
+      font-weight: 600;
+      padding: 12px 30px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    button:hover {
+      background-color: #084298;
+    }
+    .support-box{
+      max-width: 800px;
+margin: 40px auto;
+background-color: #ffffff;
+border-radius: 10px;
+overflow: hidden;
+box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+</style>
+<body class="admin-body">
+        <!-- Main Content Area -->
+        <main class="admin-main">
+            <!-- Schedule Class Form -->
+            <div id='support-form'  class="form-container">
+              <section class="page-header">
+              <div class="header-content">
+                <div class="page-title">
+                    <h1>Support Ticket</h1>
+                    <p>Submit a support ticket for any issues or inquiries.</p>
+                </div>
+            </div>
+            </section>
+<div class="support-box">
+  <center>
+  <div class="color">
+    <h1>Create Support Ticket</h1>
+  </div>
+  <div class="box">
+    <form id="support-ticket-form" action="{%url 'support_ticket' %}" method="post" >
+     {% csrf_token %}
+      <div class="form-group">
+        <label>Subject</label>
+        <input type="text" id="ticket_subject" name="ticket_subject"  placeholder="e.g., Issue with Class Scheduling" required>
+      </div>
+
+      <div class="row">
+        <div class="form-group">
+          <label>Priority</label>
+          <select id="ticket_priority" name="ticket_priority"   required>
+            <option value="">Select Priority</option>
+            <option value="Low">Low</option>
+            <option value="Medium">Medium</option>
+            <option value="High">High</option>
+            <option value="Urgent">Urgent</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Category</label>
+          <select id="ticket_category" name="ticket_category"  required>
+            <option value="">Select Category</option>
+            <option value="Technical">Technical</option>
+            <option value="Billing">Billing</option>
+            <option value="General">General</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Message</label>
+        <textarea id="ticket_message" name="ticket_message" placeholder="Describe your issue or question in detail..." required></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Attach Screenshot (Optional)</label>
+        <input type="file" id="ticket_attachment" name="ticket_attachment">
+      </div>
+
+      <div class="actions">
+        <button type="submit">Submit Ticket</button>
+      </div>
+    </form>
+  </div>
+</div>
+<center>
+                <!-- Form Footer -->
+                <div class="form-footer">
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="{% static 'js/admin.js' %}"></script>
+{%endblock%}

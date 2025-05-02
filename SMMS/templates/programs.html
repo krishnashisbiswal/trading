@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Programs - Arthavidya Trading Community</title>
+    <link rel="stylesheet" href="{% static "css/style.css" %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Additional CSS for internal pages -->
+    <style>
+        /* Fix for internal page headers */
+        .page-banner {
+            background: linear-gradient(135deg, #0b57a4 0%, #191f45 100%);
+            color: #ffffff;
+            padding: 60px 0;
+            text-align: center;
+            position: relative;
+            margin-bottom: 50px;
+        }
+        
+        .page-banner::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url("../assets/images/pattern-bg.png");
+            background-size: cover;
+            opacity: 0.05;
+            z-index: 0;
+        }
+        
+        .page-banner h1 {
+            font-size: 36px;
+            margin-bottom: 15px;
+            font-weight: 700;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .page-banner p {
+            font-size: 18px;
+            max-width: 700px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Programs page specific styles */
+        .programs-banner {
+            background: linear-gradient(135deg, #cb0a3c 0%, #a90832 100%);
+        }
+
+        .programs-intro {
+            padding: 20px 0 40px;
+        }
+        
+        .section-heading {
+            margin-bottom: 40px;
+            position: relative;
+            padding-bottom: 15px;
+        }
+        
+        .section-heading h2 {
+            font-size: 28px;
+            color: #0b57a4;
+            margin-bottom: 15px;
+        }
+        
+        /* .section-heading::after {
+            content: '';
+            position: absolute;
+            width: 60px;
+            height: 3px;
+            background-color: #cb0a3c;
+            bottom: 0;
+            left: 0;
+        } */
+        
+        .text-center .section-heading::after {
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        .text-center {
+            text-align: center;
+        }
+        
+        .program-section {
+            padding: 70px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .program-section:last-child {
+            border-bottom: none;
+        }
+        
+        .alternate-bg {
+            background-color: #f9f9f9;
+        }
+        
+        .program-content {
+            display: flex;
+            align-items: center;
+            gap: 40px;
+        }
+        
+        .program-content.reverse {
+            flex-direction: row-reverse;
+        }
+        
+        .program-image {
+            flex: 1;
+            max-width: 45%;
+        }
+        
+        .program-image img {
+            width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .program-image:hover img {
+            transform: scale(1.02);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+        }
+        
+        .program-details {
+            flex: 1;
+        }
+        
+        .program-badge {
+            display: inline-block;
+            background-color: #0b57a4;
+            color: #ffffff;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        
+        .program-details h2 {
+            font-size: 28px;
+            color: #0b57a4;
+            margin-bottom: 10px;
+        }
+        
+        .program-subtitle {
+            color: #6c757d;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+        
+        .program-features {
+            margin: 25px 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+        }
+        
+        .feature-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+        
+        .feature-item:hover {
+            background-color: #e6f0fa;
+            transform: translateX(5px);
+        }
+        
+        .feature-item i {
+            color: #0b57a4;
+            margin-right: 10px;
+            font-size: 16px;
+        }
+        
+        .program-details-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 25px;
+            padding: 20px;
+            background-color: #f5f5f5;
+            border-radius: 10px;
+        }
+        
+        .meta-item {
+            display: flex;
+            align-items: center;
+        }
+        
+        .meta-item i {
+            color: #0b57a4;
+            font-size: 20px;
+            margin-right: 10px;
+        }
+        
+        .meta-content {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .meta-label {
+            font-size: 12px;
+            color: #6c757d;
+        }
+        
+        .meta-value {
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .program-cta {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .cta-btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #cb0a3c 0%, #a90832 100%);
+            color: #ffffff;
+            padding: 12px 30px;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 15px rgba(203, 10, 60, 0.3);
+        }
+        
+        .cta-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(203, 10, 60, 0.4);
+            color: #ffffff;
+        }
+        
+        .btn-outline {
+            background-color: transparent;
+            border: 2px solid #0b57a4;
+            color: #0b57a4;
+            padding: 10px 25px;
+            border-radius: 30px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-block;
+            text-align: center;
+        }
+        
+        .btn-outline:hover {
+            background-color: #0b57a4;
+            color: #ffffff;
+            transform: translateY(-3px);
+        }
+        
+        /* Comparison Table */
+        .program-comparison {
+            padding: 70px 0;
+            background-color: #f9f9f9;
+        }
+        
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 30px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        
+        .comparison-table th,
+        .comparison-table td {
+            padding: 15px;
+            text-align: center;
+            border: 1px solid #eee;
+        }
+        
+        .comparison-table th {
+            background-color: #0b57a4;
+            color: #ffffff;
+            font-weight: 600;
+        }
+        
+        .comparison-table th:first-child {
+            text-align: left;
+        }
+        
+        .comparison-table td:first-child {
+            text-align: left;
+            font-weight: 500;
+        }
+        
+        .comparison-table tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        
+        .comparison-table tr:hover {
+            background-color: #e6f0fa;
+        }
+        
+        .check-icon {
+            color: #28a745;
+            font-size: 18px;
+        }
+        
+        .times-icon {
+            color: #dc3545;
+            font-size: 18px;
+        }
+        
+        .highlight-column {
+            background-color: #fffbf2;
+        }
+        
+        /* FAQ Section */
+        .program-faq {
+            padding: 70px 0;
+        }
+        
+        .faq-list {
+            margin-top: 40px;
+        }
+        
+        .faq-item {
+            margin-bottom: 20px;
+            border: 1px solid #eee;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .faq-question {
+            background-color: #f8f9fa;
+            padding: 15px 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+        
+        .faq-question h3 {
+            font-size: 18px;
+            margin: 0;
+            color: #0b57a4;
+        }
+        
+        .faq-question i {
+            transition: all 0.3s ease;
+        }
+        
+        .faq-answer {
+            padding: 0 20px;
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .faq-item.active .faq-question {
+            background-color: #e6f0fa;
+        }
+        
+        .faq-item.active .faq-question i {
+            transform: rotate(180deg);
+        }
+        
+        .faq-item.active .faq-answer {
+            padding: 20px;
+            max-height: 500px;
+        }
+        
+        /* CTA Section */
+        .enrollment-cta {
+            padding: 70px 0;
+            background: linear-gradient(135deg, #0b57a4, #191f45);
+            color: #ffffff;
+            text-align: center;
+        }
+        
+        .enrollment-cta h2 {
+            font-size: 32px;
+            margin-bottom: 20px;
+        }
+        
+        .enrollment-cta p {
+            font-size: 18px;
+            max-width: 700px;
+            margin: 0 auto 30px;
+            opacity: 0.9;
+        }
+        
+        /* Responsive fixes for internal pages */
+        @media (max-width: 992px) {
+            .program-content,
+            .program-content.reverse {
+                flex-direction: column;
+                gap: 30px;
+            }
+            
+            .program-image {
+                max-width: 100%;
+            }
+            
+            .page-banner h1 {
+                font-size: 30px;
+            }
+            
+            .page-banner p {
+                font-size: 16px;
+            }
+            
+            .comparison-table {
+                font-size: 14px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .program-features {
+                grid-template-columns: 1fr;
+            }
+            
+            .page-banner {
+                padding: 40px 0;
+            }
+            
+            .page-banner h1 {
+                font-size: 26px;
+            }
+            
+            .program-cta {
+                flex-direction: column;
+            }
+            
+            .cta-btn, .btn-outline {
+                width: 100%;
+                text-align: center;
+            }
+            
+            .comparison-table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Section -->
+    <header class="main-header">
+        <div class="container">
+            <div class="header-inner">
+                <div class="logo">
+                    <img src="{% static "images/logo.png" %}" alt="Arthavidya Trading Community">
+                    <div class="logo-text">
+                        <h1>Arthavidya Trading Community</h1>
+                        <p>Building A Wealthy Nation</p>
+                    </div>
+                </div>
+                <nav class="main-nav">
+                    <ul>
+                        <li><a href="{% url "home" %}" >Home</a></li>
+                        <li><a href="{% url "about" %}">About Us</a></li>
+                        <li><a href="{% url "programs" %}"class="active">Our Programs</a></li>
+                        <li><a href="{% url "community"%}">Community</a></li>
+                        <li><a href="{% url "blog" %}">Blog</a></li>
+                        <li><a href="{% url "student_form" %}" class="register-btn">Register</a></li>
+                        <li><a href="{% url "login" %}" class="login-btn">Login</a></li>
+                    </ul>
+                </nav>
+                <div class="mobile-menu-toggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Page Banner -->
+    <section class="page-banner programs-banner">
+        <div class="container">
+            <h1>Our Programs</h1>
+            <p>Comprehensive trading education for every stage of your journey</p>
+        </div>
+    </section>
+
+    <!-- Programs Introduction Section -->
+    <section class="programs-intro">
+        <div class="container">
+            <div class="section-heading text-center">
+                <h2>Trading Education For Everyone</h2>
+                <p>Arthavidya Trading Community offers specialized programs designed to take you from basic concepts to advanced trading strategies. Select the program that best fits your current skill level and goals.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTP Program Section -->
+    <section class="program-section">
+        <div class="container">
+            <div class="program-content">
+                <div class="program-image">
+                    <img src="{% static "images/ctp-program.jpg" %}" alt="Complete Trading Program">
+                </div>
+                <div class="program-details">
+                    <div class="program-badge">Flagship Program</div>
+                    <h2>Complete Trading Program (CTP)</h2>
+                    <p class="program-subtitle">The Ultimate Trading Program to Make You Profitable</p>
+                    <div class="program-description">
+                        <p>Our flagship program takes you through a comprehensive journey from basic market fundamentals to advanced trading strategies. The Complete Trading Program is designed to transform beginners into confident, profitable traders through structured learning and practical application.</p>
+                    </div>
+                    <div class="program-features">
+                        <div class="feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Introduction to Financial Markets</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Basics to Advanced Latest Concepts</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Technical Analysis</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Proven High Probability Setups</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Affordable Pricing</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Best Handholding Support System</span>
+                        </div>
+                    </div>
+                    <div class="program-details-meta">
+                        <div class="meta-item">
+                            <i class="fas fa-calendar"></i>
+                            <div class="meta-content">
+                                <span class="meta-label">Duration</span>
+                                <span class="meta-value">3 Months</span>
+                            </div>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-users"></i>
+                            <div class="meta-content">
+                                <span class="meta-label">Batch Size</span>
+                                <span class="meta-value">Limited to 30 Students</span>
+                            </div>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-clock"></i>
+                            <div class="meta-content">
+                                <span class="meta-label">Live Classes</span>
+                                <span class="meta-value">24 Sessions</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="program-cta">
+                        <a href="{% url 'student_form' %}" class="cta-btn">ENROLL NOW</a>
+                        <a href="#" class="btn-outline">Download Brochure</a>
+                        <a href="#" class="btn-outline">Enquire Now</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- AMP Program Section -->
+    <section class="program-section alternate-bg">
+        <div class="container">
+            <div class="program-content reverse">
+                <div class="program-image">
+                    <img src="{% static "images/amp-program.jpg" %}" alt="Arthavidya Mentorship Program">
+                </div>
+                <div class="program-details">
+                    <div class="program-badge">Advanced Program</div>
+                    <h2>Arthavidya Mentorship Program (AMP)</h2>
+                    <p class="program-subtitle">Personalized Guidance for Serious Traders</p>
+                    <div class="program-description">
+                        <p>The Arthavidya Mentorship Program is designed for traders who have a basic understanding of markets but need personalized guidance to take their trading to the next level. This program pairs you with experienced mentors who provide individualized feedback and strategy refinement.</p>
+                    </div>
+                    <div class="program-features">
+                        <div class="feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>One-on-One Mentoring Sessions</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Portfolio Review and Optimization</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Advanced Strategy Development</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Trading Psychology Coaching</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Real-time Trade Analysis</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Performance Tracking and Improvement</span>
+                        </div>
+                    </div>
+                    <div class="program-details-meta">
+                        <div class="meta-item">
+                            <i class="fas fa-calendar"></i>
+                            <div class="meta-content">
+                                <span class="meta-label">Duration</span>
+                                <span class="meta-value">3 Months</span>
+                            </div>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-users"></i>
+                            <div class="meta-content">
+                                <span class="meta-label">Mentorship Type</span>
+                                <span class="meta-value">Individual & Group</span>
+                            </div>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-clock"></i>
+                            <div class="meta-content">
+                                <span class="meta-label">Sessions</span>
+                                <span class="meta-value">12 (1-hour each)</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="program-cta">
+                        <a href="#" class="cta-btn">COMING SOON</a>
+                        <a href="../dashboard/student/studentfrom.html" class="btn-outline">Join Waitlist</a>
+                        <a href="#" class="btn-outline">Enquire Now</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- GMP Program Section -->
+    <section class="program-section">
+        <div class="container">
+            <div class="program-content">
+                <div class="program-image">
+                    <img src="{% static "images/gmp-program.jpg" %}" alt="Growth Mindset Program">
+                </div>
+                <div class="program-details">
+                    <div class="program-badge">Specialized Program</div>
+                    <h2>Growth Mindset Program (GMP)</h2>
+                    <p class="program-subtitle">Master the Psychology of Successful Trading</p>
+                    <div class="program-description">
+                        <p>The Growth Mindset Program focuses on the crucial psychological aspects of trading. Even with perfect technical knowledge, traders often fail due to psychological barriers. This program helps you develop the mental resilience, discipline, and emotional control needed for consistent trading success.</p>
+                    </div>
+                    <div class="program-features">
+                        <div class="feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Trading Psychology Fundamentals</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Emotional Management Techniques</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Stress Management for Traders</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Building Trading Discipline</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Overcoming Fear and Greed</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Developing a Winning Mindset</span>
+                        </div>
+                    </div>
+                    <div class="program-details-meta">
+                        <div class="meta-item">
+                            <i class="fas fa-calendar"></i>
+                            <div class="meta-content">
+                                <span class="meta-label">Duration</span>
+                                <span class="meta-value">2 Days</span>
+                            </div>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-users"></i>
+                            <div class="meta-content">
+                                <span class="meta-label">Format</span>
+                                <span class="meta-value">Intensive Workshop</span>
+                            </div>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-clock"></i>
+                            <div class="meta-content">
+                                <span class="meta-label">Hours</span>
+                                <span class="meta-value">16 Hours Total</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="program-cta">
+                        <a href="#" class="cta-btn">COMING SOON</a>
+                        <a href="../dashboard/student/studentfrom.html" class="btn-outline">Join Waitlist</a>
+                        <a href="#" class="btn-outline">Enquire Now</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SIP Program Section -->
+    <section class="program-section alternate-bg">
+        <div class="container">
+            <div class="program-content reverse">
+                <div class="program-image">
+                    <img src="{% static "images/sip-program.jpg" %}" alt="Smart Income Program">
+                </div>
+                <div class="program-details">
+                    <div class="program-badge">Financial Program</div>
+                    <h2>Smart Income Program (SIP)</h2>
+                    <p class="program-subtitle">Build Consistent Returns Through Strategic Investing</p>
+                    <div class="program-description">
+                        <p>The Smart Income Program focuses on long-term wealth creation through systematic investment approaches. Unlike active trading, this program teaches you how to build a robust investment portfolio that generates consistent returns while minimizing risk and time commitment.</p>
+                    </div>
+                    <div class="program-features">
+                        <div class="feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Fundamentals of Long-term Investing</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Portfolio Construction Principles</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Asset Allocation Strategies</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Risk Management for Investors</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Passive Income Generation</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Tax-Efficient Investing</span>
+                        </div>
+                    </div>
+                    <div class="program-details-meta">
+                        <div class="meta-item">
+                            <i class="fas fa-calendar"></i>
+                            <div class="meta-content">
+                                <span class="meta-label">Duration</span>
+                                <span class="meta-value">1 Month</span>
+                            </div>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-users"></i>
+                            <div class="meta-content">
+                                <span class="meta-label">Format</span>
+                                <span class="meta-value">Weekly Sessions</span>
+                            </div>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-clock"></i>
+                            <div class="meta-content">
+                                <span class="meta-label">Sessions</span>
+                                <span class="meta-value">4 (2-hour each)</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="program-cta">
+                        <a href="#" class="cta-btn">COMING SOON</a>
+                        <a href="../dashboard/student/studentfrom.html" class="btn-outline">Join Waitlist</a>
+                        <a href="#" class="btn-outline">Enquire Now</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Program Comparison Section -->
+    <section class="program-comparison">
+        <div class="container">
+            <div class="section-heading text-center">
+                <h2>Program Comparison</h2>
+                <p>Compare our programs to find the right fit for your trading journey</p>
+            </div>
+            
+            <div class="table-responsive">
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Features</th>
+                            <th>CTP</th>
+                            <th class="highlight-column">AMP</th>
+                            <th>GMP</th>
+                            <th>SIP</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Duration</td>
+                            <td>3 Months</td>
+                            <td class="highlight-column">3 Months</td>
+                            <td>2 Days</td>
+                            <td>1 Month</td>
+                        </tr>
+                        <tr>
+                            <td>Live Sessions</td>
+                            <td>24</td>
+                            <td class="highlight-column">12</td>
+                            <td>4</td>
+                            <td>4</td>
+                        </tr>
+                        <tr>
+                            <td>Recorded Content</td>
+                            <td><i class="fas fa-check check-icon"></i></td>
+                            <td class="highlight-column"><i class="fas fa-check check-icon"></i></td>
+                            <td><i class="fas fa-check check-icon"></i></td>
+                            <td><i class="fas fa-check check-icon"></i></td>
+                        </tr>
+                        <tr>
+                            <td>One-on-One Mentoring</td>
+                            <td><i class="fas fa-times times-icon"></i></td>
+                            <td class="highlight-column"><i class="fas fa-check check-icon"></i></td>
+                            <td><i class="fas fa-times times-icon"></i></td>
+                            <td><i class="fas fa-times times-icon"></i></td>
+                        </tr>
+                        <tr>
+                            <td>Market Analysis</td>
+                            <td><i class="fas fa-check check-icon"></i></td>
+                            <td class="highlight-column"><i class="fas fa-check check-icon"></i></td>
+                            <td><i class="fas fa-times times-icon"></i></td>
+                            <td><i class="fas fa-check check-icon"></i></td>
+                        </tr>
+                        <tr>
+                            <td>Technical Analysis</td>
+                            <td><i class="fas fa-check check-icon"></i></td>
+                            <td class="highlight-column"><i class="fas fa-check check-icon"></i></td>
+                            <td><i class="fas fa-times times-icon"></i></td>
+                            <td><i class="fas fa-check check-icon"></i></td>
+                        </tr>
+                        <tr>
+                            <td>Psychological Training</td>
+                            <td><i class="fas fa-check check-icon"></i></td>
+                            <td class="highlight-column"><i class="fas fa-check check-icon"></i></td>
+                            <td><i class="fas fa-check check-icon"></i></td>
+                            <td><i class="fas fa-times times-icon"></i></td>
+                        </tr>
+                        <tr>
+                            <td>Study Materials</td>
+                            <td><i class="fas fa-check check-icon"></i></td>
+                            <td class="highlight-column"><i class="fas fa-check check-icon"></i></td>
+                            <td><i class="fas fa-check check-icon"></i></td>
+                            <td><i class="fas fa-check check-icon"></i></td>
+                        </tr>
+                        <tr>
+                            <td>Community Access</td>
+                            <td><i class="fas fa-check check-icon"></i></td>
+                            <td class="highlight-column"><i class="fas fa-check check-icon"></i></td>
+                            <td><i class="fas fa-check check-icon"></i></td>
+                            <td><i class="fas fa-check check-icon"></i></td>
+                        </tr>
+                        <tr>
+                            <td>Portfolio Review</td>
+                            <td><i class="fas fa-times times-icon"></i></td>
+                            <td class="highlight-column"><i class="fas fa-check check-icon"></i></td>
+                            <td><i class="fas fa-times times-icon"></i></td>
+                            <td><i class="fas fa-check check-icon"></i></td>
+                        </tr>
+                        <tr>
+                            <td>Certification</td>
+                            <td><i class="fas fa-check check-icon"></i></td>
+                            <td class="highlight-column"><i class="fas fa-check check-icon"></i></td>
+                            <td><i class="fas fa-check check-icon"></i></td>
+                            <td><i class="fas fa-check check-icon"></i></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="program-faq">
+        <div class="container">
+            <div class="section-heading text-center">
+                <h2>Frequently Asked Questions</h2>
+                <p>Get answers to common questions about our programs</p>
+            </div>
+            
+            <div class="faq-list">
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h3>Which program is best for beginners?</h3>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>For complete beginners, we recommend starting with the Complete Trading Program (CTP). This comprehensive program covers all the fundamentals and gradually progresses to advanced concepts, providing a solid foundation for your trading journey.</p>
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h3>Do I need prior knowledge to join these programs?</h3>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>No prior knowledge is required for the Complete Trading Program (CTP) as it starts from the basics. However, for the Arthavidya Mentorship Program (AMP) and Growth Mindset Program (GMP), a basic understanding of trading concepts is beneficial. The Smart Income Program (SIP) is suitable for both beginners and experienced investors.</p>
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h3>How are the classes conducted?</h3>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>All our programs feature live online classes through Zoom, allowing you to interact directly with trainers. Sessions are recorded so you can review them later. We also provide downloadable study materials, assignments, and quizzes to reinforce your learning.</p>
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h3>Can I access the course content after completion?</h3>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Yes, you will have lifetime access to all recorded sessions and study materials after completing the program. This allows you to revisit concepts and strategies as you continue your trading journey.</p>
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h3>What if I miss a live session?</h3>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Don't worry if you miss a live session. All classes are recorded and made available in your student dashboard within 24 hours. You can watch the recordings at your convenience and still participate in the next live session.</p>
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h3>Do you provide job placement assistance?</h3>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Our programs are designed to make you a self-sufficient trader rather than seeking employment. However, top performers may be offered opportunities to become trainers or mentors within our community. We also provide guidance on how to become a professional trader.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Enrollment CTA -->
+    <section class="enrollment-cta">
+        <div class="container">
+            <h2>Ready to Start Your Trading Journey?</h2>
+            <p>Join thousands of successful traders who have transformed their financial future with Arthavidya Trading Community.</p>
+            <a href="{%url 'amp_enrollment'%}" class="cta-btn">ENROLL NOW</a>
+        </div>
+    </section>
+
+    <!-- Disclaimer Section -->
+    <section class="disclaimer-section">
+        <div class="container">
+            <h2>IMPORTANT DISCLAIMER</h2>
+            <p>Arthavidya Trading Community is an education and training institute dedicated to providing knowledge on trading and financial markets. We do not offer any form of investment advisory, stock tips, portfolio management, or any unauthorized services that fall under the regulatory framework of the Government of India. Our programs are purely for educational purposes, and we do not guarantee any profits or financial returns. Participants are encouraged to conduct their own research before making any investment decisions.</p>
+            <p>Management reserves the right to deny or revoke admission to any participant, even after the fee has been paid.</p>
+        </div>
+    </section>
+
+    <!-- Footer Section -->
+    <footer class="main-footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="contact-info">
+                    <a href="mailto:arthavidyacommunity@gmail.com" class="contact-item">
+                        <i class="fas fa-envelope"></i>
+                        <span>arthavidyacommunity@gmail.com</span>
+                    </a>
+                    <a href="tel:+917854933728" class="contact-item">
+                        <i class="fas fa-phone"></i>
+                        <span>+91 7854933728</span>
+                    </a>
+                </div>
+                
+                <div class="social-links">
+                    <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-youtube"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+            
+            <div class="footer-links">
+                <a href="{% url 'terms_and_condition'%}">Terms and Conditions</a>
+                <a href="terms-and-condition.html#privacy-policy">Privacy Policy</a>
+                <a href="terms-and-condition.html#refund-policy">Refund Policy</a>
+            </div>
+            
+            <div class="copyright">
+                <p>Arthavidya Trading Community Pvt Ltd © All Rights Reserved - 2025</p>
+                <p>Design and Developed by Arthavidya Trading Community</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Script -->
+    <script src="../assets/js/main.js"></script>
+    <script>
+        // FAQ Accordion
+        document.addEventListener('DOMContentLoaded', function() {
+            const faqItems = document.querySelectorAll('.faq-item');
+            
+            faqItems.forEach(item => {
+                const question = item.querySelector('.faq-question');
+                
+                question.addEventListener('click', function() {
+                    // Close all other items
+                    faqItems.forEach(otherItem => {
+                        if (otherItem !== item) {
+                            otherItem.classList.remove('active');
+                        }
+                    });
+                    
+                    // Toggle current item
+                    item.classList.toggle('active');
+                });
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>About Us - Arthavidya Trading Community</title>
+        <link rel="stylesheet" href="{% static "css/style.css" %}">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+        
+        <!-- Additional CSS for internal pages -->
+        <style>
+            /* Fix for internal page headers */
+            .page-banner {
+                background: linear-gradient(135deg, #0b57a4 0%, #191f45 100%);
+                color: #ffffff;
+                padding: 60px 0;
+                text-align: center;
+                position: relative;
+                margin-bottom: 50px;
+            }
+            
+            .page-banner::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-image: {% static 'images/pattern-bg.png' %};
+                background-size: cover;
+                opacity: 0.05;
+                z-index: 0;
+            }
+            
+            .page-banner h1 {
+                font-size: 36px;
+                margin-bottom: 15px;
+                font-weight: 700;
+                position: relative;
+                z-index: 1;
+            }
+            
+            .page-banner p {
+                font-size: 18px;
+                max-width: 700px;
+                margin: 0 auto;
+                position: relative;
+                z-index: 1;
+            }
+            
+            /* Fix for section layouts */
+            .section-heading {
+                margin-bottom: 40px;
+                position: relative;
+                padding-bottom: 15px;
+            }
+            
+            .section-heading h2 {
+                font-size: 28px;
+                color: #0b57a4;
+                margin-bottom: 15px;
+            }
+            
+            /* .section-heading::after {
+                content: '';
+                position: absolute;
+                width: 60px;
+                height: 3px;
+                background-color: #cb0a3c;
+                bottom: 0;
+                left: 0;
+            } */
+            
+            .text-center .section-heading::after {
+                left: 50%;
+                transform: translateX(-50%);
+            }
+            
+            /* Mission Vision Sections */
+            .mission-content,
+            .vision-content {
+                display: flex;
+                align-items: center;
+                gap: 40px;
+                margin-bottom: 50px;
+            }
+            
+            .mission-image,
+            .vision-image {
+                flex: 1;
+                max-width: 45%;
+            }
+            
+            .mission-image img,
+            .vision-image img {
+                width: 100%;
+                border-radius: 10px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            }
+            
+            .mission-text,
+            .vision-text {
+                flex: 1;
+            }
+            
+            .vision-content {
+                flex-direction: row-reverse;
+            }
+            
+            /* Objectives Grid */
+            .objectives-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+                gap: 30px;
+                margin-top: 40px;
+            }
+            
+            .objective-item {
+                background-color: #ffffff;
+                border-radius: 10px;
+                padding: 30px;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+                transition: all 0.3s ease;
+                border-top: 3px solid #0b57a4;
+            }
+            
+            .objective-item:hover {
+                transform: translateY(-10px);
+                box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+            }
+            
+            .objective-icon {
+                width: 60px;
+                height: 60px;
+                background: linear-gradient(135deg, #0b57a4, #191f45);
+                color: #ffffff;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                border-radius: 50%;
+                margin-bottom: 20px;
+                font-size: 24px;
+            }
+            
+            /* Process Steps */
+            .process-steps {
+                position: relative;
+                max-width: 800px;
+                margin: 50px auto 0;
+                padding-left: 40px;
+            }
+            
+            .process-steps::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 19px;
+                height: 100%;
+                width: 2px;
+                background: linear-gradient(to bottom, #0b57a4, #191f45);
+            }
+            
+            .process-step {
+                position: relative;
+                margin-bottom: 50px;
+            }
+            
+            .process-step:last-child {
+                margin-bottom: 0;
+            }
+            
+            .step-number {
+                position: absolute;
+                left: -40px;
+                top: 0;
+                width: 40px;
+                height: 40px;
+                background: linear-gradient(135deg, #0b57a4, #191f45);
+                color: #ffffff;
+                font-weight: 700;
+                border-radius: 50%;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 1;
+            }
+            
+            /* Team section */
+            .team-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+                gap: 30px;
+                margin-top: 40px;
+            }
+            
+            .team-member {
+                background-color: #ffffff;
+                border-radius: 10px;
+                overflow: hidden;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+                transition: all 0.3s ease;
+            }
+            
+            .team-member:hover {
+                transform: translateY(-10px);
+                box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+            }
+            
+            .member-image {
+                position: relative;
+                overflow: hidden;
+            }
+            
+            .member-image img {
+                width: 100%;
+                height: 280px;
+                object-fit: cover;
+                transition: all 0.5s ease;
+            }
+            
+            .team-member:hover .member-image img {
+                transform: scale(1.05);
+            }
+            
+            .member-info {
+                padding: 20px;
+            }
+            
+            .member-info h3 {
+                font-size: 20px;
+                margin-bottom: 5px;
+                color: #0b57a4;
+            }
+            
+            .member-role {
+                font-size: 14px;
+                color: #cb0a3c;
+                margin-bottom: 15px;
+                display: block;
+            }
+            
+            .member-bio {
+                font-size: 14px;
+                line-height: 1.6;
+                margin-bottom: 15px;
+            }
+            
+            .member-social {
+                display: flex;
+                gap: 10px;
+            }
+            
+            .member-social a {
+                width: 36px;
+                height: 36px;
+                background-color: #f5f5f5;
+                border-radius: 50%;
+                color: #0b57a4;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                transition: all 0.3s ease;
+            }
+            
+            .member-social a:hover {
+                background-color: #0b57a4;
+                color: #ffffff;
+                transform: translateY(-3px);
+            }
+            
+            /* Program specific styling */
+            .programs-banner {
+                background: linear-gradient(135deg, #cb0a3c 0%, #a90832 100%);
+            }
+            
+            .program-section {
+                padding: 70px 0;
+                border-bottom: 1px solid #eee;
+            }
+            
+            .program-section:last-child {
+                border-bottom: none;
+            }
+            
+            .alternate-bg {
+                background-color: #f9f9f9;
+            }
+            
+            .program-content {
+                display: flex;
+                align-items: center;
+                gap: 40px;
+            }
+            
+            .program-content.reverse {
+                flex-direction: row-reverse;
+            }
+            
+            .program-image {
+                flex: 1;
+                max-width: 45%;
+            }
+            
+            .program-image img {
+                width: 100%;
+                border-radius: 10px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            }
+            
+            .program-details {
+                flex: 1;
+            }
+            
+            .program-badge {
+                display: inline-block;
+                background-color: #0b57a4;
+                color: #ffffff;
+                padding: 5px 12px;
+                border-radius: 20px;
+                font-size: 12px;
+                font-weight: 600;
+                margin-bottom: 15px;
+            }
+            
+            .program-subtitle {
+                color: #6c757d;
+                font-size: 16px;
+                margin-bottom: 20px;
+            }
+            
+            .program-features {
+                margin: 25px 0;
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+                gap: 15px;
+            }
+            
+            .program-details-meta {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 20px;
+                margin-bottom: 25px;
+                padding: 20px;
+                background-color: #f5f5f5;
+                border-radius: 10px;
+            }
+            
+            .meta-item {
+                display: flex;
+                align-items: center;
+            }
+            
+            .meta-item i {
+                color: #0b57a4;
+                font-size: 20px;
+                margin-right: 10px;
+            }
+            
+            .meta-content {
+                display: flex;
+                flex-direction: column;
+            }
+            
+            .meta-label {
+                font-size: 12px;
+                color: #6c757d;
+            }
+            
+            .meta-value {
+                font-weight: 600;
+                color: #333;
+            }
+            
+            .program-cta {
+                display: flex;
+                gap: 15px;
+                flex-wrap: wrap;
+            }
+            
+            .btn-outline {
+                background-color: transparent;
+                border: 2px solid #0b57a4;
+                color: #0b57a4;
+                padding: 10px 20px;
+                border-radius: 30px;
+                font-weight: 600;
+                transition: all 0.3s ease;
+                display: inline-block;
+                text-align: center;
+            }
+            
+            .btn-outline:hover {
+                background-color: #0b57a4;
+                color: #ffffff;
+            }
+            
+            /* Responsive fixes for internal pages */
+            @media (max-width: 992px) {
+                .mission-content,
+                .vision-content,
+                .program-content,
+                .program-content.reverse {
+                    flex-direction: column;
+                    gap: 30px;
+                }
+                
+                .mission-image,
+                .vision-image,
+                .program-image {
+                    max-width: 100%;
+                }
+                
+                .page-banner h1 {
+                    font-size: 30px;
+                }
+                
+                .page-banner p {
+                    font-size: 16px;
+                }
+            }
+            
+            @media (max-width: 768px) {
+                .objectives-grid,
+                .team-grid {
+                    grid-template-columns: 1fr;
+                }
+                
+                .program-features {
+                    grid-template-columns: 1fr;
+                }
+                
+                .page-banner {
+                    padding: 40px 0;
+                }
+                
+                .page-banner h1 {
+                    font-size: 26px;
+                }
+            }
+        </style>
+    </head>
+<body>
+    <!-- Header Section -->
+    <header class="main-header">
+        <div class="container">
+            <div class="header-inner">
+                <div class="logo">
+                    <img src="{% static "images/logo.png" %}" alt="Arthavidya Trading Community">
+                    <div class="logo-text">
+                        <h1>Arthavidya Trading Community</h1>
+                        <p>Building A Wealthy Nation</p>
+                    </div>
+                </div>
+                <nav class="main-nav">
+                    <ul>
+                        <li><a href="{% url "home" %}">Home</a></li>
+                        <li><a href="{% url "about" %}"class="active">About Us</a></li>
+                        <li><a href="{% url "programs" %}">Our Programs</a></li>
+                        <li><a href="{% url "community"%}">Community</a></li>
+                        <li><a href="{% url "blog" %}">Blog</a></li>
+                        <li><a href="{% url "student_form" %}" class="register-btn">Register</a></li>
+                        <li><a href="{% url "login" %}" class="login-btn">Login</a></li>
+                    </ul>
+                </nav>
+                <div class="mobile-menu-toggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Page Banner -->
+    <section class="page-banner">
+        <div class="container">
+            <h1>About Us</h1>
+            <p>Learn more about Arthavidya Trading Community and our mission</p>
+        </div>
+    </section>
+
+    <!-- Our Mission Section -->
+    <section class="mission-section">
+        <div class="container">
+            <div class="mission-content">
+                <div class="mission-image">
+                    <img src="{% static "images/mission1.jpg" %}" alt="Our Mission">
+                </div>
+                <div class="mission-text">
+                    <div class="section-heading">
+                        <h2>Our Mission</h2>
+                    </div>
+                    <p>Our mission is to empower individuals with the knowledge, skills, and confidence to navigate the financial markets successfully. We aim to make high-quality trading education accessible to everyone, fostering financial independence through expert mentorship, structured learning, and a strong traders' community.</p>
+                    <div class="mission-icon">
+                        <i class="fas fa-bullseye"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Our Vision Section -->
+    <section class="vision-section">
+        <div class="container">
+            <div class="vision-content">
+                <div class="vision-text">
+                    <div class="section-heading">
+                        <h2>Our Vision</h2>
+                    </div>
+                    <p>To be a leading trading education community, recognized for its commitment to excellence, practical learning, and a results-driven approach. We envision building a global network of skilled traders who consistently achieve financial growth and stability.</p>
+                    <div class="vision-icon">
+                        <i class="fas fa-lightbulb"></i>
+                    </div>
+                </div>
+                <div class="vision-image">
+                    <img src="{% static "images/Financial graph overlays with people learning in the background.2.jpg" %}" alt="Our Vision">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Our Objectives Section -->
+    <section class="objectives-section">
+        <div class="container">
+            <div class="section-heading text-center">
+                <h2>Our Objectives</h2>
+                <p>At Arthavidya Trading Community, we're committed to the following key objectives:</p>
+            </div>
+            <div class="objectives-grid">
+                <div class="objective-item">
+                    <div class="objective-icon">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <h3>Comprehensive Education</h3>
+                    <p>Provide comprehensive trading education from Basic to Advanced levels.</p>
+                </div>
+                <div class="objective-item">
+                    <div class="objective-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3>Profitable Trading Setups</h3>
+                    <p>Equip traders with high-probability, profitable setups to ensure consistent success.</p>
+                </div>
+                <div class="objective-item">
+                    <div class="objective-icon">
+                        <i class="fas fa-hands-helping"></i>
+                    </div>
+                    <h3>Personalized Support</h3>
+                    <p>Offer personalized handholding support for practical market exposure.</p>
+                </div>
+                <div class="objective-item">
+                    <div class="objective-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3>Community Building</h3>
+                    <p>Develop a dynamic and collaborative trading community for continuous learning.</p>
+                </div>
+                <div class="objective-item">
+                    <div class="objective-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3>Risk Management</h3>
+                    <p>Focus on risk management and disciplined trading strategies to sustain long-term success.</p>
+                </div>
+                <div class="objective-item">
+                    <div class="objective-icon">
+                        <i class="fas fa-rupee-sign"></i>
+                    </div>
+                    <h3>Affordability</h3>
+                    <p>Make trading education affordable and accessible to all aspiring traders.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Our Process Section -->
+    <section class="process-section">
+        <div class="container">
+            <div class="section-heading text-center">
+                <h2>Our Process</h2>
+                <p>How we help you master trading and achieve financial growth</p>
+            </div>
+            <div class="process-steps">
+                <div class="process-step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h3>Enroll in the Course</h3>
+                        <p>Choose the right level of trading education that suits your experience and goals.</p>
+                    </div>
+                </div>
+                <div class="process-step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h3>Learn Through Structured Modules</h3>
+                        <p>Step-by-step guidance from fundamentals to advanced strategies.</p>
+                    </div>
+                </div>
+                <div class="process-step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h3>Live Market Application</h3>
+                        <p>Practice in real-time with expert supervision.</p>
+                    </div>
+                </div>
+                <div class="process-step">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h3>Personalized Mentorship</h3>
+                        <p>Get hands-on guidance and feedback for improvement.</p>
+                    </div>
+                </div>
+                <div class="process-step">
+                    <div class="step-number">5</div>
+                    <div class="step-content">
+                        <h3>Continuous Community Engagement</h3>
+                        <p>Join a network of traders for lifelong learning.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Our Team Section -->
+    <!-- <section class="team-section">
+        <div class="container">
+            <div class="section-heading text-center">
+                <h2>Meet Our Team</h2>
+                <p>Learn from experienced traders and financial experts</p>
+            </div>
+            <div class="team-grid">
+                <div class="team-member">
+                    <div class="member-image">
+                        <img src="../assets/images/founder.jpg" alt="Andaz Aaron">
+                    </div>
+                    <div class="member-info">
+                        <h3>Andaz Aaron</h3>
+                        <p class="member-role">Founder & Lead Trainer</p>
+                        <p class="member-bio">With over 5 years of hands-on experience in trading and investing, Andaz Aaron has established himself as a professional trader through perseverance and continuous learning.</p>
+                        <div class="member-social">
+                            <a href="#"><i class="fab fa-linkedin"></i></a>
+                            <a href="#"><i class="fab fa-twitter"></i></a>
+                            <a href="#"><i class="fab fa-instagram"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="team-member">
+                    <div class="member-image">
+                        <img src="../assets/images/trainers/trainer1.jpg" alt="Kanheyalal Jena">
+                    </div>
+                    <div class="member-info">
+                        <h3>Kanheyalal Jena</h3>
+                        <p class="member-role">Technical Analysis Specialist</p>
+                        <p class="member-bio">Specialized in technical analysis with over 5 years of experience, Kanheyalal helps students develop a deep understanding of chart patterns and market structures.</p>
+                        <div class="member-social">
+                            <a href="#"><i class="fab fa-linkedin"></i></a>
+                            <a href="#"><i class="fab fa-twitter"></i></a>
+                            <a href="#"><i class="fab fa-instagram"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="team-member">
+                    <div class="member-image">
+                        <img src="../assets/images/trainers/trainer2.jpg" alt="Rasmita Parida">
+                    </div>
+                    <div class="member-info">
+                        <h3>Rasmita Parida</h3>
+                        <p class="member-role">Risk Management Expert</p>
+                        <p class="member-bio">With a background in finance and years of trading experience, Rasmita specializes in teaching proper risk management strategies for sustainable trading success.</p>
+                        <div class="member-social">
+                            <a href="#"><i class="fab fa-linkedin"></i></a>
+                            <a href="#"><i class="fab fa-twitter"></i></a>
+                            <a href="#"><i class="fab fa-instagram"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="team-member">
+                    <div class="member-image">
+                        <img src="../assets/images/trainers/trainer3.jpg" alt="Prakash Nayak">
+                    </div>
+                    <div class="member-info">
+                        <h3>Prakash Nayak</h3>
+                        <p class="member-role">Fundamental Analysis Coach</p>
+                        <p class="member-bio">Prakash brings deep knowledge of fundamental analysis and market economics to help traders understand the bigger picture behind price movements.</p>
+                        <div class="member-social">
+                            <a href="#"><i class="fab fa-linkedin"></i></a>
+                            <a href="#"><i class="fab fa-twitter"></i></a>
+                            <a href="#"><i class="fab fa-instagram"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section> -->
+
+    <!-- Partners Section -->
+    <section class="partners-section">
+        <div class="container">
+            <div class="section-heading text-center">
+                <h2>Our Partners</h2>
+                <p>We collaborate with leading financial institutions and platforms</p>
+            </div>
+            <div class="partners-grid">
+                <div class="partner-logo">
+                    <img src="{% static "images/partners/sebi.png" %}" alt="SEBI">
+                </div>
+                <div class="partner-logo">
+                    <img src="{% static "images/partners/nse.png" %}" alt="NSE">
+                </div>
+                <div class="partner-logo">
+                    <img src="{% static "images/partners/angel.png" %}" alt="Angel One">
+                </div>
+                <div class="partner-logo">
+                    <img src="{% static "images/partners/zerodha.png" %}" alt="Zerodha">
+                </div>
+                <div class="partner-logo">
+                    <img src="{% static "images/partners/upstox.png" %}" alt="Upstox">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Disclaimer Section -->
+    <section class="disclaimer-section">
+        <div class="container">
+            <h2>IMPORTANT DISCLAIMER</h2>
+            <p>Arthavidya Trading Community is an education and training institute dedicated to providing knowledge on trading and financial markets. We do not offer any form of investment advisory, stock tips, portfolio management, or any unauthorized services that fall under the regulatory framework of the Government of India. Our programs are purely for educational purposes, and we do not guarantee any profits or financial returns. Participants are encouraged to conduct their own research before making any investment decisions.</p>
+            <p>Management reserves the right to deny or revoke admission to any participant, even after the fee has been paid.</p>
+        </div>
+    </section>
+
+    <!-- Footer Section -->
+    <footer class="main-footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="contact-info">
+                    <a href="mailto:arthavidyacommunity@gmail.com" class="contact-item">
+                        <i class="fas fa-envelope"></i>
+                        <span>arthavidyacommunity@gmail.com</span>
+                    </a>
+                    <a href="tel:+917854933728" class="contact-item">
+                        <i class="fas fa-phone"></i>
+                        <span>+91 7854933728</span>
+                    </a>
+                </div>
+                
+                <div class="social-links">
+                    <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-youtube"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+            
+            <div class="footer-links">
+                {% comment %} <a href="{% url 'terms_and_condition'%}">Terms and Conditions</a> {% endcomment %}
+                <a href="terms-and-condition.html#privacy-policy">Privacy Policy</a>
+                <a href="terms-and-condition.html#refund-policy">Refund Policy</a>
+            </div>
+            
+            <div class="copyright">
+                <p>Arthavidya Trading Community Pvt Ltd © All Rights Reserved - 2025</p>
+                <p>Design and Developed by Arthavidya Trading Community</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Script -->
+    <script src="../assets/js/main.js"></script>
+    <script>
+        
+        // Add this script at the end of your body tag or in your JS file
+        document.addEventListener('DOMContentLoaded', function() {
+            // Clone the partner logos to create the infinite effect
+            const partnersGrid = document.querySelector('.partners-grid');
+            const partnerLogos = document.querySelectorAll('.partner-logo');
+            
+            // Create a clone of each logo
+            partnerLogos.forEach(logo => {
+                const clone = logo.cloneNode(true);
+                partnersGrid.appendChild(clone);
+            });
+            
+            // Add the necessary CSS for sliding animation
+            const style = document.createElement('style');
+            style.textContent = `
+                .partners-grid {
+                    display: flex;
+                    justify-content: flex-start;
+                    align-items: center;
+                    flex-wrap: nowrap;
+                    gap: 30px;
+                    animation: slideLogos 20s linear infinite;
+                    width: auto;
+                    overflow: visible;
+                }
+                
+                @keyframes slideLogos {
+                    0% {
+                        transform: translateX(0);
+                    }
+                    100% {
+                        transform: translateX(calc(-100% / 2));
+                    }
+                }
+                
+                .partners-section {
+                    overflow: hidden;
+                }
+                
+                /* Pause animation on hover */
+                .partners-grid:hover {
+                    animation-play-state: paused;
+                }
+                
+                .partner-logo {
+                    flex: 0 0 auto;
+                    min-width: 150px;
+                }
+            `;
+            
+            document.head.appendChild(style);
+        });
+            </script>
+</body>
+</html>

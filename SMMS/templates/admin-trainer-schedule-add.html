@@ -1,0 +1,686 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Admin Result{% endblock %}
+{% block content %}
+    <style>
+        /* Modal Form Styles */
+        .modal-form {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-form.active {
+            display: flex;
+        }
+        
+        .form-container {
+            background-color: var(--bg-white);
+            border-radius: var(--border-radius);
+            width: 90%;
+            max-width: 700px;
+            box-shadow: var(--box-shadow-lg);
+            overflow: hidden;
+        }
+        
+        .form-header {
+            padding: 20px;
+            background-color: var(--primary-blue-lighter);
+            color: var(--primary-blue);
+            font-weight: 600;
+            font-size: 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-light);
+        }
+        
+        .form-header .close-btn {
+            cursor: pointer;
+            font-size: 20px;
+            color: var(--text-muted);
+            transition: var(--transition);
+        }
+        
+        .form-header .close-btn:hover {
+            color: var(--danger-color);
+            transform: rotate(90deg);
+        }
+        
+        .form-body {
+            padding: 20px;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+        
+        .form-row {
+            margin-bottom: 20px;
+        }
+        
+        .form-row label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-dark);
+        }
+        
+        .form-row input, 
+        .form-row select, 
+        .form-row textarea {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid var(--border-medium);
+            border-radius: var(--border-radius);
+            font-size: 14px;
+            transition: var(--transition);
+        }
+        
+        .form-row input:focus, 
+        .form-row select:focus, 
+        .form-row textarea:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(11, 87, 164, 0.1);
+            outline: none;
+        }
+        
+        .form-row textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+        
+        .form-footer {
+            padding: 20px;
+            border-top: 1px solid var(--border-light);
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+        }
+        
+        .cancel-btn {
+            padding: 10px 20px;
+            border: 1px solid var(--border-medium);
+            border-radius: var(--border-radius);
+            background-color: var(--bg-white);
+            color: var(--text-medium);
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .cancel-btn:hover {
+            background-color: var(--bg-light);
+        }
+        
+        .submit-btn {
+            padding: 10px 25px;
+            border-radius: var(--border-radius);
+            background-color: var(--primary-blue);
+            color: var(--text-light);
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: var(--transition);
+        }
+        
+        .submit-btn:hover {
+            background-color: var(--primary-blue-dark);
+        }
+        
+        /* Schedule Calendar View Styles */
+        .calendar-view {
+            background-color: var(--bg-white);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: var(--box-shadow-sm);
+        }
+        
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .calendar-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .calendar-nav {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .calendar-nav button {
+            background: var(--bg-light);
+            border: none;
+            padding: 8px 15px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .calendar-nav button:hover {
+            background: var(--primary-blue-lighter);
+        }
+        
+        .calendar-body {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+        }
+        
+        .weekday-header {
+            text-align: center;
+            font-weight: 600;
+            color: var(--text-muted);
+            padding: 10px;
+            background-color: var(--bg-light);
+            border-radius: var(--border-radius-sm);
+        }
+        
+        .calendar-day {
+            min-height: 100px;
+            border: 1px solid var(--border-light);
+            border-radius: var(--border-radius-sm);
+            padding: 10px;
+            overflow: hidden;
+        }
+        
+        .day-header {
+            text-align: right;
+            font-weight: 500;
+            margin-bottom: 10px;
+        }
+        
+        .day-content {
+            font-size: 12px;
+        }
+        
+        .schedule-item {
+            background-color: var(--primary-blue-lighter);
+            color: var(--primary-blue);
+            padding: 5px;
+            border-radius: 3px;
+            margin-bottom: 5px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .schedule-item:hover {
+            background-color: var(--primary-blue);
+            color: var(--text-light);
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .calendar-body {
+                grid-template-columns: repeat(1, 1fr);
+            }
+            
+            .weekday-header {
+                display: none;
+            }
+            
+            .calendar-day {
+                min-height: auto;
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+</head>
+<body class="admin-body">
+    <!-- Admin Container -->
+    <div class="admin-container">
+        <!-- Main Content Area -->
+        <main class="admin-main">
+            <!-- Page Header -->
+            <section class="page-header">
+                <div class="header-content">
+                    <div class="page-title">
+                        <h1>Trainer Schedule</h1>
+                        <p>Manage class schedules for trainers</p>
+                    </div>
+                    <div class="header-actions">
+                        <button class="btn-add" id="addScheduleBtn">
+                            <i class="fas fa-plus"></i> Schedule New Class
+                        </button>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Trainer Filter -->
+            <section class="filter-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Filter Schedule</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-grid">
+                            <div class="form-row">
+                                <label for="trainerFilter">Select Trainer</label>
+                                <select id="trainerFilter" name="trainerFilter">
+                                    <option value="">All Trainers</option>
+                                    <option value="1">Andaz Aaron</option>
+                                    <option value="2">Kanheyalal Jena</option>
+                                    <option value="3">Prashanta Kumar Palei</option>
+                                </select>
+                            </div>
+                            <div class="form-row">
+                                <label for="monthFilter">Select Month</label>
+                                <input type="month" id="monthFilter" name="monthFilter" value="2025-04">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Calendar View -->
+            <section class="calendar-view">
+                <div class="calendar-header">
+                    <div class="calendar-title">April 2025</div>
+                    <div class="calendar-nav">
+                        <button id="prevMonth"><i class="fas fa-chevron-left"></i></button>
+                        <button id="currentMonth">Today</button>
+                        <button id="nextMonth"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                </div>
+                <div class="calendar-body">
+                    <!-- Weekday Headers -->
+                    <div class="weekday-header">Sun</div>
+                    <div class="weekday-header">Mon</div>
+                    <div class="weekday-header">Tue</div>
+                    <div class="weekday-header">Wed</div>
+                    <div class="weekday-header">Thu</div>
+                    <div class="weekday-header">Fri</div>
+                    <div class="weekday-header">Sat</div>
+                    
+                    <!-- Calendar Days (Sample for April 2025) -->
+                    <!-- Week 1 -->
+                    <div class="calendar-day">
+                        <div class="day-header">30</div>
+                        <div class="day-content"></div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-header">31</div>
+                        <div class="day-content"></div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-header">1</div>
+                        <div class="day-content">
+                            <div class="schedule-item">CTP - 10:00 AM (Andaz)</div>
+                        </div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-header">2</div>
+                        <div class="day-content">
+                            <div class="schedule-item">AMP - 2:00 PM (Prashanta)</div>
+                        </div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-header">3</div>
+                        <div class="day-content"></div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-header">4</div>
+                        <div class="day-content">
+                            <div class="schedule-item">GMP - 5:00 PM (Kanheyalal)</div>
+                        </div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-header">5</div>
+                        <div class="day-content"></div>
+                    </div>
+                    
+                    <!-- Week 2 -->
+                    <div class="calendar-day">
+                        <div class="day-header">6</div>
+                        <div class="day-content"></div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-header">7</div>
+                        <div class="day-content">
+                            <div class="schedule-item">CTP - 10:00 AM (Andaz)</div>
+                            <div class="schedule-item">SIP - 3:00 PM (Prashanta)</div>
+                        </div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-header">8</div>
+                        <div class="day-content"></div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-header">9</div>
+                        <div class="day-content">
+                            <div class="schedule-item">AMP - 2:00 PM (Andaz)</div>
+                        </div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-header">10</div>
+                        <div class="day-content"></div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-header">11</div>
+                        <div class="day-content">
+                            <div class="schedule-item">GMP - 5:00 PM (Kanheyalal)</div>
+                        </div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-header">12</div>
+                        <div class="day-content"></div>
+                    </div>
+                    
+                    <!-- Additional weeks would continue here -->
+                </div>
+            </section>
+            
+            <!-- Table View -->
+            <section class="table-section">
+                <div class="table-container">
+                    <div class="table-header">
+                        <h3 class="table-title">Upcoming Classes</h3>
+                        <div class="table-actions">
+                            <div class="search-container">
+                                <i class="fas fa-search search-icon"></i>
+                                <input type="text" class="search-input" id="searchInput" placeholder="Search classes...">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Table Content -->
+                    <div class="table-responsive">
+                        <table class="admin-table" id="scheduleTable">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Time</th>
+                                    <th>Program</th>
+                                    <th>Batch</th>
+                                    <th>Topic</th>
+                                    <th>Trainer</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Sample data rows -->
+                                <tr>
+                                    <td>Apr 1, 2025</td>
+                                    <td>10:00 AM - 12:00 PM</td>
+                                    <td>Complete Trading Program</td>
+                                    <td>CTP-APR-2025</td>
+                                    <td>Market Structure</td>
+                                    <td>Andaz Aaron</td>
+                                    <td><span class="status-badge status-success">Scheduled</span></td>
+                                    <td>
+                                        <div class="row-actions">
+                                            <button class="action-btn view" title="View Details">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="action-btn edit" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="action-btn delete" title="Cancel Class">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Apr 2, 2025</td>
+                                    <td>2:00 PM - 4:00 PM</td>
+                                    <td>Arthavidya Mentorship Program</td>
+                                    <td>AMP-APR-2025</td>
+                                    <td>Advanced Risk Management</td>
+                                    <td>Prashanta Kumar Palei</td>
+                                    <td><span class="status-badge status-success">Scheduled</span></td>
+                                    <td>
+                                        <div class="row-actions">
+                                            <button class="action-btn view" title="View Details">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="action-btn edit" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="action-btn delete" title="Cancel Class">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Apr 4, 2025</td>
+                                    <td>5:00 PM - 7:00 PM</td>
+                                    <td>Growth Mindset Program</td>
+                                    <td>GMP-MAY-2025</td>
+                                    <td>Emotional Intelligence in Trading</td>
+                                    <td>Kanheyalal Jena</td>
+                                    <td><span class="status-badge status-success">Scheduled</span></td>
+                                    <td>
+                                        <div class="row-actions">
+                                            <button class="action-btn view" title="View Details">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="action-btn edit" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="action-btn delete" title="Cancel Class">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Table Footer with Pagination -->
+                    <div class="table-footer">
+                        <div class="page-info">
+                            Showing <span id="startRange">1</span> to <span id="endRange">10</span> of <span id="totalItems">25</span> entries
+                        </div>
+                        <div class="pagination">
+                            <button class="page-btn" id="prevPage" disabled>
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <button class="page-btn active">1</button>
+                            <button class="page-btn">2</button>
+                            <button class="page-btn">3</button>
+                            <button class="page-btn" id="nextPage">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    
+    <!-- Modal Form for Adding/Editing Class Schedule -->
+    <div class="modal-form" id="scheduleForm">
+        <div class="form-container">
+            <div class="form-header">
+                <span id="formTitle">Schedule New Class</span>
+                <i class="fas fa-times close-btn" id="closeForm"></i>
+            </div>
+            <form id="scheduleDataForm">
+                <div class="form-body">
+                    <input type="hidden" id="scheduleId" name="scheduleId">
+                    
+                    <div class="form-grid">
+                        <div class="form-row">
+                            <label for="program">Program <span class="required">*</span></label>
+                            <select id="program" name="program" required>
+                                <option value="">Select Program</option>
+                                <option value="CTP">Complete Trading Program</option>
+                                <option value="AMP">Arthavidya Mentorship Program</option>
+                                <option value="GMP">Growth Mindset Program</option>
+                                <option value="SIP">Smart Income Program</option>
+                            </select>
+                        </div>
+                        <div class="form-row">
+                            <label for="batch">Batch <span class="required">*</span></label>
+                            <select id="batch" name="batch" required>
+                                <option value="">Select Batch</option>
+                                <option value="CTP-APR-2025">CTP April 2025</option>
+                                <option value="CTP-JUL-2025">CTP July 2025</option>
+                                <option value="AMP-APR-2025">AMP April 2025</option>
+                                <option value="GMP-MAY-2025">GMP May 2025</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <label for="topic">Class Topic <span class="required">*</span></label>
+                        <input type="text" id="topic" name="topic" required>
+                    </div>
+                    
+                    <div class="form-row">
+                        <label for="description">Description</label>
+                        <textarea id="description" name="description"></textarea>
+                    </div>
+                    
+                    <div class="form-grid">
+                        <div class="form-row">
+                            <label for="classDate">Date <span class="required">*</span></label>
+                            <input type="date" id="classDate" name="classDate" required>
+                        </div>
+                        <div class="form-row">
+                            <label for="trainer">Trainer <span class="required">*</span></label>
+                            <select id="trainer" name="trainer" required>
+                                <option value="">Select Trainer</option>
+                                <option value="1">Andaz Aaron</option>
+                                <option value="2">Kanheyalal Jena</option>
+                                <option value="3">Prashanta Kumar Palei</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-grid">
+                        <div class="form-row">
+                            <label for="startTime">Start Time <span class="required">*</span></label>
+                            <input type="time" id="startTime" name="startTime" required>
+                        </div>
+                        <div class="form-row">
+                            <label for="endTime">End Time <span class="required">*</span></label>
+                            <input type="time" id="endTime" name="endTime" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-grid">
+                        <div class="form-row">
+                            <label for="meetingLink">Meeting Link</label>
+                            <input type="url" id="meetingLink" name="meetingLink">
+                        </div>
+                        <div class="form-row">
+                            <label for="meetingPassword">Meeting Password</label>
+                            <input type="text" id="meetingPassword" name="meetingPassword">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-footer">
+                    <button type="button" class="cancel-btn" id="cancelForm">Cancel</button>
+                    <button type="submit" class="submit-btn">Schedule Class</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    {% block footer %}{% endblock footer %}
+    <!-- JavaScript for Form Handling -->
+    <script src="{% static 'js/admin.js' %}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Form open/close functionality
+            const addScheduleBtn = document.getElementById('addScheduleBtn');
+            const scheduleForm = document.getElementById('scheduleForm');
+            const closeForm = document.getElementById('closeForm');
+            const cancelForm = document.getElementById('cancelForm');
+            const scheduleDataForm = document.getElementById('scheduleDataForm');
+            
+            // Open form when Add button is clicked
+            addScheduleBtn.addEventListener('click', function() {
+                document.getElementById('formTitle').textContent = 'Schedule New Class';
+                scheduleDataForm.reset();
+                scheduleForm.classList.add('active');
+            });
+            
+            // Close form when X button is clicked
+            closeForm.addEventListener('click', function() {
+                scheduleForm.classList.remove('active');
+            });
+            
+            // Close form when Cancel button is clicked
+            cancelForm.addEventListener('click', function() {
+                scheduleForm.classList.remove('active');
+            });
+            
+            // Submit form handler
+            scheduleDataForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                // Here you would typically send the data to your backend
+                alert('Class scheduled! In a real application, this would be saved to the database.');
+                scheduleForm.classList.remove('active');
+            });
+            
+            // Search functionality
+            const searchInput = document.getElementById('searchInput');
+            searchInput.addEventListener('keyup', function() {
+                const searchText = this.value.toLowerCase();
+                const tableRows = document.querySelectorAll('#scheduleTable tbody tr');
+                
+                tableRows.forEach(row => {
+                    const text = row.textContent.toLowerCase();
+                    row.style.display = text.includes(searchText) ? '' : 'none';
+                });
+            });
+            
+            // Calendar navigation
+            document.getElementById('prevMonth').addEventListener('click', function() {
+                alert('In a real application, this would show the previous month');
+            });
+            
+            document.getElementById('nextMonth').addEventListener('click', function() {
+                alert('In a real application, this would show the next month');
+            });
+            
+            document.getElementById('currentMonth').addEventListener('click', function() {
+                alert('In a real application, this would return to the current month');
+            });
+            
+            // Edit schedule handlers (for demonstration)
+            const editButtons = document.querySelectorAll('.action-btn.edit');
+            editButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const row = this.closest('tr');
+                    const topic = row.cells[4].textContent;
+                    const trainer = row.cells[5].textContent;
+                    
+                    // Fill the form with the row data
+                    document.getElementById('formTitle').textContent = 'Edit Class Schedule';
+                    document.getElementById('topic').value = topic;
+                    
+                    // Open the form
+                    scheduleForm.classList.add('active');
+                });
+            });
+        });
+    </script>
+{% endblock %}

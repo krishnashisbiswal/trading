@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arthavidya Trading Community - Building A Wealthy Nation</title>
+    <link rel="stylesheet" href="{% static "css/style.css" %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header Section -->
+    <header class="main-header">
+        <div class="container">
+            <div class="header-inner">
+                <div class="logo">
+                    <img src="{% static "images/logo.png" %}" alt="Arthavidya Trading Community">
+                    <div class="logo-text">
+                        <h1>Arthavidya Trading Community</h1>
+                        <p>Building A Wealthy Nation</p>
+                    </div>
+                </div>
+                <nav class="main-nav">
+                    <ul>
+                        <li><a href="{% url "home" %}"class="active">Home</a></li>
+                        <li><a href="{% url "about" %}">About Us</a></li>
+                        <li><a href="{% url "programs" %}">Our Programs</a></li>
+                        <li><a href="{% url "community"%}">Community</a></li>
+                        <li><a href="{% url "blog" %}">Blog</a></li>
+                        <li><a href="{% url "student_form" %}" class="register-btn">Register</a></li>
+                        <li><a href="{% url "login" %}" class="login-btn">Login</a></li>
+                    </ul>
+                </nav>
+                <div class="mobile-menu-toggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Banner Section -->
+    <section class="hero-banner">
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-text">
+                    <h2>Complete Trading Program (CTP)</h2>
+                    <p>The Ultimate Trading Program to Make You Profitable</p>
+                    <div class="feature-list">
+                        <div class="feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Introduction to Financial Markets</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Basics to Advanced Latest Concepts</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Technical Analysis</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Proven High Probability Setups</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Affordable Pricing</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Best Handholding Support System</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Guaranteed 100% Satisfaction</span>
+                        </div>
+                    </div>
+                    <a href="#" class="cta-btn">ENROLL NOW</a>
+                </div>
+                <div class="hero-image">
+                    <img src="{% static "images/hero-image.jpg" %}" alt="Trading Education">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- We Are Different Section -->
+    <section class="we-are-different">
+        <div class="container">
+            <div class="section-heading">
+                <h2>WE ARE DIFFERENT</h2>
+                <p>AN EMERGING FINANCIAL EDUCATION INSTITUTE</p>
+            </div>
+            <div class="different-content">
+                <div class="different-text">
+                    <p>Arthavidya Trading Community offers specialized and comprehensive trading courses, covering Basic to Advanced levels with a focus on high probability, profitable setups at affordable pricing. Our program provides personalized handholding support, ensuring you gain practical skills and effective trading education through expert mentorship. Committed to excellence, we nurture a supportive & dynamic traders' community for continuous lifelong learning and grow together.</p>
+                </div>
+                <div class="different-image">
+                    <img src="{% static "images/trading-screens.jpg" %}" alt="Trading Screens">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Reasons Why Section -->
+    <section class="reasons-section">
+        <div class="container">
+            <div class="section-heading">
+                <h2>Reasons Why You Should Choose Us?</h2>
+            </div>
+            <div class="reasons-grid">
+                <div class="reason-item">
+                    <div class="reason-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="reason-text">
+                        <p>Latest and Advanced Concepts</p>
+                    </div>
+                </div>
+                <div class="reason-item">
+                    <div class="reason-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="reason-text">
+                        <p>Comprehensive Physical & Digital study materials</p>
+                    </div>
+                </div>
+                <div class="reason-item">
+                    <div class="reason-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="reason-text">
+                        <p>Proven high-probability Strategies</p>
+                    </div>
+                </div>
+                <div class="reason-item">
+                    <div class="reason-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="reason-text">
+                        <p>Dedicated handholding support</p>
+                    </div>
+                </div>
+                <div class="reason-item">
+                    <div class="reason-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="reason-text">
+                        <p>Affordable Pricing</p>
+                    </div>
+                </div>
+                <div class="reason-item">
+                    <div class="reason-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="reason-text">
+                        <p>Community Support & Network</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="founder-section">
+                <div class="section-heading">
+                    <h3>About Founder</h3>
+                </div>
+                <div class="founder-content">
+                    <div class="founder-image">
+                        <img src="{% static "images/founder.jpg" %}" alt="Andaz Aaron">
+                    </div>
+                    <div class="founder-info">
+                        <h4>ANDAZ AARON</h4>
+                        <p>Andaz Aaron, the founder of Arthavidya Trading Community, brings over five years of hands-on experience in trading and investing through perseverance and continuous learning. He has successfully established himself as a professional trader. Passionate about financial education, he is committed to empowering individuals with the knowledge and strategies needed to achieve financial independence. His teaching methodology focuses on simplifying complex concepts while guiding people toward informed investment decisions and long-term wealth creation.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats-section">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <h3>20000+</h3>
+                    <p>Participants</p>
+                </div>
+                <div class="stat-item">
+                    <h3>5000+</h3>
+                    <p>Students</p>
+                </div>
+                <div class="stat-item">
+                    <h3>20+</h3>
+                    <p>Trainers</p>
+                </div>
+                <div class="stat-item">
+                    <h3>50+</h3>
+                    <p>Cities</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Partners Section -->
+    <section class="partners-section">
+        <div class="container">
+            <div class="section-heading">
+                <h2>Our Partners</h2>
+            </div>
+            <div class="partners-grid">
+                <div class="partner-logo">
+                    <img src="{% static "images/partners/sebi.png" %}" alt="SEBI">
+                </div>
+                <div class="partner-logo">
+                    <img src="{% static "images/partners/nse.png" %}" alt="NSE">
+                </div>
+                <div class="partner-logo">
+                    <img src="{% static "images/partners/angel.png" %}" alt="Angel One">
+                </div>
+                <div class="partner-logo">
+                    <img src="{% static "images/partners/zerodha.png" %}" alt="Zerodha">
+                </div>
+                <div class="partner-logo">
+                    <img src="{% static "images/partners/upstox.png" %}" alt="Upstox">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Disclaimer Section -->
+    <section class="disclaimer-section">
+        <div class="container">
+            <h2>IMPORTANT DISCLAIMER</h2>
+            <p>Arthavidya Trading Community is an education and training institute dedicated to providing knowledge on trading and financial markets. We do not offer any form of investment advisory, stock tips, portfolio management, or any unauthorized services that fall under the regulatory framework of the Government of India. Our programs are purely for educational purposes, and we do not guarantee any profits or financial returns. Participants are encouraged to conduct their own research before making any investment decisions.</p>
+            <p>Management reserves the right to deny or revoke admission to any participant, even after the fee has been paid.</p>
+        </div>
+    </section>
+
+    <!-- Footer Section -->
+    <footer class="main-footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="contact-info">
+                    <a href="mailto:arthavidyacommunity@gmail.com" class="contact-item">
+                        <i class="fas fa-envelope"></i>
+                        <span>arthavidyacommunity@gmail.com</span>
+                    </a>
+                    <a href="tel:+917854933728" class="contact-item">
+                        <i class="fas fa-phone"></i>
+                        <span>+91 7854933728</span>
+                    </a>
+                </div>
+                
+                <div class="social-links">
+                    <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-youtube"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+            
+            <div class="footer-links">
+                <a href="{% url "terms_and_condition" %}">Shipping policy</a>
+                <a href="{% url "terms_and_condition" %}">Return Policy</a>
+                <a href="{% url "terms_and_condition" %}">Refund Policy</a>
+            </div>
+            
+            <div class="copyright">
+                <p>Arthavidya Trading Community Pvt Ltd © All Rights Reserved - 2025</p>
+                <p>Design and Developed by Arthavidya Trading Community</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Script -->
+    <script src="{%static 'js/main.js'%}"></script>
+    <script>
+        
+        // Add this script at the end of your body tag or in your JS file
+        document.addEventListener('DOMContentLoaded', function() {
+            // Clone the partner logos to create the infinite effect
+            const partnersGrid = document.querySelector('.partners-grid');
+            const partnerLogos = document.querySelectorAll('.partner-logo');
+            
+            // Create a clone of each logo
+            partnerLogos.forEach(logo => {
+                const clone = logo.cloneNode(true);
+                partnersGrid.appendChild(clone);
+            });
+            
+            // Add the necessary CSS for sliding animation
+            const style = document.createElement('style');
+            style.textContent = `
+                .partners-grid {
+                    display: flex;
+                    justify-content: flex-start;
+                    align-items: center;
+                    flex-wrap: nowrap;
+                    gap: 30px;
+                    animation: slideLogos 20s linear infinite;
+                    width: auto;
+                    overflow: visible;
+                }
+                
+                @keyframes slideLogos {
+                    0% {
+                        transform: translateX(0);
+                    }
+                    100% {
+                        transform: translateX(calc(-100% / 2));
+                    }
+                }
+                
+                .partners-section {
+                    overflow: hidden;
+                }
+                
+                /* Pause animation on hover */
+                .partners-grid:hover {
+                    animation-play-state: paused;
+                }
+                
+                .partner-logo {
+                    flex: 0 0 auto;
+                    min-width: 150px;
+                }
+            `;
+            
+            document.head.appendChild(style);
+        });
+            </script>
+</body>
+</html>

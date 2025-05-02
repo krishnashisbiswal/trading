@@ -1,0 +1,687 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+        <!-- Main Content Area -->
+        <main class="admin-main">
+            <!-- Page Header with Quick Stats -->
+            <section class="page-header">
+                <div class="header-content">
+                    <div class="page-title">
+                        <h1>Dashboard Overview</h1>
+                        <p>Welcome back, Andaz! Here's what's happening today.</p>
+                    </div>
+                    <div class="date-picker">
+                        <div class="date-range">
+                            <i class="fas fa-calendar-alt"></i>
+                            <span>April 1, 2025 - April 8, 2025</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Quick Stats Cards -->
+            <section class="stats-cards">
+                <div class="row">
+                    <div class="stats-card students">
+                        <div class="stats-icon">
+                            <i class="fas fa-user-graduate"></i>
+                        </div>
+                        <div class="stats-info">
+                            <h3>Total Students</h3>
+                            <div class="stats-numbers">
+                                <span class="stats-value">2,845</span>
+                                <span class="stats-change positive">
+                                    <i class="fas fa-arrow-up"></i> 12%
+                                </span>
+                            </div>
+                            <p class="stats-period">vs. previous month</p>
+                        </div>
+                    </div>
+                    <div class="stats-card revenue">
+                        <div class="stats-icon">
+                            <i class="fas fa-rupee-sign"></i>
+                        </div>
+                        <div class="stats-info">
+                            <h3>Monthly Revenue</h3>
+                            <div class="stats-numbers">
+                                <span class="stats-value">₹12.6L</span>
+                                <span class="stats-change positive">
+                                    <i class="fas fa-arrow-up"></i> 8.3%
+                                </span>
+                            </div>
+                            <p class="stats-period">vs. previous month</p>
+                        </div>
+                    </div>
+                    <div class="stats-card programs">
+                        <div class="stats-icon">
+                            <i class="fas fa-graduation-cap"></i>
+                        </div>
+                        <div class="stats-info">
+                            <h3>Active Programs</h3>
+                            <div class="stats-numbers">
+                                <span class="stats-value">16</span>
+                                <span class="stats-change neutral">
+                                    <i class="fas fa-minus"></i> 0%
+                                </span>
+                            </div>
+                            <p class="stats-period">vs. previous month</p>
+                        </div>
+                    </div>
+                    <div class="stats-card retention">
+                        <div class="stats-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="stats-info">
+                            <h3>Retention Rate</h3>
+                            <div class="stats-numbers">
+                                <span class="stats-value">92.7%</span>
+                                <span class="stats-change positive">
+                                    <i class="fas fa-arrow-up"></i> 2.1%
+                                </span>
+                            </div>
+                            <p class="stats-period">vs. previous month</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Revenue & Enrollments Chart -->
+            <section class="chart-section">
+                <div class="card revenue-chart-card">
+                    <div class="card-header">
+                        <h2>Revenue & Enrollments</h2>
+                        <div class="card-actions">
+                            <select id="revenue-chart-range">
+                                <option value="week">Last Week</option>
+                                <option value="month" selected>Last Month</option>
+                                <option value="quarter">Last Quarter</option>
+                                <option value="year">Last Year</option>
+                            </select>
+                            <button class="btn-icon">
+                                <i class="fas fa-download"></i>
+                            </button>
+                            <button class="btn-icon">
+                                <i class="fas fa-ellipsis-v"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="revenueChart" height="300"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Recent Activities & Program Performance -->
+            <section class="dual-section">
+                <div class="row">
+                    <!-- Recent Activities -->
+                    <div class="card recent-activities-card">
+                        <div class="card-header">
+                            <h2>Recent Activities</h2>
+                            <div class="card-actions">
+                                <button class="btn-text">View All</button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="activity-list">
+                                <div class="activity-item">
+                                    <div class="activity-icon registration">
+                                        <i class="fas fa-user-plus"></i>
+                                    </div>
+                                    <div class="activity-content">
+                                        <h4>New Student Registration</h4>
+                                        <p>Rahul Sharma registered for Complete Trading Program (CTP)</p>
+                                        <span class="activity-time">10 minutes ago</span>
+                                    </div>
+                                </div>
+                                <div class="activity-item">
+                                    <div class="activity-icon payment">
+                                        <i class="fas fa-rupee-sign"></i>
+                                    </div>
+                                    <div class="activity-content">
+                                        <h4>Payment Received</h4>
+                                        <p>Priya Patel made a payment of ₹19,999 for CTP program</p>
+                                        <span class="activity-time">45 minutes ago</span>
+                                    </div>
+                                </div>
+                                <div class="activity-item">
+                                    <div class="activity-icon class">
+                                        <i class="fas fa-video"></i>
+                                    </div>
+                                    <div class="activity-content">
+                                        <h4>Live Class Completed</h4>
+                                        <p>CTP Class 12 - Support, Resistance & POI completed with 85% attendance</p>
+                                        <span class="activity-time">2 hours ago</span>
+                                    </div>
+                                </div>
+                                <div class="activity-item">
+                                    <div class="activity-icon partner">
+                                        <i class="fas fa-handshake"></i>
+                                    </div>
+                                    <div class="activity-content">
+                                        <h4>New Partner Application</h4>
+                                        <p>Neha Singh applied to become a Business Development Associate</p>
+                                        <span class="activity-time">5 hours ago</span>
+                                    </div>
+                                </div>
+                                <div class="activity-item">
+                                    <div class="activity-icon assignment">
+                                        <i class="fas fa-file-alt"></i>
+                                    </div>
+                                    <div class="activity-content">
+                                        <h4>New Assignment Created</h4>
+                                        <p>Assignment on "Fibonacci Retracement Tool" created by Prashanta Kumar</p>
+                                        <span class="activity-time">Yesterday</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Program Performance -->
+                    <div class="card program-performance-card">
+                        <div class="card-header">
+                            <h2>Program Performance</h2>
+                            <div class="card-actions">
+                                <button class="btn-text">View All</button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="performance-list">
+                                <div class="performance-item">
+                                    <div class="program-info">
+                                        <h4>Complete Trading Program (CTP)</h4>
+                                        <div class="meta-row">
+                                            <span class="students-count"><i class="fas fa-users"></i> 852 students</span>
+                                            <span class="rating"><i class="fas fa-star"></i> 4.8/5</span>
+                                        </div>
+                                    </div>
+                                    <div class="progress-container">
+                                        <div class="progress-stats">
+                                            <span class="completion-rate">92% Completion</span>
+                                            <span class="revenue">₹42.6L</span>
+                                        </div>
+                                        <div class="progress-bar">
+                                            <div class="progress-fill" style="width: 92%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="performance-item">
+                                    <div class="program-info">
+                                        <h4>Arthavidya Mentorship Program (AMP)</h4>
+                                        <div class="meta-row">
+                                            <span class="students-count"><i class="fas fa-users"></i> 124 students</span>
+                                            <span class="rating"><i class="fas fa-star"></i> 4.9/5</span>
+                                        </div>
+                                    </div>
+                                    <div class="progress-container">
+                                        <div class="progress-stats">
+                                            <span class="completion-rate">88% Completion</span>
+                                            <span class="revenue">₹37.2L</span>
+                                        </div>
+                                        <div class="progress-bar">
+                                            <div class="progress-fill" style="width: 88%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="performance-item">
+                                    <div class="program-info">
+                                        <h4>Smart Income Program (SIP)</h4>
+                                        <div class="meta-row">
+                                            <span class="students-count"><i class="fas fa-users"></i> 386 students</span>
+                                            <span class="rating"><i class="fas fa-star"></i> 4.7/5</span>
+                                        </div>
+                                    </div>
+                                    <div class="progress-container">
+                                        <div class="progress-stats">
+                                            <span class="completion-rate">79% Completion</span>
+                                            <span class="revenue">₹23.2L</span>
+                                        </div>
+                                        <div class="progress-bar">
+                                            <div class="progress-fill" style="width: 79%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="performance-item">
+                                    <div class="program-info">
+                                        <h4>Growth Mindset Program (GMP)</h4>
+                                        <div class="meta-row">
+                                            <span class="students-count"><i class="fas fa-users"></i> 215 students</span>
+                                            <span class="rating"><i class="fas fa-star"></i> 4.6/5</span>
+                                        </div>
+                                    </div>
+                                    <div class="progress-container">
+                                        <div class="progress-stats">
+                                            <span class="completion-rate">81% Completion</span>
+                                            <span class="revenue">₹8.6L</span>
+                                        </div>
+                                        <div class="progress-bar">
+                                            <div class="progress-fill" style="width: 81%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Upcoming Classes & Latest Support Tickets -->
+            <section class="dual-section">
+                <div class="row">
+                    <!-- Upcoming Classes -->
+                    <div class="card upcoming-classes-card">
+                        <div class="card-header">
+                            <h2>Today's Classes</h2>
+                            <div class="card-actions">
+                                <button class="btn-text">View Schedule</button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="classes-list">
+                                <div class="class-item">
+                                    <div class="class-time">
+                                        <span class="time">10:00 AM</span>
+                                        <span class="duration">2 hrs</span>
+                                    </div>
+                                    <div class="class-details">
+                                        <h4>GMP Class 5 - Emotional Intelligence in Trading</h4>
+                                        <p>Trainer: Prashanta Kumar Palei | Batch: April 2025</p>
+                                    </div>
+                                    <div class="class-status ongoing">
+                                        <span>Ongoing</span>
+                                    </div>
+                                </div>
+                                <div class="class-item">
+                                    <div class="class-time">
+                                        <span class="time">02:00 PM</span>
+                                        <span class="duration">1.5 hrs</span>
+                                    </div>
+                                    <div class="class-details">
+                                        <h4>SIP Class 3 - Asset Allocation Strategies</h4>
+                                        <p>Trainer: Andaz Aaron | Batch: March 2025</p>
+                                    </div>
+                                    <div class="class-status upcoming">
+                                        <span>Upcoming</span>
+                                    </div>
+                                </div>
+                                <div class="class-item">
+                                    <div class="class-time">
+                                        <span class="time">05:00 PM</span>
+                                        <span class="duration">2 hrs</span>
+                                    </div>
+                                    <div class="class-details">
+                                        <h4>CTP Class 13 - Price Action Trading</h4>
+                                        <p>Trainer: Andaz Aaron | Batch: February 2025</p>
+                                    </div>
+                                    <div class="class-status upcoming">
+                                        <span>Upcoming</span>
+                                    </div>
+                                </div>
+                                <div class="class-item">
+                                    <div class="class-time">
+                                        <span class="time">08:00 PM</span>
+                                        <span class="duration">2 hrs</span>
+                                    </div>
+                                    <div class="class-details">
+                                        <h4>AMP Class 6 - Advanced Risk Management</h4>
+                                        <p>Trainer: Prashanta Kumar Palei | Batch: April 2025</p>
+                                    </div>
+                                    <div class="class-status upcoming">
+                                        <span>Upcoming</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Latest Support Tickets -->
+                    <div class="card support-tickets-card">
+                        <div class="card-header">
+                            <h2>Support Tickets</h2>
+                            <div class="card-actions">
+                                <button class="btn-text">View All</button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="tickets-list">
+                                <div class="ticket-item">
+                                    <div class="ticket-priority high"></div>
+                                    <div class="ticket-content">
+                                        <h4>Unable to access class recordings</h4>
+                                        <p>Submitted by: Amit Kumar | 1 hour ago</p>
+                                    </div>
+                                    <div class="ticket-status new">
+                                        <span>New</span>
+                                    </div>
+                                </div>
+                                <div class="ticket-item">
+                                    <div class="ticket-priority medium"></div>
+                                    <div class="ticket-content">
+                                        <h4>Payment confirmation not received</h4>
+                                        <p>Submitted by: Priya Patel | 3 hours ago</p>
+                                    </div>
+                                    <div class="ticket-status in-progress">
+                                        <span>In Progress</span>
+                                    </div>
+                                </div>
+                                <div class="ticket-item">
+                                    <div class="ticket-priority low"></div>
+                                    <div class="ticket-content">
+                                        <h4>Request for assignment extension</h4>
+                                        <p>Submitted by: Rahul Sharma | 5 hours ago</p>
+                                    </div>
+                                    <div class="ticket-status in-progress">
+                                        <span>In Progress</span>
+                                    </div>
+                                </div>
+                                <div class="ticket-item">
+                                    <div class="ticket-priority medium"></div>
+                                    <div class="ticket-content">
+                                        <h4>Issue with quiz submission</h4>
+                                        <p>Submitted by: Neha Singh | Yesterday</p>
+                                    </div>
+                                    <div class="ticket-status resolved">
+                                        <span>Resolved</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Recent Enrollments & Top Performing Partners -->
+            <section class="dual-section">
+                <div class="row">
+                    <!-- Recent Enrollments -->
+                    <div class="card recent-enrollments-card">
+                        <div class="card-header">
+                            <h2>Recent Enrollments</h2>
+                            <div class="card-actions">
+                                <button class="btn-text">View All</button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="admin-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Student</th>
+                                            <th>Program</th>
+                                            <th>Date</th>
+                                            <th>Amount</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <div class="user-info">
+                                                    <img src="{% static 'images/student-avatar-1.jpg' %}" alt="Student" class="user-avatar">
+                                                    <div class="user-details">
+                                                        <h4>Rahul Sharma</h4>
+                                                        <p>rahul.s@gmail.com</p>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>Complete Trading Program (CTP)</td>
+                                            <td>April 8, 2025</td>
+                                            <td>₹19,999</td>
+                                            <td><span class="status-badge status-success">Paid</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div class="user-info">
+                                                    <img src="{% static 'images/student-avatar-2.jpg' %}" alt="Student" class="user-avatar">
+                                                    <div class="user-details">
+                                                        <h4>Priya Patel</h4>
+                                                        <p>priya.p@gmail.com</p>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>Arthavidya Mentorship Program (AMP)</td>
+                                            <td>April 7, 2025</td>
+                                            <td>₹39,999</td>
+                                            <td><span class="status-badge status-success">Paid</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div class="user-info">
+                                                    <img src="{% static 'images/student-avatar-3.jpg' %}" alt="Student" class="user-avatar">
+                                                    <div class="user-details">
+                                                        <h4>Amit Kumar</h4>
+                                                        <p>amit.k@gmail.com</p>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>Growth Mindset Program (GMP)</td>
+                                            <td>April 7, 2025</td>
+                                            <td>₹7,999</td>
+                                            <td><span class="status-badge status-warning">Pending</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div class="user-info">
+                                                    <img src="{% static 'images/student-avatar-4.jpg' %}" alt="Student" class="user-avatar">
+                                                    <div class="user-details">
+                                                        <h4>Neha Singh</h4>
+                                                        <p>neha.s@gmail.com</p>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>Smart Income Program (SIP)</td>
+                                            <td>April 6, 2025</td>
+                                            <td>₹11,999</td>
+                                            <td><span class="status-badge status-success">Paid</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div class="user-info">
+                                                    <img src="{% static 'images/student-avatar-5.jpg' %}" alt="Student" class="user-avatar">
+                                                    <div class="user-details">
+                                                        <h4>Rajesh Verma</h4>
+                                                        <p>rajesh.v@gmail.com</p>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>Complete Trading Program (CTP)</td>
+                                            <td>April 5, 2025</td>
+                                            <td>₹19,999</td>
+                                            <td><span class="status-badge status-danger">Failed</span></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Top Performing Partners -->
+                    <div class="card partners-card">
+                        <div class="card-header">
+                            <h2>Top Performing Partners</h2>
+                            <div class="card-actions">
+                                <button class="btn-text">View All</button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="partners-list">
+                                <div class="partner-item">
+                                    <div class="partner-rank">1</div>
+                                    <div class="partner-info">
+                                        <img src="{% static 'images/trainer-avatar-1.jpg' %}" alt="Partner" class="partner-avatar">
+                                        <div class="partner-details">
+                                            <h4>Vikash Mishra</h4>
+                                            <p>Partner since: Jan 2024</p>
+                                        </div>
+                                    </div>
+                                    <div class="partner-stats">
+                                        <div class="stat-item">
+                                            <span class="stat-value">48</span>
+                                            <span class="stat-label">Referrals</span>
+                                        </div>
+                                        <div class="stat-item">
+                                            <span class="stat-value">₹1.44L</span>
+                                            <span class="stat-label">Commission</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="partner-item">
+                                    <div class="partner-rank">2</div>
+                                    <div class="partner-info">
+                                        <img src="{% static 'images/trainer-avatar-2.jpg' %}" alt="Partner" class="partner-avatar">
+                                        <div class="partner-details">
+                                            <h4>Suman Rao</h4>
+                                            <p>Partner since: Mar 2024</p>
+                                        </div>
+                                    </div>
+                                    <div class="partner-stats">
+                                        <div class="stat-item">
+                                            <span class="stat-value">35</span>
+                                            <span class="stat-label">Referrals</span>
+                                        </div>
+                                        <div class="stat-item">
+                                            <span class="stat-value">₹1.05L</span>
+                                            <span class="stat-label">Commission</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="partner-item">
+                                    <div class="partner-rank">3</div>
+                                    <div class="partner-info">
+                                        <img src="{% static 'images/trainer-avatar-4.jpg' %}" alt="Partner" class="partner-avatar">
+                                        <div class="partner-details">
+                                            <h4>Deepak Sharma</h4>
+                                            <p>Partner since: Feb 2024</p>
+                                        </div>
+                                    </div>
+                                    <div class="partner-stats">
+                                        <div class="stat-item">
+                                            <span class="stat-value">29</span>
+                                            <span class="stat-label">Referrals</span>
+                                        </div>
+                                        <div class="stat-item">
+                                            <span class="stat-value">₹87K</span>
+                                            <span class="stat-label">Commission</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="partner-item">
+                                    <div class="partner-rank">4</div>
+                                    <div class="partner-info">
+                                        <img src="{% static 'images/trainer-avatar-7.jpg' %}" alt="Partner" class="partner-avatar">
+                                        <div class="partner-details">
+                                            <h4>Anjali Reddy</h4>
+                                            <p>Partner since: Dec 2023</p>
+                                        </div>
+                                    </div>
+                                    <div class="partner-stats">
+                                        <div class="stat-item">
+                                            <span class="stat-value">22</span>
+                                            <span class="stat-label">Referrals</span>
+                                        </div>
+                                        <div class="stat-item">
+                                            <span class="stat-value">₹66K</span>
+                                            <span class="stat-label">Commission</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Student Demographics & Regional Distribution -->
+            <section class="chart-section">
+                <div class="row">
+                    <!-- Student Demographics Chart -->
+                    <div class="card demographics-card">
+                        <div class="card-header">
+                            <h2>Student Demographics</h2>
+                            <div class="card-actions">
+                                <button class="btn-icon">
+                                    <i class="fas fa-download"></i>
+                                </button>
+                                <button class="btn-icon">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container">
+                                <canvas id="demographicsChart" height="250"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Regional Distribution Chart -->
+                    <div class="card regional-card">
+                        <div class="card-header">
+                            <h2>Regional Distribution</h2>
+                            <div class="card-actions">
+                                <button class="btn-icon">
+                                    <i class="fas fa-download"></i>
+                                </button>
+                                <button class="btn-icon">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container">
+                                <canvas id="regionalChart" height="250"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Quick Actions -->
+            <section class="quick-actions-section">
+                <div class="row">
+                    <div class="quick-action-card">
+                        <div class="quick-action-icon">
+                            <i class="fas fa-calendar-plus"></i>
+                        </div>
+                        <h3>Schedule Class</h3>
+                        <p>Create a new live class session</p>
+                        <a href="{% url  'admin_class_add' %}" class="action-link">Schedule</a>
+                    </div>
+                    <div class="quick-action-card">
+                        <div class="quick-action-icon">
+                            <i class="fas fa-user-plus"></i>
+                        </div>
+                        <h3>Add Student</h3>
+                        <p>Register a new student</p>
+                        <a href="{%url 'admin_student_add'%}" class="action-link">Add</a>
+                    </div>
+                    <div class="quick-action-card">
+                        <div class="quick-action-icon">
+                            <i class="fas fa-bullhorn"></i>
+                        </div>
+                        <h3>Announcement</h3>
+                        <p>Create a new announcement</p>
+                        <a href="admin-announcements.html" class="action-link">Create</a>
+                    </div>
+                    <div class="quick-action-card">
+                        <div class="quick-action-icon">
+                            <i class="fas fa-file-upload"></i>
+                        </div>
+                        <h3>Upload Resource</h3>
+                        <p>Add new learning resources</p>
+                        <a href="admin-resources.html" class="action-link">Upload</a>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+        <!-- Scripts -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.1/chart.min.js"></script>
+        <script src="{% static 'js/admin.js' %}"></script>    
+{% endblock %}

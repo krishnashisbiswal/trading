@@ -1,0 +1,897 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}admin user Management{% endblock %}
+{% block content %}
+    <style>
+        /* Modal Form Styles */
+        .modal-form {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-form.active {
+            display: flex;
+        }
+        
+        .form-container {
+            background-color: var(--bg-white);
+            border-radius: var(--border-radius);
+            width: 90%;
+            max-width: 700px;
+            box-shadow: var(--box-shadow-lg);
+            overflow: hidden;
+        }
+        
+        .form-header {
+            padding: 20px;
+            background-color: var(--primary-blue-lighter);
+            color: var(--primary-blue);
+            font-weight: 600;
+            font-size: 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-light);
+        }
+        
+        .form-header .close-btn {
+            cursor: pointer;
+            font-size: 20px;
+            color: var(--text-muted);
+            transition: var(--transition);
+        }
+        
+        .form-header .close-btn:hover {
+            color: var(--danger-color);
+            transform: rotate(90deg);
+        }
+        
+        .form-body {
+            padding: 20px;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+        
+        .form-row {
+            margin-bottom: 20px;
+        }
+        
+        .form-row label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-dark);
+        }
+        
+        .form-row input, 
+        .form-row select, 
+        .form-row textarea {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid var(--border-medium);
+            border-radius: var(--border-radius);
+            font-size: 14px;
+            transition: var(--transition);
+        }
+        
+        .form-row input:focus, 
+        .form-row select:focus, 
+        .form-row textarea:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(11, 87, 164, 0.1);
+            outline: none;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+        
+        .form-footer {
+            padding: 20px;
+            border-top: 1px solid var(--border-light);
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+        }
+        
+        .cancel-btn {
+            padding: 10px 20px;
+            border: 1px solid var(--border-medium);
+            border-radius: var(--border-radius);
+            background-color: var(--bg-white);
+            color: var(--text-medium);
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .cancel-btn:hover {
+            background-color: var(--bg-light);
+        }
+        
+        .submit-btn {
+            padding: 10px 25px;
+            border-radius: var(--border-radius);
+            background-color: var(--primary-blue);
+            color: var(--text-light);
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: var(--transition);
+        }
+        
+        .submit-btn:hover {
+            background-color: var(--primary-blue-dark);
+        }
+        
+        /* Bulk actions */
+        .bulk-actions {
+            padding: 15px 20px;
+            background-color: var(--bg-light);
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border-light);
+        }
+        
+        .bulk-actions.show {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .bulk-selected {
+            font-size: 14px;
+            color: var(--text-dark);
+        }
+        
+        .bulk-selected span {
+            font-weight: 600;
+            color: var(--primary-blue);
+        }
+        
+        .bulk-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .bulk-btn {
+            padding: 8px 15px;
+            font-size: 13px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .bulk-btn.assign {
+            background-color: var(--primary-blue-lighter);
+            color: var(--primary-blue);
+        }
+        
+        .bulk-btn.assign:hover {
+            background-color: var(--primary-blue);
+            color: white;
+        }
+        
+        .bulk-btn.delete {
+            background-color: var(--danger-light);
+            color: var(--danger-color);
+        }
+        
+        .bulk-btn.delete:hover {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        /* User avatar upload */
+        .avatar-upload {
+            position: relative;
+            max-width: 150px;
+            margin-bottom: 20px;
+        }
+        
+        .avatar-preview {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 2px solid var(--border-medium);
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+            background-color: var(--bg-light);
+        }
+        
+        .avatar-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .avatar-preview i {
+            font-size: 40px;
+            color: var(--text-muted);
+        }
+        
+        .avatar-upload label {
+            display: block;
+            width: 100%;
+            padding: 8px 0;
+            text-align: center;
+            background-color: var(--primary-blue-lighter);
+            color: var(--primary-blue);
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 14px;
+            transition: var(--transition);
+        }
+        
+        .avatar-upload label:hover {
+            background-color: var(--primary-blue-light);
+        }
+        
+        .avatar-upload input[type="file"] {
+            display: none;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body class="admin-body">
+    <!-- Admin Container -->
+    <div class="admin-container">
+        <!-- Main Content Area -->
+        <main class="admin-main">
+            <!-- Page Header -->
+            <section class="page-header">
+                <div class="header-content">
+                    <div class="page-title">
+                        <h1>User Management</h1>
+                        <p>Manage users and their access levels</p>
+                    </div>
+                    <div class="header-actions">
+                        <button class="btn-add" id="addUserBtn">
+                            <i class="fas fa-plus"></i> Add New User
+                        </button>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Main Table Section -->
+            <section class="table-section">
+                <div class="table-container">
+                    <div class="bulk-actions" id="bulkActions">
+                        <div class="bulk-selected">
+                            <span id="selectedCount">0</span> users selected
+                        </div>
+                        <div class="bulk-buttons">
+                            <button class="bulk-btn assign">
+                                <i class="fas fa-user-tag"></i> Change Role
+                            </button>
+                            <button class="bulk-btn delete">
+                                <i class="fas fa-trash"></i> Delete Selected
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="table-header">
+                        <h3 class="table-title">All Users</h3>
+                        <div class="table-actions">
+                            <div class="search-container">
+                                <i class="fas fa-search search-icon"></i>
+                                <input type="text" class="search-input" id="searchInput" placeholder="Search users...">
+                            </div>
+                            <div class="filter-container">
+                                <button class="filter-btn" id="filterBtn">
+                                    <i class="fas fa-filter"></i> Filter
+                                </button>
+                                <div class="filter-dropdown" id="filterDropdown">
+                                    <div class="filter-group">
+                                        <label class="filter-label">Role</label>
+                                        <select class="filter-select" id="roleFilter">
+                                            <option value="">All Roles</option>
+                                            <option value="admin">Administrator</option>
+                                            <option value="trainer">Trainer</option>
+                                            <option value="student">Student</option>
+                                            <option value="guest">Guest</option>
+                                        </select>
+                                    </div>
+                                    <div class="filter-group">
+                                        <label class="filter-label">Status</label>
+                                        <select class="filter-select" id="statusFilter">
+                                            <option value="">All Status</option>
+                                            <option value="active">Active</option>
+                                            <option value="inactive">Inactive</option>
+                                            <option value="pending">Pending</option>
+                                            <option value="blocked">Blocked</option>
+                                        </select>
+                                    </div>
+                                    <div class="filter-group">
+                                        <label class="filter-label">Joined Date</label>
+                                        <select class="filter-select" id="dateFilter">
+                                            <option value="">All Time</option>
+                                            <option value="today">Today</option>
+                                            <option value="week">This Week</option>
+                                            <option value="month">This Month</option>
+                                            <option value="year">This Year</option>
+                                        </select>
+                                    </div>
+                                    <div class="filter-actions">
+                                        <button class="btn-reset" id="resetFilterBtn">Reset</button>
+                                        <button class="btn-apply" id="applyFilterBtn">Apply</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Table Content -->
+                    <div class="table-responsive">
+                        <table class="admin-table" id="usersTable">
+                            <thead>
+                                <tr>
+                                    <th class="checkbox-cell">
+                                        <label class="custom-checkbox">
+                                            <input type="checkbox" id="selectAllUsers">
+                                            <span class="checkmark"></span>
+                                        </label>
+                                    </th>
+                                    <th>User</th>
+                                    <th>Email</th>
+                                    <th>Role</th>
+                                    <th>Joined Date</th>
+                                    <th>Last Login</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Sample data rows -->
+                                <tr>
+                                    <td class="checkbox-cell">
+                                        <label class="custom-checkbox">
+                                            <input type="checkbox" class="user-checkbox">
+                                            <span class="checkmark"></span>
+                                        </label>
+                                    </td>
+                                    <td>
+                                        <div class="user-info">
+                                            <img src="{% static 'images/users/avatar1.jpg'%}" alt="User" class="user-avatar">
+                                            <div class="user-details">
+                                                <h4>Rajesh Kumar</h4>
+                                                <p>@rajesh.kumar</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>rajesh.kumar@example.com</td>
+                                    <td>Administrator</td>
+                                    <td>Jan 15, 2024</td>
+                                    <td>Apr 24, 2025</td>
+                                    <td><span class="status-badge status-success">Active</span></td>
+                                    <td>
+                                        <div class="row-actions">
+                                            <button class="action-btn view" title="View Profile">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="action-btn edit" title="Edit User">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="action-btn delete" title="Delete User">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="checkbox-cell">
+                                        <label class="custom-checkbox">
+                                            <input type="checkbox" class="user-checkbox">
+                                            <span class="checkmark"></span>
+                                        </label>
+                                    </td>
+                                    <td>
+                                        <div class="user-info">
+                                            <img src="{% static 'images/users/avatar2.jpg'%}" alt="User" class="user-avatar">
+                                            <div class="user-details">
+                                                <h4>Priya Sharma</h4>
+                                                <p>@priya.sharma</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>priya.sharma@example.com</td>
+                                    <td>Trainer</td>
+                                    <td>Mar 10, 2024</td>
+                                    <td>Apr 22, 2025</td>
+                                    <td><span class="status-badge status-success">Active</span></td>
+                                    <td>
+                                        <div class="row-actions">
+                                            <button class="action-btn view" title="View Profile">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="action-btn edit" title="Edit User">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="action-btn delete" title="Delete User">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="checkbox-cell">
+                                        <label class="custom-checkbox">
+                                            <input type="checkbox" class="user-checkbox">
+                                            <span class="checkmark"></span>
+                                        </label>
+                                    </td>
+                                    <td>
+                                        <div class="user-info">
+                                            <img src="{% static 'images/users/avatar3.jpg'%}" alt="User" class="user-avatar">
+                                            <div class="user-details">
+                                                <h4>Amit Patel</h4>
+                                                <p>@amit.patel</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>amit.patel@example.com</td>
+                                    <td>Student</td>
+                                    <td>Apr 05, 2025</td>
+                                    <td>Apr 20, 2025</td>
+                                    <td><span class="status-badge status-warning">Pending</span></td>
+                                    <td>
+                                        <div class="row-actions">
+                                            <button class="action-btn view" title="View Profile">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="action-btn edit" title="Edit User">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="action-btn delete" title="Delete User">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="checkbox-cell">
+                                        <label class="custom-checkbox">
+                                            <input type="checkbox" class="user-checkbox">
+                                            <span class="checkmark"></span>
+                                        </label>
+                                    </td>
+                                    <td>
+                                        <div class="user-info">
+                                            <img src="{% static 'images/users/avatar4.jpg'%}" alt="User" class="user-avatar">
+                                            <div class="user-details">
+                                                <h4>Neha Gupta</h4>
+                                                <p>@neha.gupta</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>neha.gupta@example.com</td>
+                                    <td>Student</td>
+                                    <td>Feb 20, 2024</td>
+                                    <td>Mar 15, 2025</td>
+                                    <td><span class="status-badge status-danger">Blocked</span></td>
+                                    <td>
+                                        <div class="row-actions">
+                                            <button class="action-btn view" title="View Profile">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="action-btn edit" title="Edit User">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="action-btn delete" title="Delete User">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="checkbox-cell">
+                                        <label class="custom-checkbox">
+                                            <input type="checkbox" class="user-checkbox">
+                                            <span class="checkmark"></span>
+                                        </label>
+                                    </td>
+                                    <td>
+                                        <div class="user-info">
+                                            <img src="{% static 'images/users/avatar5.jpg'%}" alt="User" class="user-avatar">
+                                            <div class="user-details">
+                                                <h4>Vikram Singh</h4>
+                                                <p>@vikram.singh</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>vikram.singh@example.com</td>
+                                    <td>Guest</td>
+                                    <td>Mar 30, 2025</td>
+                                    <td>Apr 18, 2025</td>
+                                    <td><span class="status-badge status-neutral">Inactive</span></td>
+                                    <td>
+                                        <div class="row-actions">
+                                            <button class="action-btn view" title="View Profile">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="action-btn edit" title="Edit User">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="action-btn delete" title="Delete User">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Table Footer with Pagination -->
+                    <div class="table-footer">
+                        <div class="page-info">
+                            Showing <span id="startRange">1</span> to <span id="endRange">5</span> of <span id="totalItems">28</span> users
+                        </div>
+                        <div class="pagination">
+                            <button class="page-btn" id="prevPage" disabled>
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <button class="page-btn active">1</button>
+                            <button class="page-btn">2</button>
+                            <button class="page-btn">3</button>
+                            <button class="page-btn">4</button>
+                            <button class="page-btn">5</button>
+                            <button class="page-btn">6</button>
+                            <button class="page-btn" id="nextPage">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    
+    <!-- Modal Form for Adding/Editing User -->
+    <div class="modal-form" id="userForm">
+        <div class="form-container">
+            <div class="form-header">
+                <span id="formTitle">Add New User</span>
+                <i class="fas fa-times close-btn" id="closeForm"></i>
+            </div>
+            <form id="userDataForm">
+                <div class="form-body">
+                    <input type="hidden" id="userId" name="userId">
+                    
+                    <div class="avatar-upload">
+                        <div class="avatar-preview">
+                            <i class="fas fa-user" id="avatarPlaceholder"></i>
+                            <img src="" id="avatarPreview" style="display: none;">
+                        </div>
+                        <label for="avatarUpload">Upload Photo</label>
+                        <input type="file" id="avatarUpload" accept="image/*">
+                    </div>
+                    
+                    <div class="form-grid">
+                        <div class="form-row">
+                            <label for="firstName">First Name <span class="required">*</span></label>
+                            <input type="text" id="firstName" name="firstName" required>
+                        </div>
+                        <div class="form-row">
+                            <label for="lastName">Last Name <span class="required">*</span></label>
+                            <input type="text" id="lastName" name="lastName" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <label for="username">Username <span class="required">*</span></label>
+                        <input type="text" id="username" name="username" required>
+                    </div>
+                    
+                    <div class="form-row">
+                        <label for="email">Email Address <span class="required">*</span></label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                    
+                    <div class="form-grid">
+                        <div class="form-row">
+                            <label for="phone">Phone Number</label>
+                            <input type="tel" id="phone" name="phone">
+                        </div>
+                        <div class="form-row">
+                            <label for="role">User Role <span class="required">*</span></label>
+                            <select id="role" name="role" required>
+                                <option value="">Select Role</option>
+                                <option value="admin">Administrator</option>
+                                <option value="trainer">Trainer</option>
+                                <option value="student">Student</option>
+                                <option value="guest">Guest</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-grid">
+                        <div class="form-row">
+                            <label for="password">Password <span class="required">*</span></label>
+                            <input type="password" id="password" name="password" required>
+                        </div>
+                        <div class="form-row">
+                            <label for="confirmPassword">Confirm Password <span class="required">*</span></label>
+                            <input type="password" id="confirmPassword" name="confirmPassword" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <label for="status">Account Status <span class="required">*</span></label>
+                        <select id="status" name="status" required>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                            <option value="pending">Pending Verification</option>
+                            <option value="blocked">Blocked</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-row">
+                        <label for="bio">Bio/Description</label>
+                        <textarea id="bio" name="bio" rows="4"></textarea>
+                    </div>
+                </div>
+                
+                <div class="form-footer">
+                    <button type="button" class="cancel-btn" id="cancelForm">Cancel</button>
+                    <button type="submit" class="submit-btn">Save User</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    {% block footer %}{% endblock footer %}
+    <!-- JavaScript for Form Handling -->
+    <script src="{% static 'js/admin.js' %}"></script>
+    <script>
+        checkbox.checked = isChecked;
+        if (isChecked) checkedCount++;
+    });
+    
+    // Update bulk actions visibility
+    if (checkedCount > 0) {
+        bulkActions.classList.add('show');
+        selectedCount.textContent = checkedCount;
+    } else {
+        bulkActions.classList.remove('show');
+    }
+});
+
+// Individual checkbox functionality
+userCheckboxes.forEach(checkbox => {
+    checkbox.addEventListener('change', function() {
+        let checkedCount = 0;
+        let allChecked = true;
+        
+        userCheckboxes.forEach(cb => {
+            if (cb.checked) checkedCount++;
+            else allChecked = false;
+        });
+        
+        // Update "select all" checkbox
+        selectAllCheckbox.checked = allChecked;
+        
+        // Update bulk actions visibility
+        if (checkedCount > 0) {
+            bulkActions.classList.add('show');
+            selectedCount.textContent = checkedCount;
+        } else {
+            bulkActions.classList.remove('show');
+        }
+    });
+});
+
+// Filter functionality
+const filterBtn = document.getElementById('filterBtn');
+const filterDropdown = document.getElementById('filterDropdown');
+
+filterBtn.addEventListener('click', function() {
+    filterDropdown.classList.toggle('show');
+});
+
+// Close filter dropdown when clicking outside
+document.addEventListener('click', function(e) {
+    if (!filterBtn.contains(e.target) && !filterDropdown.contains(e.target)) {
+        filterDropdown.classList.remove('show');
+    }
+});
+
+// Apply filter button
+const applyFilterBtn = document.getElementById('applyFilterBtn');
+applyFilterBtn.addEventListener('click', function() {
+    const roleFilter = document.getElementById('roleFilter').value;
+    const statusFilter = document.getElementById('statusFilter').value;
+    const dateFilter = document.getElementById('dateFilter').value;
+    
+    // Here you would typically send these filter values to the server
+    // and reload the table with filtered data
+    // For demo, just close dropdown and show alert
+    alert(`Filters applied: Role=${roleFilter}, Status=${statusFilter}, Date=${dateFilter}`);
+    filterDropdown.classList.remove('show');
+});
+
+// Reset filter button
+const resetFilterBtn = document.getElementById('resetFilterBtn');
+resetFilterBtn.addEventListener('click', function() {
+    document.getElementById('roleFilter').selectedIndex = 0;
+    document.getElementById('statusFilter').selectedIndex = 0;
+    document.getElementById('dateFilter').selectedIndex = 0;
+    
+    // In a real app, you'd reset the filters and reload data
+    filterDropdown.classList.remove('show');
+});
+
+// Search functionality
+const searchInput = document.getElementById('searchInput');
+searchInput.addEventListener('keyup', function() {
+    const searchText = this.value.toLowerCase();
+    const tableRows = document.querySelectorAll('#usersTable tbody tr');
+    
+    tableRows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(searchText) ? '' : 'none';
+    });
+});
+
+// View user profile handlers
+const viewButtons = document.querySelectorAll('.action-btn.view');
+viewButtons.forEach(button => {
+    button.addEventListener('click', function() {
+        const row = this.closest('tr');
+        const userName = row.querySelector('.user-details h4').textContent;
+        alert(`Viewing profile for ${userName}. In a real application, this would open a detailed user profile view.`);
+    });
+});
+
+// Delete user handlers
+const deleteButtons = document.querySelectorAll('.action-btn.delete');
+deleteButtons.forEach(button => {
+    button.addEventListener('click', function() {
+        const row = this.closest('tr');
+        const userName = row.querySelector('.user-details h4').textContent;
+        
+        if (confirm(`Are you sure you want to delete user ${userName}?`)) {
+            // In a real app, you'd send a delete request to the server
+            row.remove();
+            alert(`User ${userName} has been deleted.`);
+            
+            // Update the showing X to Y of Z entries text
+            updateTableInfo();
+        }
+    });
+});
+
+// Bulk delete button handler
+const bulkDeleteBtn = document.querySelector('.bulk-btn.delete');
+bulkDeleteBtn.addEventListener('click', function() {
+    const checkedUsers = document.querySelectorAll('.user-checkbox:checked');
+    const count = checkedUsers.length;
+    
+    if (confirm(`Are you sure you want to delete ${count} selected users?`)) {
+        checkedUsers.forEach(checkbox => {
+            const row = checkbox.closest('tr');
+            row.remove();
+        });
+        
+        // Hide bulk actions and update table info
+        bulkActions.classList.remove('show');
+        updateTableInfo();
+        
+        // Uncheck "select all" checkbox
+        selectAllCheckbox.checked = false;
+        
+        alert(`${count} users have been deleted.`);
+    }
+});
+
+// Bulk change role button handler
+const bulkChangeRoleBtn = document.querySelector('.bulk-btn.assign');
+bulkChangeRoleBtn.addEventListener('click', function() {
+    const checkedUsers = document.querySelectorAll('.user-checkbox:checked');
+    const count = checkedUsers.length;
+    
+    const newRole = prompt('Enter new role for selected users (Administrator, Trainer, Student, Guest):');
+    
+    if (newRole) {
+        checkedUsers.forEach(checkbox => {
+            const row = checkbox.closest('tr');
+            row.cells[3].textContent = newRole;
+        });
+        
+        alert(`Role updated to "${newRole}" for ${count} users.`);
+        
+        // Hide bulk actions
+        bulkActions.classList.remove('show');
+        
+        // Uncheck all checkboxes
+        selectAllCheckbox.checked = false;
+        userCheckboxes.forEach(cb => cb.checked = false);
+    }
+});
+
+// Pagination functionality
+const prevPageBtn = document.getElementById('prevPage');
+const nextPageBtn = document.getElementById('nextPage');
+const pageButtons = document.querySelectorAll('.pagination .page-btn:not(#prevPage):not(#nextPage)');
+
+// Function to handle page change
+function changePage(pageNum) {
+    // In a real app, you'd load data for the selected page
+    // For demo, just update the active page button
+    
+    pageButtons.forEach((btn, index) => {
+        btn.classList.toggle('active', index === pageNum - 1);
+    });
+    
+    // Update prev/next button states
+    prevPageBtn.disabled = pageNum === 1;
+    nextPageBtn.disabled = pageNum === pageButtons.length;
+    
+    // Update showing X to Y of Z text
+    const startRange = document.getElementById('startRange');
+    const endRange = document.getElementById('endRange');
+    
+    startRange.textContent = ((pageNum - 1) * 5) + 1;
+    endRange.textContent = Math.min(pageNum * 5, 28); // Total is 28 users
+    
+    alert(`In a real application, page ${pageNum} data would be loaded here.`);
+}
+
+// Add click handlers to page buttons
+pageButtons.forEach((btn, index) => {
+    btn.addEventListener('click', function() {
+        changePage(index + 1);
+    });
+});
+
+// Previous page button
+prevPageBtn.addEventListener('click', function() {
+    if (!this.disabled) {
+        const currentPage = Array.from(pageButtons).findIndex(btn => btn.classList.contains('active')) + 1;
+        changePage(currentPage - 1);
+    }
+});
+
+// Next page button
+nextPageBtn.addEventListener('click', function() {
+    if (!this.disabled) {
+        const currentPage = Array.from(pageButtons).findIndex(btn => btn.classList.contains('active')) + 1;
+        changePage(currentPage + 1);
+    }
+});
+
+// Function to update table info text
+function updateTableInfo() {
+    const totalItems = document.getElementById('totalItems');
+    const remainingRows = document.querySelectorAll('#usersTable tbody tr').length;
+    totalItems.textContent = remainingRows;
+    
+    const currentPage = Array.from(pageButtons).findIndex(btn => btn.classList.contains('active')) + 1;
+    const startRange = document.getElementById('startRange');
+    const endRange = document.getElementById('endRange');
+    
+    startRange.textContent = ((currentPage - 1) * 5) + 1;
+    endRange.textContent = Math.min(currentPage * 5, remainingRows);
+}
+});
+</script>
+{% endblock %}

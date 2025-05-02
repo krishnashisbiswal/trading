@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Arthavidya Trading Community</title>
+
+    <link rel="stylesheet" href="{% static 'css/style.css'%}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Login form specific styles */
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e5e9f2 100%);
+            padding: 40px 20px;
+        }
+        
+        .login-card {
+            width: 100%;
+            max-width: 420px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 5px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .login-header {
+            background: linear-gradient(135deg, #0b57a4 0%, #191f45 100%);
+            color: #ffffff;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .login-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url("../assets/images/pattern-bg.png");
+            background-size: cover;
+            opacity: 0.05;
+            z-index: 0;
+        }
+        
+        .login-header h2 {
+            font-size: 24px;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .login-header p {
+            font-size: 14px;
+            margin: 0;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .login-logo {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .login-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        
+        .login-body {
+            padding: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #333;
+        }
+        
+        .input-icon-group {
+            position: relative;
+        }
+        
+        .input-icon-group i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 15px 12px 45px;
+            font-size: 16px;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            transition: all 0.3s;
+        }
+        
+        .form-control:focus {
+            border-color: #0b57a4;
+            box-shadow: 0 0 0 2px rgba(11, 87, 164, 0.2);
+            outline: none;
+        }
+        
+        .password-toggle {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+            cursor: pointer;
+            z-index: 2;
+        }
+        
+        .form-check {
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+        }
+        
+        .form-check input {
+            margin-right: 10px;
+        }
+        
+        .login-btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #0b57a4 0%, #191f45 100%);
+            color: #ffffff;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+        
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(11, 87, 164, 0.3);
+        }
+        
+        .form-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+        
+        .form-footer a {
+            color: #0b57a4;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .form-footer a:hover {
+            color: #084785;
+            text-decoration: underline;
+        }
+        
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 30px 0;
+        }
+        
+        .divider::before, 
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background-color: #dee2e6;
+        }
+        
+        .divider span {
+            padding: 0 15px;
+            font-size: 14px;
+            color: #6c757d;
+        }
+        
+        .social-login {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        .social-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            color: #ffffff;
+            transition: all 0.3s;
+        }
+        
+        .social-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .google-btn {
+            background-color: #DB4437;
+        }
+        
+        .facebook-btn {
+            background-color: #4267B2;
+        }
+        
+        .linkedin-btn {
+            background-color: #0077B5;
+        }
+        
+        .register-link {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 14px;
+        }
+        
+        .register-link a {
+            color: #0b57a4;
+            font-weight: 600;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .register-link a:hover {
+            color: #084785;
+            text-decoration: underline;
+        }
+        
+        /* For user roles selection */
+        .user-roles {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .role-tab {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            border-radius: 6px;
+            background-color: #f8f9fa;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+        
+        .role-tab.active {
+            background-color: #0b57a4;
+            color: #ffffff;
+        }
+        
+        /* Responsive design */
+        @media (max-width: 576px) {
+            .login-header {
+                padding: 20px;
+            }
+            
+            .login-body {
+                padding: 20px;
+            }
+            
+            .social-login {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <div class="login-logo">
+                    <img src="{% static "images/logo.png" %}" alt="Arthavidya Trading Community">
+                </div>
+                <h2>Welcome Back</h2>
+                <p>Log in to access your Arthavidya account</p>
+            </div>
+            <div class="login-body">
+                <div class="user-roles">
+                    <div class="role-tab active" data-role="student">Student</div>
+                    <div class="role-tab" data-role="trainer">Trainer</div>
+                    <div class="role-tab" data-role="partner">Partner</div>
+                </div>
+                
+                <form id="login-form" action="#" method="post">
+                    <input type="hidden" id="user_role" name="user_role" value="student">
+                    
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <div class="input-icon-group">
+                            <i class="fas fa-envelope"></i>
+                            <input type="email" id="email" name="email" class="form-control" placeholder="Enter your email" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <div class="input-icon-group">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" id="password" name="password" class="form-control" placeholder="Enter your password" required>
+                            <span class="password-toggle" id="password-toggle">
+                                <i class="fas fa-eye"></i>
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="form-check">
+                            <input type="checkbox" id="remember_me" name="remember_me">
+                            <label for="remember_me">Remember me</label>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="login-btn">Log In</button>
+                    
+                    <div class="form-footer">
+                        <a href="forgot-password.html">Forgot Password?</a>
+                    </div>
+                    
+                    <div class="divider">
+                        <span>OR</span>
+                    </div>
+                    
+                    <div class="social-login">
+                        <a href="#" class="social-btn google-btn">
+                            <i class="fab fa-google"></i>
+                        </a>
+                        <a href="#" class="social-btn facebook-btn">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="social-btn linkedin-btn">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                    </div>
+                    
+                    <div class="register-link">
+                        Don't have an account? <a href="{% url "student_form" %}">Register Now</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Toggle password visibility
+            const passwordToggle = document.getElementById('password-toggle');
+            const passwordField = document.getElementById('password');
+            
+            passwordToggle.addEventListener('click', function() {
+                const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordField.setAttribute('type', type);
+                
+                // Toggle icon
+                const icon = this.querySelector('i');
+                icon.classList.toggle('fa-eye');
+                icon.classList.toggle('fa-eye-slash');
+            });
+            
+            // User role selection
+            const roleTabs = document.querySelectorAll('.role-tab');
+            const userRoleInput = document.getElementById('user_role');
+            
+            roleTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // Remove active class from all tabs
+                    roleTabs.forEach(t => t.classList.remove('active'));
+                    
+                    // Add active class to clicked tab
+                    this.classList.add('active');
+                    
+                    // Set user role value
+                    userRoleInput.value = this.dataset.role;
+                });
+            });
+            
+            // Form submission
+            document.getElementById('login-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+                const userRole = document.getElementById('user_role').value;
+                
+                // Basic validation
+                if (!email || !password) {
+                    alert('Please enter both email and password.');
+                    return;
+                }
+                
+                // Here you would normally send the form data to your server
+                // For demonstration, we'll simulate different redirects based on role
+                let redirectUrl = '';
+                
+                switch(userRole) {
+                    case 'student':
+                        redirectUrl = '../dashboard/student/index.html';
+                        break;
+                    case 'trainer':
+                        redirectUrl = '../dashboard/trainer/index.html';
+                        break;
+                    case 'partner':
+                        redirectUrl = '../dashboard/partner/index.html';
+                        break;
+                    default:
+                        redirectUrl = '../dashboard/student/index.html';
+                }
+                
+                // Show success message and redirect
+                alert(`Login successful! Redirecting to ${userRole} dashboard.`);
+                window.location.href = redirectUrl;
+            });
+        });
+    </script>
+</body>
+</html>
