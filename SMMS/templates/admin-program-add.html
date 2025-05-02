@@ -14,7 +14,7 @@
         padding:25px 0;
 
     }
-    .container {
+    .container-x {
       background-color: #ffffff;
       border-radius: 12px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.05);
@@ -29,7 +29,6 @@
       font-size: 26px;
       font-weight: 700;
       color: #ffffff;
-      text-align: center;
     }
     .form-group {
       margin-bottom: 20px;
@@ -90,8 +89,18 @@
   </style>
 </head>
 <body class="admin-body">
-<div class="container">
-            <div class="color">
+<div class="admin-main">
+    <section class="page-header">
+      <div class="header-content">
+        <div class="page-title">
+          <h1>Add New Program</h1>
+          <p>Fill in the details below to add a new program.</p>
+        </div>
+    </div>
+    </section>
+<div class="container-x">
+<center>
+  <div class="color">
     <h1>Add New Program</h1></div>
 <div class="box">
   <form id="add-program-form">
@@ -171,8 +180,9 @@
     <div class="actions">
       <button type="button" onclick="submitProgram()">Save Program</button>
     </div>
-
+  </center>
   </form>
+</div>
 </div>
 </div>
 {% block footer%}
