@@ -185,24 +185,24 @@ class reg(models.Model):
 
         return True
 
-class support_ticket(models.Model):
+class support_ticketx(models.Model):
     @classmethod
     def add_support_ticket(cls, data):
         """Save data directly to MySQL using raw SQL"""
 
         # Connect to MySQL database
-        # db_settings = settings.DATABASES['default']
-        #
-        # # Connect to MySQL database
-        # db = MySQLdb.connect(
-        #     host=db_settings['HOST'],
-        #     user=db_settings['USER'],
-        #     passwd=db_settings['PASSWORD'],
-        #     db=db_settings['NAME'],
-        #     port=int(db_settings['PORT']),
-        # )
+        db_settings = settings.DATABASES['default']
 
-       # cursor = db.cursor()
+        # Connect to MySQL database
+        db = MySQLdb.connect(
+            host=db_settings['HOST'],
+            user=db_settings['USER'],
+            passwd=db_settings['PASSWORD'],
+            db=db_settings['NAME'],
+            port=int(db_settings['PORT']),
+        )
+
+        cursor = db.cursor()
 
         # Create SQL query for insertion
 
@@ -213,26 +213,45 @@ class support_ticket(models.Model):
         print(f"message: {data.get('ticket_message')}")
         print(f"attachment: {data.get('ticket_attachment')}")
 
-        # query = """
-        # INSERT INTO support_tickets
-        # (ticket_subject,ticket_priority,ticket_category,ticket_message)
-        # VALUES (%s, %s, %s, %s, %s,)
-        # """
-        #
-        # # Execute the query with data
-        # cursor.execute(query, (
-        #     data.get('ticket_subject', ''),
-        #     data.get('ticket_priority', ''),
-        #     data.get('ticket_category', ''),
-        #     data.get('ticket_message', ''),
-        #     data.get('ticket_message', ''),
-        #     data.get('ticket_attachment', '')
-        # ))
-        # # Commit the transaction
-        # db.commit()
-        # if cursor:
-        #     cursor.close()
-        # # Close the connection
-        # db.close()
+        query = """
+        INSERT INTO support_tickets
+        (ticket_subject, ticket_priority, ticket_category, ticket_message, ticket_attachment)
+        VALUES (%s, %s, %s, %s, %s)
+        """
+
+        # Execute the query with data
+        cursor.execute(query, (
+            data.get('ticket_subject', ''),
+            data.get('ticket_priority', ''),
+            data.get('ticket_category', ''),
+            data.get('ticket_message', ''),
+            data.get('ticket_attachment', '')
+        ))
+        # Commit the transaction
+        db.commit()
+        if cursor:
+            cursor.close()
+        # Close the connection
+        db.close()
         return True
+
+    @classmethod
+    def get_all_tickets(cls):
+        """Fetch all support tickets from the database"""
+
+        db_settings = settings.DATABASES['default']
+
+        db = MySQLdb.connect(
+            host=db_settings['HOST'],
+            user=db_settings['USER'],
+            passwd=db_settings['PASSWORD'],
+            db=db_settings['NAME'],
+            port=int(db_settings['PORT']),
+        )
+
+        cursor = db.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute("SELECT * FROM support_tickets ORDER BY id DESC")
+        results = cursor.fetchall()
+        db.close()
+        return results
 

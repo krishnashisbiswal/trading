@@ -148,12 +148,117 @@ box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
     </form>
   </div>
 </div>
+
+<!-- Display existing tickets -->
+  <div class="card">
+        <div class="card-header">
+            <h3>Your Tickets</h3>
+        </div>
+        <div class="card-body">
+          {% if tickets %}
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Subject</th>
+                            <th>Priority</th>
+                            <th>Category</th>
+                            <th>Status</th>
+                            <th>Created</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for ticket in tickets %}
+                            <tr>
+                                <td>{{ ticket.id }}</td>
+                                <td>{{ ticket.ticket_subject }}</td>
+                                <td>
+                                    {% if ticket.ticket_priority|lower == 'high' %}
+                                        <span class="badge bg-danger">High</span>
+                                    {% elif ticket.ticket_priority|lower == 'medium' %}
+                                        <span class="badge bg-warning">Medium</span>
+                                    {% else %}
+                                        <span class="badge bg-success">Low</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ ticket.ticket_category }}</td>
+                                <td>
+                                    {% if ticket.ticket_status == 'open' %}
+                                        <span class="badge bg-primary">Open</span>
+                                    {% elif ticket.ticket_status == 'in_progress' %}
+                                        <span class="badge bg-info">In Progress</span>
+                                    {% elif ticket.ticket_status == 'resolved' %}
+                                        <span class="badge bg-success">Resolved</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Closed</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ ticket.ticket_created_at }}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#ticketModal{{ ticket.id }}">
+                                        View
+                                    </button>
+                                </td>
+                            </tr>
+
+                            <!-- Modal for displaying ticket details -->
+                            <div class="modal fade" id="ticketModal{{ ticket.id }}" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog modal-lg">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">Ticket #{{ ticket.id }}: {{ ticket.ticket_subject }}</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="row mb-3">
+                                                <div class="col-md-4"><strong>Priority:</strong></div>
+                                                <div class="col-md-8">{{ ticket.ticket_priority }}</div>
+                                            </div>
+                                            <div class="row mb-3">
+                                                <div class="col-md-4"><strong>Category:</strong></div>
+                                                <div class="col-md-8">{{ ticket.ticket_category }}</div>
+                                            </div>
+                                            <div class="row mb-3">
+                                                <div class="col-md-4"><strong>Status:</strong></div>
+                                                <div class="col-md-8">{{ ticket.ticket_status }}</div>
+                                            </div>
+                                            <div class="row mb-3">
+                                                <div class="col-md-4"><strong>Message:</strong></div>
+                                                <div class="col-md-8">{{ ticket.ticket_message }}</div>
+                                            </div>
+                                            {% if ticket.ticket_attachment %}
+                                            <div class="row mb-3">
+                                                <div class="col-md-4"><strong>Attachment:</strong></div>
+                                                <div class="col-md-8">
+                                                    <a href="{{ ticket.ticket_attachment }}" target="_blank">View Attachment</a>
+                                                </div>
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <div class="alert alert-info">
+                    No support tickets found. Create a new ticket using the form above.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
 <center>
                 <!-- Form Footer -->
                 <div class="form-footer">
                 </div>
             </div>
         </main>
-    </div>
+  </div>
     <script src="{% static 'js/admin.js' %}"></script>
 {%endblock%}

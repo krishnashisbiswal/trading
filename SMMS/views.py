@@ -290,7 +290,7 @@ def support_ticket(request):
         attachment= request.POST.get('ticket_attachment', '')
 
         # Basic validation
-        if not all([subject, priority, category, message, attachment]):
+        if not all([subject, priority, category, message]):
             messages.error(request, 'All fields are required')
         else:
             try:
@@ -304,16 +304,20 @@ def support_ticket(request):
                 }
                 print("form_data:", form_data)
                 # Use the model's class method to save to MySQL
-                result = support_ticket.add_support_ticket(form_data)
+                result = support_ticketx.add_support_ticket(form_data)
                 # Redirect to the same page after submission
                 if result:
                     messages.success(request, 'ticket raised successfully!')
-                    return redirect('support_ticket.html')
+                    return redirect('support_ticket')
                 else:
                     messages.error(request, 'Failed to save data. Check server logs for details.')
             except Exception as e:
                 messages.error(request,f'Error saving data: {str(e)}')
-    return render(request, 'support-ticket.html')
+
+    # Fetch existing tickets to display
+    tickets = support_ticketx.get_all_tickets()
+
+    return render(request, 'support-ticket.html', {'tickets': tickets})
 
 def dashboard(request):
     return render(request, 'dashboard.html')
