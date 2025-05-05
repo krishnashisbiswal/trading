@@ -109,117 +109,117 @@
         <aside class="admin-sidebar">
             <nav class="sidebar-nav">
                 <ul>
-                    <li class='active'>
+                    <li class="{% if request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}">
                         <a href="{% url 'admin_dashboard' %}">
                             <i class="fas fa-tachometer-alt"></i>
                             <span>Dashboard</span>
                         </a>
                     </li>
-                    <li>
+                    <li class="{% if request.resolver_match.url_name in 'personal_info_view admin_student_add admin_batch' %}active{% endif %}">
                         <a href="#" class="submenu-toggle">
                             <i class="fas fa-user-graduate"></i>
                             <span>Students</span>
                             <i class="fas fa-chevron-right submenu-indicator"></i>
                         </a>
                         <ul class="submenu">
-                            <li><a href="{% url 'personal_info_view' %}">All Students</a></li>
-                            <li><a href="{% url 'admin_student_add' %}">Add New Student</a></li>
-                           <li><a href="{% url 'admin_batch' %}">Batch Management</a></li>
+                            <li class="{% if request.resolver_match.url_name == 'personal_info_view' %}active{% endif %}"><a href="{% url 'personal_info_view' %}">All Students</a></li>
+                            <li class="{% if request.resolver_match.url_name == 'admin_student_add' %}active{% endif %}"><a href="{% url 'admin_student_add' %}">Add New Student</a></li>
+                            <li class="{% if request.resolver_match.url_name == 'admin_batch' %}active{% endif %}"><a href="{% url 'admin_batch' %}">Batch Management</a></li>
                         </ul>
                     </li>
-                    <li>
+                    <li class="{% if request.resolver_match.url_name in 'admin_trainers admin_trainer_add admin_trainer_schedule' %}active{% endif %}">
                         <a href="#" class="submenu-toggle">
                             <i class="fas fa-chalkboard-teacher"></i>
                             <span>Trainers</span>
                             <i class="fas fa-chevron-right submenu-indicator"></i>
                         </a>
                         <ul class="submenu">
-                            <li><a href="{% url 'admin_trainers' %}">All Trainers</a></li>
-                            <li><a href="{% url 'admin_trainer_add' %}">Add New Trainer</a></li>
-                            <li><a href="{% url 'admin_trainer_schedule' %}">Trainer Schedule</a></li>
+                            <li class="{% if request.resolver_match.url_name == 'admin_trainers' %}active{% endif %}"><a href="{% url 'admin_trainers' %}">All Trainers</a></li>
+                            <li class="{% if request.resolver_match.url_name == 'admin_trainer_add' %}active{% endif %}"><a href="{% url 'admin_trainer_add' %}">Add New Trainer</a></li>
+                            <li class="{% if request.resolver_match.url_name == 'admin_trainer_schedule' %}active{% endif %}"><a href="{% url 'admin_trainer_schedule' %}">Trainer Schedule</a></li>
                         </ul>
                     </li>
-                    <li>
+                    <li class="{% if request.resolver_match.url_name in 'admin_program admin_program_add admin_program_categories' %}active{% endif %}">
                         <a href="#" class="submenu-toggle">
                             <i class="fas fa-graduation-cap"></i>
                             <span>Programs</span>
                             <i class="fas fa-chevron-right submenu-indicator"></i>
                         </a>
                         <ul class="submenu">
-                            <li><a href="{% url 'admin_program' %}">All Programs</a></li>
-                            <li><a href="{% url 'admin_program_add' %}">Add New Program</a></li>
-                            <li><a href="{% url 'admin_program_categories' %}">Program Categories</a></li>
+                            <li class="{% if request.resolver_match.url_name == 'admin_program' %}active{% endif %}"><a href="{% url 'admin_program' %}">All Programs</a></li>
+                            <li class="{% if request.resolver_match.url_name == 'admin_program_add' %}active{% endif %}"><a href="{% url 'admin_program_add' %}">Add New Program</a></li>
+                            <li class="{% if request.resolver_match.url_name == 'admin_program_categories' %}active{% endif %}"><a href="{% url 'admin_program_categories' %}">Program Categories</a></li>
                         </ul>
                     </li>
-                    <li>
+                    <li class="{% if request.resolver_match.url_name in 'admin_classes admin_class_add admin_class_recordings' %}active{% endif %}">
                         <a href="#" class="submenu-toggle">
                             <i class="fas fa-calendar-alt"></i>
                             <span>Classes</span>
                             <i class="fas fa-chevron-right submenu-indicator"></i>
                         </a>
                         <ul class="submenu">
-                            <li><a href="{% url 'admin_classes' %}">All Classes</a></li>
-                            <li><a href="{% url 'admin_class_add' %}">Schedule New Class</a></li>
-                            <li><a href="{% url 'admin_class_recordings' %}">Class Recordings</a></li>
+                            <li class="{% if request.resolver_match.url_name == 'admin_classes' %}active{% endif %}"><a href="{% url 'admin_classes' %}">All Classes</a></li>
+                            <li class="{% if request.resolver_match.url_name == 'admin_class_add' %}active{% endif %}"><a href="{% url 'admin_class_add' %}">Schedule New Class</a></li>
+                            <li class="{% if request.resolver_match.url_name == 'admin_class_recordings' %}active{% endif %}"><a href="{% url 'admin_class_recordings' %}">Class Recordings</a></li>
                         </ul>
                     </li>
-                    <li>
+                    <li class="{% if request.resolver_match.url_name in 'admin_quiz admin_exams admin_results' %}active{% endif %}">
                         <a href="#" class="submenu-toggle">
                             <i class="fas fa-tasks"></i>
                             <span>Assessments</span>
                             <i class="fas fa-chevron-right submenu-indicator"></i>
                         </a>
                         <ul class="submenu">
-                            <li><a href="{% url 'admin_quiz' %}">Quizzes</a></li>
-                            {% comment %} <li><a href="{% url 'admin_classes' %}admin-assignments.html">Assignments</a></li> {% endcomment %}
-                            <li><a href="{% url 'admin_exams' %}">Exams</a></li>
-                            <li><a href="{% url 'admin_results' %}">Results</a></li>
+                            <li class="{% if request.resolver_match.url_name == 'admin_quiz' %}active{% endif %}"><a href="{% url 'admin_quiz' %}">Quizzes</a></li>
+                            {% comment %} <li><a href="{% url 'admin_classes' %}admin-assignments.html">Assignments</a></li> {% endcomment %} 
+                            <li class="{% if request.resolver_match.url_name == 'admin_exams' %}active{% endif %}"><a href="{% url 'admin_exams' %}">Exams</a></li>
+                            <li class="{% if request.resolver_match.url_name == 'admin_results' %}active{% endif %}"><a href="{% url 'admin_results' %}">Results</a></li>
                         </ul>
                     </li>
-                    <li>
+                    <li class="{% if request.resolver_match.url_name in 'admin_partners commissions' %}active{% endif %}">
                         <a href="#" class="submenu-toggle">
                             <i class="fas fa-handshake"></i>
                             <span>Partners</span>
                             <i class="fas fa-chevron-right submenu-indicator"></i>
                         </a>
                         <ul class="submenu">
-                            <li><a href="{% url 'admin_partners' %}">All Partners</a></li>
+                            <li class="{% if request.resolver_match.url_name == 'admin_partners' %}active{% endif %}"><a href="{% url 'admin_partners' %}">All Partners</a></li>
                             {% comment %} <li><a href="admin-partner-applications.html">Applications</a></li> {% endcomment %}
-                            <li><a href="{% url 'commissions' %}">Commissions</a></li>
+                            <li class="{% if request.resolver_match.url_name == 'commissions' %}active{% endif %}"><a href="{% url 'commissions' %}">Commissions</a></li>
                         </ul>
                     </li>
-                    <li>
+                    <li class="{% if request.resolver_match.url_name in 'admin_payments invoices revenue refunds' %}active{% endif %}">
                         <a href="#" class="submenu-toggle">
                             <i class="fas fa-rupee-sign"></i>
                             <span>Finance</span>
                             <i class="fas fa-chevron-right submenu-indicator"></i>
                         </a>
                         <ul class="submenu">
-                            <li><a href="{% url 'admin_payments' %}">Payments</a></li>
-                            <li><a href="{% url 'invoices' %}">Invoices</a></li>
-                            <li><a href="{% url 'revenue' %}">Revenue Reports</a></li>
-                            <li><a href="{% url 'refunds' %}">Refunds</a></li>
+                            <li class="{% if request.resolver_match.url_name == 'admin_payments' %}active{% endif %}"><a href="{% url 'admin_payments' %}">Payments</a></li>
+                            <li class="{% if request.resolver_match.url_name == 'invoices' %}active{% endif %}"><a href="{% url 'invoices' %}">Invoices</a></li>
+                            <li class="{% if request.resolver_match.url_name == 'revenue' %}active{% endif %}"><a href="{% url 'revenue' %}">Revenue Reports</a></li>
+                            <li class="{% if request.resolver_match.url_name == 'refunds' %}active{% endif %}"><a href="{% url 'refunds' %}">Refunds</a></li>
                         </ul>
                     </li>
-                    <li>
+                    <li class="">
                         <a href="{% url 'admin_resources' %}">
                             <i class="fas fa-book"></i>
                             <span>Resources</span>
                         </a>
                     </li>
-                    <li>
+                    <li class="{% if request.resolver_match.url_name in 'admin_announcements support_ticket' %}active{% endif %}">
                         <a href="#" class="submenu-toggle">
                             <i class="fas fa-envelope"></i>
                             <span>Communication</span>
                             <i class="fas fa-chevron-right submenu-indicator"></i>
                         </a>
                         <ul class="submenu">
-                            <li><a href="{% url 'admin_announcements' %}">Announcements</a></li>
+                            <li class="{% if request.resolver_match.url_name == 'admin_announcements' %}active{% endif %}"><a href="{% url 'admin_announcements' %}">Announcements</a></li>
                             {% comment %} <li><a href="admin-email-campaigns.html">Email Campaigns</a></li> {% endcomment %}
-                            <li><a href="{% url 'support_ticket' %}">Support Tickets</a></li>
+                            <li class="{% if request.resolver_match.url_name == 'support_ticket' %}active{% endif %}"><a href="{% url 'support_ticket' %}">Support Tickets</a></li>
                         </ul>
                     </li>
-                    <li>
+                    <li class="{% if request.resolver_match.url_name == 'admin_user' %}active{% endif %}">
                         <a href="#" class="submenu-toggle">
                             <i class="fas fa-cog"></i>
                             <span>Settings</span>
@@ -227,7 +227,7 @@
                         </a>
                         <ul class="submenu">
                             {% comment %} <li><a href="admin-general-settings.html">General Settings</a></li> {% endcomment %}
-                            <li><a href="{% url "admin_user" %}">User Management</a></li>
+                            <li class="{% if request.resolver_match.url_name == 'admin_user' %}active{% endif %}"><a href="{% url "admin_user" %}">User Management</a></li>
                             {% comment %} <li><a href="admin-site-settings.html">Site Settings</a></li> {% endcomment %}
                         </ul>
                     </li>
