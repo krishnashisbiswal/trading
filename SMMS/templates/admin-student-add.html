@@ -340,7 +340,8 @@
             <h2 class="form-title">Student Information</h2>
         </div>
         
-        <form id="student-registration-form">
+        <form id="student-registration-form" method="POST" action="{% url 'admin_student_add' %}">
+            {% csrf_token %}
             <!-- Personal Information Section -->
             <div class="form-section">
                 <h3 class="section-title"><i class="fas fa-user"></i> Personal Information</h3>
@@ -923,21 +924,7 @@
         
         // Form validation and submission
         const registrationForm = document.getElementById('student-registration-form');
-        
-        registrationForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            // Perform validation
-            if (!validateForm()) {
-                return false;
-            }
-            
-            // In a real application, you would submit the form data to the server
-            alert('Student registered successfully!');
-            
-            // Redirect to students list
-            window.location.href = 'admin-students.html';
-        });
+
         
         function validateForm() {
             // Required fields validation
@@ -1050,7 +1037,4 @@
         document.head.appendChild(style);
     });
 </script>
-{% block footer %}
-{% endblock %}
-
 {% endblock %}

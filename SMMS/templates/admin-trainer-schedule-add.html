@@ -520,7 +520,8 @@
                 <span id="formTitle">Schedule New Class</span>
                 <i class="fas fa-times close-btn" id="closeForm"></i>
             </div>
-            <form id="scheduleDataForm">
+            <form id="scheduleDataForm" action="{% url 'admin_trainer_schedule' %}" method="post">
+                {% csrf_token %}
                 <div class="form-body">
                     <input type="hidden" id="scheduleId" name="scheduleId">
                     
@@ -632,13 +633,7 @@
                 scheduleForm.classList.remove('active');
             });
             
-            // Submit form handler
-            scheduleDataForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                // Here you would typically send the data to your backend
-                alert('Class scheduled! In a real application, this would be saved to the database.');
-                scheduleForm.classList.remove('active');
-            });
+            console.log('Trainer Scheduled successfully');
             
             // Search functionality
             const searchInput = document.getElementById('searchInput');

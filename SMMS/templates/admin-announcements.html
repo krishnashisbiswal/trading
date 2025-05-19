@@ -475,7 +475,9 @@
                 <span id="formTitle">Create Announcement</span>
                 <i class="fas fa-times close-btn" id="closeForm"></i>
             </div>
-            <form id="announcementDataForm">
+            <form id="announcementDataForm" method="post">
+                {% csrf_token %}
+                <p>Token: {{ csrf_token }}</p>
                 <div class="form-body">
                     <input type="hidden" id="announcementId" name="announcementId">
                     <input type="hidden" id="formAction" name="formAction" value="add">
@@ -579,10 +581,6 @@
             // Submit form handler
             announcementDataForm.addEventListener('submit', function(e) {
                 e.preventDefault();
-                
-                // Here you would typically send the data to your backend
-                alert('Announcement created successfully! In a real application, this would be saved to the database and published to students.');
-                
                 // Close the form
                 announcementForm.classList.remove('active');
             });

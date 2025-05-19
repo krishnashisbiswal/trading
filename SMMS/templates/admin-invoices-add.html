@@ -611,7 +611,8 @@
                 <span id="formTitle">Create New Invoice</span>
                 <i class="fas fa-times close-btn" id="closeForm"></i>
             </div>
-            <form id="invoiceDataForm">
+            <form id="invoiceDataForm" method="POST" action="{% url 'invoices' %}">
+                {% csrf_token %}
                 <div class="form-body">
                     <input type="hidden" id="invoiceId" name="invoiceId">
                     <input type="hidden" id="formAction" name="formAction" value="add">
@@ -815,6 +816,305 @@
     <script src="{% static 'js/admin.js' %}"></script>
     <script src="{% static 'js/admin-forms.js'%}"></script>
     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+    // Form submission handler
+    const invoiceDataForm = document.getElementById('invoiceDataForm');
+    
+    if (invoiceDataForm) {
+        invoiceDataForm.addEventListener('submit', function(e) {
+            e.preventDefault(); // Prevent default form submission
+            
+            // Get form data
+            const formData = new FormData(this);
+            
+            // Get the CSRF token from the cookie
+            const csrftoken = getCookie('csrftoken');
+            
+            // Send the form data to the server using fetch API
+            fetch(this.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRFToken': csrftoken
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Handle successful response
+                if (data.success) {
+                    // Close the form
+                    document.getElementById('invoiceForm').classList.remove('active');
+                    
+                    // Show success message
+                    alert(data.message || 'Invoice saved successfully.');
+                    
+                    // Reload the page to show updated data
+                    window.location.reload();
+                } else {
+                    // Show error message
+                    alert(data.message || 'Failed to save invoice.');
+                }
+            })
+            .catch(error => {
+                // Show error message
+                console.error('Error:', error);
+                window.location.reload();
+            });
+            
+        })
+    }
+    
+    // View invoice button handler
+    const viewButtons = document.querySelectorAll('.action-btn.view');
+    const invoicePreviewForm = document.getElementById('invoicePreviewForm');
+    const closePreviewForm = document.getElementById('closePreviewForm');
+    
+    viewButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            invoicePreviewForm.classList.add('active');
+        });
+    });
+    
+    // Close preview modal
+    closePreviewForm.addEventListener('click', function() {
+        invoicePreviewForm.classList.remove('active');
+    });
+    
+    // Close when clicking outside
+    invoicePreviewForm.addEventListener('click', function(e) {
+        if (e.target === invoicePreviewForm) {
+            invoicePreviewForm.classList.remove('active');
+        }
+    });
+    
+    // Add/Edit invoice form handling
+    const addInvoiceBtn = document.getElementById('addInvoiceBtn');
+    const invoiceForm = document.getElementById('invoiceForm');
+    const closeForm = document.getElementById('closeForm');
+    const cancelForm = document.getElementById('cancelForm');
+    
+    if (addInvoiceBtn) {
+        addInvoiceBtn.addEventListener('click', function() {
+            // Reset form
+            invoiceDataForm.reset();
+            document.getElementById('formTitle').textContent = 'Create New Invoice';
+            document.getElementById('formAction').value = 'add';
+            
+            // Show form
+            invoiceForm.classList.add('active');
+        });
+    }
+    
+    // Close form buttons
+    if (closeForm) {
+        closeForm.addEventListener('click', function() {
+            invoiceForm.classList.remove('active');
+        });
+    }
+    
+    if (cancelForm) {
+        cancelForm.addEventListener('click', function() {
+            invoiceForm.classList.remove('active');
+        });
+    }
+    
+    // Close when clicking outside
+    invoiceForm.addEventListener('click', function(e) {
+        if (e.target === invoiceForm) {
+            invoiceForm.classList.remove('active');
+        }
+    });
+    
+    // Edit invoice button handler
+    const editButtons = document.querySelectorAll('.action-btn.edit');
+    
+    editButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const row = this.closest('tr');
+            const invoiceId = row.cells[0].textContent;
+            
+            // Simulate fetching invoice data
+            // In a real app, you would fetch this from the server
+            const fakeInvoiceData = {
+                id: invoiceId,
+                student: row.querySelector('.user-details h4').textContent,
+                studentId: '1', // This would be the actual ID from your database
+                program: row.cells[2].textContent,
+                programCode: row.cells[2].textContent === 'Complete Trading Program' ? 'CTP' : 
+                             row.cells[2].textContent === 'Arthavidya Mentorship Program' ? 'AMP' : 
+                             row.cells[2].textContent === 'Growth Mindset Program' ? 'GMP' : 'SIP',
+                batch: 'CTP-APR-2025', // Example batch value
+                issueDate: row.cells[3].textContent,
+                dueDate: row.cells[4].textContent,
+                amount: row.cells[5].textContent.replace('₹', '').replace(',', ''),
+                status: row.cells[6].querySelector('.status-badge').textContent.toLowerCase()
+            };
+            
+            // Populate form with invoice data
+            document.getElementById('invoiceId').value = fakeInvoiceData.id;
+            document.getElementById('invoiceNumber').value = fakeInvoiceData.id;
+            document.getElementById('student').value = fakeInvoiceData.studentId;
+            document.getElementById('program').value = fakeInvoiceData.programCode;
+            document.getElementById('batch').value = fakeInvoiceData.batch;
+            
+            // Format dates for input fields
+            const issueDate = new Date(fakeInvoiceData.issueDate);
+            const dueDate = new Date(fakeInvoiceData.dueDate);
+            
+            document.getElementById('issueDate').value = formatDateForInput(issueDate);
+            document.getElementById('dueDate').value = formatDateForInput(dueDate);
+            
+            document.getElementById('amount').value = fakeInvoiceData.amount;
+            document.getElementById('status').value = fakeInvoiceData.status;
+            
+            // Set form action to edit
+            document.getElementById('formAction').value = 'edit';
+            document.getElementById('formTitle').textContent = 'Edit Invoice';
+            
+            // Show form
+            invoiceForm.classList.add('active');
+        });
+    });
+    
+    // Helper function to format date for input field
+    function formatDateForInput(date) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+    
+    // Function to get CSRF token from cookies
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    
+    // Download button handler
+    const downloadButtons = document.querySelectorAll('.action-btn.download, .invoice-btn.download');
+    downloadButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const invoiceId = this.closest('tr')?.cells[0].textContent || 'INV-25040001';
+            alert(`Downloading invoice ${invoiceId} as PDF... In a real application, this would generate and download a PDF file.`);
+        });
+    });
+    
+    // Print button handler
+    const printButtons = document.querySelectorAll('.invoice-btn.print');
+    printButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            alert('Printing invoice... In a real application, this would open the print dialog.');
+        });
+    });
+    
+    // Send reminder button handler
+    const sendButtons = document.querySelectorAll('.action-btn.send, .invoice-btn.send');
+    sendButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const invoiceId = this.closest('tr')?.cells[0].textContent || 'INV-25040001';
+            const studentName = this.closest('tr')?.querySelector('.user-details h4')?.textContent || 'Rahul Sharma';
+            alert(`Sending invoice/reminder to ${studentName} for invoice ${invoiceId}... In a real application, this would send an email to the student.`);
+        });
+    });
+    
+    // Set current date in form
+    const issueDateInput = document.getElementById('issueDate');
+    const dueDateInput = document.getElementById('dueDate');
+    
+    if (issueDateInput && dueDateInput) {
+        const today = new Date();
+        const dueDate = new Date(today);
+        dueDate.setDate(today.getDate() + 7); // Due date 7 days from today
+        
+        issueDateInput.value = formatDateForInput(today);
+        dueDateInput.value = formatDateForInput(dueDate);
+    }
+    
+    // Filter functionality
+    const filterBtn = document.getElementById('filterBtn');
+    const filterDropdown = document.getElementById('filterDropdown');
+    
+    if (filterBtn && filterDropdown) {
+        filterBtn.addEventListener('click', function() {
+            filterDropdown.classList.toggle('active');
+        });
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!filterBtn.contains(e.target) && !filterDropdown.contains(e.target)) {
+                filterDropdown.classList.remove('active');
+            }
+        });
+        
+        // Apply filter button
+        const applyFilterBtn = document.getElementById('applyFilterBtn');
+        if (applyFilterBtn) {
+            applyFilterBtn.addEventListener('click', function() {
+                // Collect filter values
+                const status = document.getElementById('statusFilter').value;
+                const program = document.getElementById('programFilter').value;
+                const startDate = document.getElementById('startDateFilter').value;
+                const endDate = document.getElementById('endDateFilter').value;
+                
+                // In a real app, you would send these to the server or filter client-side
+                alert(`Filters applied!\nStatus: ${status || 'All'}\nProgram: ${program || 'All'}\nDate Range: ${startDate || 'Any'} to ${endDate || 'Any'}`);
+                
+                filterDropdown.classList.remove('active');
+            });
+        }
+        
+        // Reset filter button
+        const resetFilterBtn = document.getElementById('resetFilterBtn');
+        if (resetFilterBtn) {
+            resetFilterBtn.addEventListener('click', function() {
+                document.getElementById('statusFilter').value = '';
+                document.getElementById('programFilter').value = '';
+                document.getElementById('startDateFilter').value = '';
+                document.getElementById('endDateFilter').value = '';
+                
+                filterDropdown.classList.remove('active');
+            });
+        }
+    }
+    
+    // Search functionality
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            const searchValue = this.value.toLowerCase();
+            
+            // In a real app, you might want to debounce this or handle server-side search
+            // This is a simple client-side example
+            const rows = document.querySelectorAll('#invoicesTable tbody tr');
+            
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                if (text.includes(searchValue)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+    }
+});
         document.addEventListener('DOMContentLoaded', function() {
             // View invoice button handler
             const viewButtons = document.querySelectorAll('.action-btn.view');

@@ -348,18 +348,20 @@
                                 <button class="btn-text">View All</button>
                             </div>
                         </div>
+                        {% for ticket in ticketsx %}
                         <div class="card-body">
                             <div class="tickets-list">
                                 <div class="ticket-item">
                                     <div class="ticket-priority high"></div>
                                     <div class="ticket-content">
-                                        <h4>Unable to access class recordings</h4>
-                                        <p>Submitted by: Amit Kumar | 1 hour ago</p>
+                                        <h4>{{ticket.message}}</h4>
+                                        <p>Submitted by: Amit Kumar | {{ ticket.created_at }}</p>
                                     </div>
                                     <div class="ticket-status new">
-                                        <span>New</span>
+                                        <span>{{ ticket.status }}</span>
                                     </div>
                                 </div>
+                                {% endfor %}
                                 <div class="ticket-item">
                                     <div class="ticket-priority medium"></div>
                                     <div class="ticket-content">
