@@ -2,8 +2,88 @@
 from django.db import models
 import MySQLdb
 from django.conf import settings
+import json
 
+class Student(models.Model):
+    @classmethod
+    def add_student(cls, data):
+        print("Data to be inserted:")
+        print(f"first_name: {data.get('first_name')}")
+        """Save data directly to MySQL using raw SQL"""
+        db_settings = settings.DATABASES['default']
 
+        # Connect to MySQL database
+        db = MySQLdb.connect(
+            host=db_settings['HOST'],
+            user=db_settings['USER'],
+            passwd=db_settings['PASSWORD'],
+            db=db_settings['NAME'],
+            port=int(db_settings['PORT']),
+        )
+
+        cursor = db.cursor()
+
+        # Create SQL query for insertion
+        query = """
+        INSERT INTO students 
+        (first_name, last_name, email, phone, dob, address_line1 , address_line2 , city , state , postal_code , country , program, batch, referral_source, notes, payment_status, payment_method, amount_paid, transaction_id , invoice_number, payment_date, username , password)  
+        VALUES (%s, %s, %s, %s, %s, %s , %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s , %s, %s , %s) 
+        """
+        # Execute the query with data
+        cursor.execute(query, (
+                data.get('first_name', ''),
+                data.get('last_name', ''),
+                data.get('email', ''),
+                data.get('phone', ''),
+                data.get('dob', ''),
+                data.get('address_line1', ''),
+                data.get('address_line2', ''),
+                data.get('city', ''),
+                data.get('state', ''),
+                data.get('postal_code', ''),
+                data.get('country', ''),
+                data.get('program', ''),
+                data.get('batch', ''),
+                data.get('referral_source', ''),
+                data.get('notes', ''),
+                data.get('payment_status', ''),
+                data.get('payment_method', ''),
+                data.get('amount_paid', ''),
+                data.get('transaction_id', ''),
+                data.get('invoice_number', ''),
+                data.get('payment_date', ''),
+                data.get('username', ''),
+                data.get('password', '')
+            ))
+            # Commit the transaction
+        db.commit()
+        if cursor:
+            cursor.close()
+            # Close the connection
+        db.close()
+
+        return True 
+
+    @classmethod
+    def get_all_students(cls):
+
+        db_settings = settings.DATABASES['default']
+
+        db = MySQLdb.connect(
+            host=db_settings['HOST'],
+            user=db_settings['USER'],
+            passwd=db_settings['PASSWORD'],
+            db=db_settings['NAME'],
+            port=int(db_settings['PORT']),
+        )
+
+        cursor = db.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute("SELECT * FROM students")
+        # Fetch all results
+        results = cursor.fetchall()
+        db.close()
+        return results
+    
 class PersonalInformation(models.Model):
     @classmethod
     def save_to_mysql(cls, data):
@@ -185,24 +265,24 @@ class reg(models.Model):
 
         return True
 
-class support_ticket(models.Model):
+class support_ticketx(models.Model):
     @classmethod
     def add_support_ticket(cls, data):
         """Save data directly to MySQL using raw SQL"""
 
         # Connect to MySQL database
-        # db_settings = settings.DATABASES['default']
-        #
-        # # Connect to MySQL database
-        # db = MySQLdb.connect(
-        #     host=db_settings['HOST'],
-        #     user=db_settings['USER'],
-        #     passwd=db_settings['PASSWORD'],
-        #     db=db_settings['NAME'],
-        #     port=int(db_settings['PORT']),
-        # )
+        db_settings = settings.DATABASES['default']
 
-       # cursor = db.cursor()
+        # Connect to MySQL database
+        db = MySQLdb.connect(
+            host=db_settings['HOST'],
+            user=db_settings['USER'],
+            passwd=db_settings['PASSWORD'],
+            db=db_settings['NAME'],
+            port=int(db_settings['PORT']),
+        )
+
+        cursor = db.cursor()
 
         # Create SQL query for insertion
 
@@ -213,26 +293,584 @@ class support_ticket(models.Model):
         print(f"message: {data.get('ticket_message')}")
         print(f"attachment: {data.get('ticket_attachment')}")
 
-        # query = """
-        # INSERT INTO support_tickets
-        # (ticket_subject,ticket_priority,ticket_category,ticket_message)
-        # VALUES (%s, %s, %s, %s, %s,)
-        # """
-        #
-        # # Execute the query with data
-        # cursor.execute(query, (
-        #     data.get('ticket_subject', ''),
-        #     data.get('ticket_priority', ''),
-        #     data.get('ticket_category', ''),
-        #     data.get('ticket_message', ''),
-        #     data.get('ticket_message', ''),
-        #     data.get('ticket_attachment', '')
-        # ))
-        # # Commit the transaction
-        # db.commit()
-        # if cursor:
-        #     cursor.close()
-        # # Close the connection
-        # db.close()
+        query = """
+        INSERT INTO support_tickets
+        (subject, proirity, category, message, attachment)
+        VALUES (%s, %s, %s, %s, %s)
+        """
+
+        # Execute the query with data
+        cursor.execute(query, (
+            data.get('ticket_subject', ''),
+            data.get('ticket_priority', ''),
+            data.get('ticket_category', ''),
+            data.get('ticket_message', ''),
+            data.get('ticket_attachment', '')
+        ))
+        # Commit the transaction
+        db.commit()
+        if cursor:
+            cursor.close()
+        # Close the connection
+        db.close()
         return True
 
+    @classmethod
+    def get_all_tickets(cls):
+        """Fetch all support tickets from the database"""
+
+        db_settings = settings.DATABASES['default']
+
+        db = MySQLdb.connect(
+            host=db_settings['HOST'],
+            user=db_settings['USER'],
+            passwd=db_settings['PASSWORD'],
+            db=db_settings['NAME'],
+            port=int(db_settings['PORT']),
+        )
+
+        cursor = db.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute("SELECT * FROM support_tickets ORDER BY id DESC")
+        results = cursor.fetchall()
+        db.close()
+        return results
+
+class Batch(models.Model):
+    @classmethod
+    def add_batch(cls, data):
+        print("Data to be inserted:")
+        print(f"subject: {data.get('batch_code')}")
+        print(f"priority: {data.get('batch_name')}")
+
+        db_settings = settings.DATABASES['default']
+        db = MySQLdb.connect(
+            host=db_settings['HOST'],
+            user=db_settings['USER'],
+            passwd=db_settings['PASSWORD'],
+            db=db_settings['NAME'],
+            port=int(db_settings['PORT']),
+        )
+        cursor = db.cursor()
+        query = """
+        INSERT INTO batch_management
+        (batch_code, batch_name, program, capacity, trainer, status, start_date, end_date, description)
+        VALUES (%s, %s, %s, %s ,%s, %s, %s, %s , %s)
+        """
+        cursor.execute(query, (
+            data.get('batch_code', ''),
+            data.get('batch_name', ''),
+            data.get('program', ''),
+            data.get('start_date', ''),
+            data.get('end_date', ''),
+            data.get('capacity', ''),
+            data.get('status', ''),
+            data.get('trainer', ''),
+            data.get('description', '')
+        ))
+        db.commit()
+        if cursor:
+            cursor.close()
+        db.close()
+        return True
+
+    @classmethod
+    def get_all_batches(cls):
+        db_settings = settings.DATABASES['default']
+        db = MySQLdb.connect(
+            host=db_settings['HOST'],
+            user=db_settings['USER'],
+            passwd=db_settings['PASSWORD'],
+            db=db_settings['NAME'],
+            port=int(db_settings['PORT']),
+        )
+        cursor = db.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute("SELECT * FROM batch_management ORDER BY id DESC")
+        results = cursor.fetchall()
+        db.close()
+        return results
+
+class Trainer(models.Model):
+    @classmethod
+    def add_trainer(cls, data, ):
+        print("Data to be inserted:")
+        print(f"subject: {data.get('first_name')}")
+        print(f"priority: {data.get('last_name')}")
+        db_settings = settings.DATABASES['default']
+        db = MySQLdb.connect(
+            host=db_settings['HOST'],
+            user=db_settings['USER'],
+            passwd=db_settings['PASSWORD'],
+            db=db_settings['NAME'],
+            port=int(db_settings['PORT']),
+        )
+        cursor = db.cursor()
+
+        # Convert list fields to JSON strings
+        # expertise_areas_json = json.dumps(data.get('expertise_areas', []))
+        # certifications_json = json.dumps(data.get('certifications', []))
+        # programs_json = json.dumps(data.get('programs', []))
+        # specific_modules_json = json.dumps(data.get('specific_modules', []))
+        #
+        # # Handle profile_picture_file saving logic as needed (e.g., save to media folder)
+        # For now, store filename or path as string
+        # profile_picture_path = profile_picture_file.name if profile_picture_file else ''
+
+        query = """
+        INSERT INTO trainers
+        (first_name, last_name, email, phone, dob, gender,
+         address_line1, address_line2, city, state, postal_code, country,
+         designation, experience_years, teaching_experience, bio, hourly_rate,
+         max_hours_weekly, create_account, username, password, linkedin_profile, website, notes)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
+
+        cursor.execute(query, (
+            data.get('first_name', ''),
+            data.get('last_name', ''),
+            data.get('email', ''),
+            data.get('phone', ''),
+            data.get('dob', ''),
+            data.get('gender', ''),
+            data.get('address_line1', ''),
+            data.get('address_line2', ''),
+            data.get('city', ''),
+            data.get('state', ''),
+            data.get('postal_code', ''),
+            data.get('country', ''),
+            data.get('designation', ''),
+            data.get('experience_years', 0),
+            data.get('teaching_experience', 0),
+            # expertise_areas_json,
+            # certifications_json,
+            data.get('bio', ''),
+            # programs_json,
+            # specific_modules_json,
+            data.get('hourly_rate', 0),
+            data.get('max_hours_weekly', 20),
+            int(data.get('create_account', False)),
+            data.get('username', ''),
+            data.get('password', ''),
+            data.get('linkedin_profile', ''),
+            data.get('website', ''),
+            data.get('notes', ''),
+        ))
+
+        db.commit()
+        if cursor:
+            cursor.close()
+        db.close()
+        return True
+
+    @classmethod
+    def get_all_trainers(cls):
+        db_settings = settings.DATABASES['default']
+        db = MySQLdb.connect(
+            host=db_settings['HOST'],
+            user=db_settings['USER'],
+            passwd=db_settings['PASSWORD'],
+            db=db_settings['NAME'],
+            port=int(db_settings['PORT']),
+        )
+        cursor = db.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute("SELECT * FROM trainers ORDER BY id DESC")
+        results = cursor.fetchall()
+        db.close()
+        return results
+
+class TrainerSchedule(models.Model):
+    @classmethod
+    def add_schedule(cls, data):
+        print("Data to be inserted:")
+        print(f"subject: {data.get('program')}")
+        print(f"priority: {data.get('batch')}")
+        db_settings = settings.DATABASES['default']
+        db = MySQLdb.connect(
+            host=db_settings['HOST'],
+            user=db_settings['USER'],
+            passwd=db_settings['PASSWORD'],
+            db=db_settings['NAME'],
+            port=int(db_settings['PORT']),
+        )
+        cursor = db.cursor()
+        query = """
+        INSERT INTO trainer_schedules
+        (program, batch, topic, description, class_date, trainer, start_time, end_time, meeting_link, meeting_password)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
+        cursor.execute(query, (
+            data.get('program', ''),
+            data.get('batch', ''),
+            data.get('topic', ''),
+            data.get('description', ''),
+            data.get('class_date', ''),
+            data.get('trainer', ''),
+            data.get('start_time', ''),
+            data.get('end_time', ''),
+            data.get('meeting_link', ''),
+            data.get('meeting_password', ''),
+        ))
+        db.commit()
+        if cursor:
+            cursor.close()
+        db.close()
+        return True
+
+    @classmethod
+    def get_all_schedules(cls):
+        db_settings = settings.DATABASES['default']
+        db = MySQLdb.connect(
+            host=db_settings['HOST'],
+            user=db_settings['USER'],
+            passwd=db_settings['PASSWORD'],
+            db=db_settings['NAME'],
+            port=int(db_settings['PORT']),
+        )
+        cursor = db.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute("SELECT * FROM trainer_schedules ORDER BY class_date DESC, start_time DESC")
+        results = cursor.fetchall()
+        db.close()
+        return results
+
+class Program(models.Model):
+    @classmethod
+    def add_program(cls, data, program_image_file=None):
+        print("Data to be inserted:")
+        print(f"subject: {data.get('title')}")
+        print(f"priority: {data.get('duration_months')}")
+        db_settings = settings.DATABASES['default']
+        db = MySQLdb.connect(
+            host=db_settings['HOST'],
+            user=db_settings['USER'],
+            passwd=db_settings['PASSWORD'],
+            db=db_settings['NAME'],
+            port=int(db_settings['PORT']),
+        )
+        cursor = db.cursor()
+
+        # Handle program_image_file saving logic as needed (e.g., save to media folder)
+        # For now, store filename or path as string
+        program_image_path = program_image_file.name if program_image_file else ''
+
+        query = """
+        INSERT INTO programs
+        (title, duration_months, num_classes, students_enrolled, price, revenue, rating, completion_percentage,
+         description, status, is_featured, image)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
+
+        cursor.execute(query, (
+            data.get('title', ''),
+            data.get('duration_months', 0),
+            data.get('num_classes', 0),
+            data.get('students_enrolled', 0),
+            data.get('price', 0.0),
+            data.get('revenue', ''),
+            data.get('rating', 0.0),
+            data.get('completion_percentage', 0),
+            data.get('description', ''),
+            data.get('status', ''),
+            int(data.get('is_featured', False)),
+            program_image_path,
+        ))
+        db.commit()
+        if cursor:
+            cursor.close()
+        db.close()
+        return True
+            
+    @classmethod
+    def get_all_programs(cls):
+        db_settings = settings.DATABASES['default']
+        db = MySQLdb.connect(
+            host=db_settings['HOST'],
+            user=db_settings['USER'],
+            passwd=db_settings['PASSWORD'],
+            db=db_settings['NAME'],
+            port=int(db_settings['PORT']),
+        )
+        cursor = db.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute("SELECT * FROM programs")
+        results = cursor.fetchall()
+        db.close()
+        return results
+
+class Class(models.Model):
+    @classmethod
+    def add_class(cls, data):
+        print("Data to be inserted:")
+        print(f"subject: {data.get('class_title')}")
+        print(f"priority: {data.get('class_title')}")
+        db_settings = settings.DATABASES['default']
+        db = MySQLdb.connect(
+            host=db_settings['HOST'],
+            user=db_settings['USER'],
+            passwd=db_settings['PASSWORD'],
+            db=db_settings['NAME'],
+            port=int(db_settings['PORT']),
+        )
+        cursor = db.cursor()
+        query = """
+        INSERT INTO classes
+        (class_title, program, batch, description, class_date, start_time, end_time, duration,
+         trainer, platform, meeting_link, meeting_password, prerequisites, materials, notes)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
+        cursor.execute(query, (
+            data.get('class_title', ''),
+            data.get('program', ''),
+            data.get('batch', ''),
+            data.get('description', ''),
+            data.get('class_date', ''),
+            data.get('start_time', ''),
+            data.get('end_time', ''),
+            data.get('duration', 0),
+            data.get('trainer', ''),
+            data.get('platform', ''),
+            data.get('meeting_link', ''),
+            data.get('meeting_password', ''),
+            data.get('prerequisites', ''),
+            data.get('materials', ''),
+            data.get('notes', ''),
+        ))
+        db.commit()
+        if cursor:
+            cursor.close()
+        db.close()
+        return True
+
+    @classmethod
+    def get_all_classes(cls):
+        db_settings = settings.DATABASES['default']
+        db = MySQLdb.connect(
+            host=db_settings['HOST'],
+            user=db_settings['USER'],
+            passwd=db_settings['PASSWORD'],
+            db=db_settings['NAME'],
+            port=int(db_settings['PORT']),
+        )
+        cursor = db.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute("SELECT * FROM classes ORDER BY class_date DESC, start_time DESC")
+        results = cursor.fetchall()
+        db.close()
+        return results
+        
+class commissionx(models.Model):
+    @classmethod
+    def add_commission(cls, data):
+        print("Data to be inserted:")
+        print(f"subject: {data.get('partner')}")
+        print(f"priority: {data.get('transaction_id')}")
+        db_settings = settings.DATABASES['default']
+        db = MySQLdb.connect(
+            host=db_settings['HOST'],
+            user=db_settings['USER'],
+            passwd=db_settings['PASSWORD'],
+            db=db_settings['NAME'],
+            port=int(db_settings['PORT']),
+        )
+        cursor = db.cursor()
+        
+        query = """
+        INSERT INTO commissions
+        (transaction_id, partner, referred_student, program, amount, processing_fee, status, notes)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+        """
+        
+        cursor.execute(query, (
+            data.get('transaction_id', ''),
+            data.get('partner', ''),
+            data.get('referred_student', ''),
+            data.get('program', ''),
+            data.get('amount', 0),
+            data.get('processing_fee', 0),
+            data.get('date', ''),
+            data.get('status', 'pending'),
+            data.get('notes', '')
+        ))
+        
+        db.commit()
+        cursor.close()
+        db.close()
+        return True
+
+    @classmethod
+    def get_all_commissions(cls):
+        db_settings = settings.DATABASES['default']
+        db = MySQLdb.connect(
+            host=db_settings['HOST'],
+            user=db_settings['USER'],
+            passwd=db_settings['PASSWORD'],
+            db=db_settings['NAME'],
+            port=int(db_settings['PORT']),
+        )
+        cursor = db.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute("SELECT * FROM commissions")
+        results = cursor.fetchall()
+        db.close()
+        return results
+
+class invoicex(models.Model):
+    @classmethod
+    def add_invoice(cls, data):
+        print("Data to be inserted:")
+        print(f"subject: {data.get('invoice_number')}")
+        print(f"priority: {data.get('student')}")
+        db_settings = settings.DATABASES['default']
+        db = MySQLdb.connect(
+            host=db_settings['HOST'],
+            user=db_settings['USER'],
+            passwd=db_settings['PASSWORD'],
+            db=db_settings['NAME'],
+            port=int(db_settings['PORT']),
+        )
+        cursor = db.cursor()
+        
+        query = """
+        INSERT INTO invoices
+        (invoice_number, student, program, batch, issue_date, due_date, 
+         amount, status, notes)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
+        
+        cursor.execute(query, (
+            data.get('invoice_number', ''),
+            data.get('student', ''),
+            data.get('program', ''),
+            data.get('batch', ''),
+            data.get('issue_date', ''),
+            data.get('due_date', ''),
+            data.get('amount', 0),
+            data.get('status', 'pending'),
+            data.get('notes', '')
+        ))
+        
+        db.commit()
+        cursor.close()
+        db.close()
+        return True
+
+    @classmethod
+    def get_all_invoices(cls):
+        db_settings = settings.DATABASES['default']
+        db = MySQLdb.connect(
+            host=db_settings['HOST'],
+            user=db_settings['USER'],
+            passwd=db_settings['PASSWORD'],
+            db=db_settings['NAME'],
+            port=int(db_settings['PORT']),
+        )
+        cursor = db.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute("SELECT * FROM invoices ORDER BY issue_date DESC")
+        results = cursor.fetchall()
+        db.close()
+        return results
+
+class announcementx(models.Model):
+    @classmethod
+    def add_announcement(cls, data):
+        print("Data to be inserted:")
+        print(f"subject: {data.get('title')}")
+        print(f"priority: {data.get('message')}")
+        db_settings = settings.DATABASES['default']
+        db = MySQLdb.connect(
+            host=db_settings['HOST'],
+            user=db_settings['USER'],
+            passwd=db_settings['PASSWORD'],
+            db=db_settings['NAME'],
+            port=int(db_settings['PORT']),
+        )
+        cursor = db.cursor()
+        
+        query = """
+        INSERT INTO announcements
+        (title, message, audience, program, batch, expiry_date, is_important, created_date, created_by)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
+        
+        cursor.execute(query, (
+            data.get('title', ''),
+            data.get('message', ''),
+            data.get('audience', 'all'),
+            data.get('program', ''),
+            data.get('batch', ''),
+            data.get('expiry_date', ''),
+            data.get('is_important', False),
+            data.get('created_date', datetime.now().strftime('%Y-%m-%d')),
+            data.get('created_by', 'Admin')
+        ))
+        
+        db.commit()
+        cursor.close()
+        db.close()
+        return True
+
+    @classmethod
+    def get_all_announcements(cls):
+        db_settings = settings.DATABASES['default']
+        db = MySQLdb.connect(
+            host=db_settings['HOST'],
+            user=db_settings['USER'],
+            passwd=db_settings['PASSWORD'],
+            db=db_settings['NAME'],
+            port=int(db_settings['PORT']),
+        )
+        cursor = db.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute("SELECT * FROM announcements")
+        results = cursor.fetchall()
+        db.close()
+        return results
+
+class refundx(models.Model):
+    @classmethod
+    def add_refund(cls, data):
+        print("Data to be inserted:")
+        print(f"subject: {data.get('refund_number')}")
+        print(f"priority: {data.get('student')}")
+        db_settings = settings.DATABASES['default']
+        db = MySQLdb.connect(
+            host=db_settings['HOST'],
+            user=db_settings['USER'],
+            passwd=db_settings['PASSWORD'],
+            db=db_settings['NAME'],
+            port=int(db_settings['PORT']),
+        )
+        cursor = db.cursor()
+        
+        query = """
+        INSERT INTO refunds
+        (refund_number, student, program, enrollment_id, request_date, amount, reason, status, notes)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
+        
+        cursor.execute(query, (
+            data.get('refund_number', 0),
+            data.get('student', ''),
+            data.get('program', ''),
+            data.get('enrollment_id', ''),
+            data.get('request_date', ''),
+            data.get('amount', 0),
+            data.get('reason', ''),
+            data.get('status', 'pending'),
+            data.get('notes', '')
+        ))
+        
+        db.commit()
+        cursor.close()
+        db.close()
+        return True
+
+    @classmethod
+    def get_all_refunds(cls):
+        db_settings = settings.DATABASES['default']
+        db = MySQLdb.connect(
+            host=db_settings['HOST'],
+            user=db_settings['USER'],
+            passwd=db_settings['PASSWORD'],
+            db=db_settings['NAME'],
+            port=int(db_settings['PORT']),
+        )
+        cursor = db.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute("SELECT * FROM refunds")
+        results = cursor.fetchall()
+        db.close()
+        return results

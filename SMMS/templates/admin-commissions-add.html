@@ -553,7 +553,9 @@
                 <span id="formTitle">Add Manual Commission</span>
                 <i class="fas fa-times close-btn" id="closeForm"></i>
             </div>
-            <form id="commissionDataForm">
+            <form id="commissionDataForm" method="POST" action="{% url 'commissions' %}">
+                {% csrf_token %}
+                <p>Token: {{ csrf_token }}</p>
                 <div class="form-body">
                     <input type="hidden" id="commissionId" name="commissionId">
                     <input type="hidden" id="formAction" name="formAction" value="add">

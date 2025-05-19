@@ -408,7 +408,8 @@
             <h2 class="form-title">Trainer Information</h2>
         </div>
         
-        <form id="trainer-registration-form">
+        <form id="trainer-registration-form" action="{% url 'admin_trainer_add' %}" method="post">
+            {% csrf_token %}
             <!-- Personal Information Section -->
             <div class="form-section">
                 <h3 class="section-title"><i class="fas fa-user"></i> Personal Information</h3>
@@ -457,7 +458,6 @@
                     <div class="file-upload-container">
                         <input type="file" id="profile_picture" name="profile_picture" class="file-input" accept="image/*">
                         <div class="file-upload-btn">
-                            <i class="fas fa-cloud-upload-alt"><input type="file" id="profile_pc"/></i>
                         </div>
                     </div>
                     <div class="form-text">Maximum file size: 2MB. Recommended dimensions: 300x300px</div>
@@ -569,7 +569,7 @@
                         <label>Assign to Programs <span class="required">*</span></label>
                         <div class="checkbox-container">
                             <div class="form-check">
-                                <input type="checkbox" id="program_ctp" name="programs[]" value="ctp">
+                                <input type="checkbox" id="program_ctp" name="programs" value="ctp">
                                 <label for="program_ctp">Complete Trading Program (CTP)</label>
                             </div>
                             <div class="form-check">

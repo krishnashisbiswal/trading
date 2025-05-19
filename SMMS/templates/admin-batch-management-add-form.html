@@ -331,7 +331,8 @@
                 <span id="formTitle">Create New Batch</span>
                 <i class="fas fa-times close-btn" id="closeForm"></i>
             </div>
-            <form id="batchDataForm">
+            <form id="batchDataForm" action="{% url 'admin_batch' %}" method="post">
+                {% csrf_token %}
                 <div class="form-body">
                     <input type="hidden" id="batchId" name="batchId">
                     
@@ -386,7 +387,7 @@
                     
                     <div class="form-row">
                         <label for="trainerAssignment">Assign Trainers</label>
-                        <select id="trainerAssignment" name="trainerAssignment[]" multiple size="4">
+                        <select id="trainerAssignment" name="trainerAssignment" multiple size="4">
                             <option value="1">Andaz Aaron (Main Trainer)</option>
                             <option value="2">Kanheyalal Jena (Co-Trainer)</option>
                             <option value="3">Prashanta Kumar Palei (Main Trainer)</option>
@@ -437,13 +438,8 @@
             });
             
             // Submit form handler
-            batchDataForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                // Here you would typically send the data to your backend
-                alert('Batch data submitted! In a real application, this would be saved to the database.');
-                batchForm.classList.remove('active');
-            });
-            
+
+
             // Edit batch handlers (for demonstration)
             const editButtons = document.querySelectorAll('.action-btn.edit');
             editButtons.forEach(button => {

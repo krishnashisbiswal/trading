@@ -589,7 +589,8 @@
                 <span id="formTitle">Create Refund</span>
                 <i class="fas fa-times close-btn" id="closeForm"></i>
             </div>
-            <form id="refundDataForm">
+            <form id="refundDataForm" method="post" action="{% url "refund" %}"> 
+                {% csrf_token %}
                 <div class="form-body">
                     <input type="hidden" id="refundId" name="refundId">
                     <input type="hidden" id="formAction" name="formAction" value="add">

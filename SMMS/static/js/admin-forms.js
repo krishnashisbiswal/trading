@@ -76,23 +76,23 @@ function initializeFormHandlers() {
         });
         
         // Submit form handler
-        if (dataForm) {
-            dataForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                const formData = new FormData(dataForm);
-                const formAction = formData.get('formAction') || 'add';
-                
-                // Here you would typically send the data to your backend
-                console.log(`${formPrefix} form submitted with action: ${formAction}`);
-                console.log('Form data:', Object.fromEntries(formData));
-                
-                // Show success message (in a real app, this would be after successful API call)
-                alert(`${formPrefix.charAt(0).toUpperCase() + formPrefix.slice(1)} ${formAction === 'add' ? 'added' : 'updated'} successfully! In a real application, this would be saved to the database.`);
-                
-                // Close the form
-                form.classList.remove('active');
-            });
-        }
+        // if (dataForm) {
+        //     dataForm.addEventListener('submit', function(e) {
+        //         e.preventDefault();
+        //         const formData = new FormData(dataForm);
+        //         const formAction = formData.get('formAction') || 'add';
+        //         //
+        //         // // Here you would typically send the data to your backend
+        //         // console.log(`${formPrefix} form submitted with action: ${formAction}`);
+        //         // console.log('Form data:', Object.fromEntries(formData));
+        //         //
+        //         // // Show success message (in a real app, this would be after successful API call)
+        //         // alert(`${formPrefix.charAt(0).toUpperCase() + formPrefix.slice(1)} ${formAction === 'add' ? 'added' : 'updated'} successfully! In a real application, this would be saved to the database.`);
+        //         //
+        //         // Close the form
+        //         form.classList.remove('active');
+        //     });
+        // }
     });
     
     // Handle edit buttons

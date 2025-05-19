@@ -8,7 +8,11 @@ from .models import *
 from datetime import datetime
 import json
 from django.http import JsonResponse
-
+from django.views.decorators.csrf import csrf_protect
+from phonepe.sdk.pg.payments.v2.standard_checkout_client import StandardCheckoutClient
+from phonepe.sdk.pg.env import Env
+from uuid import uuid4
+from phonepe.sdk.pg.payments.v2.models.request.standard_checkout_pay_request import StandardCheckoutPayRequest
 
 def personal_info_view(request):
     print(f"Method: {request.method}")
@@ -124,7 +128,61 @@ def admin_dashboard(request):
     return render(request, 'admin-dashboard.html')
 
 def admin_class_add(request):
-    return render(request, 'admin-class-add.html')
+    if request.method == 'POST':
+        print("POST data:", request.POST)
+        class_title = request.POST.get('class_title', '')
+        program = request.POST.get('program', '')
+        batch = request.POST.get('batch', '')
+        description = request.POST.get('description', '')
+        class_date = request.POST.get('class_date', '')
+        start_hour = request.POST.get('start_hour', '')
+        start_minute = request.POST.get('start_minute', '')
+        end_hour = request.POST.get('end_hour', '')
+        end_minute = request.POST.get('end_minute', '')
+        duration = int(request.POST.get('duration', 0))
+        trainer = request.POST.get('trainer', '')
+        platform = request.POST.get('platform', '')
+        meeting_link = request.POST.get('meeting_link', '')
+        meeting_password = request.POST.get('meeting_password', '')
+        prerequisites = request.POST.get('prerequisites', '')
+        materials = request.POST.get('materials', '')
+        notes = request.POST.get('notes', '')
+        start_time = f"{start_hour}:{start_minute}"
+        end_time = f"{end_hour}:{end_minute}"
+
+        if not all([class_title, program, batch, class_date, start_hour, start_minute, end_hour, end_minute, trainer, platform]):
+            messages.error(request, 'Please fill in all required fields.')
+        else:
+            try:
+                form_data = {
+                    'class_title': class_title,
+                    'program': program,
+                    'batch': batch,
+                    'description': description,
+                    'class_date': class_date,
+                    'start_time': start_time,
+                    'end_time': end_time,
+                    'duration': duration,
+                    'trainer': trainer,
+                    'platform': platform,
+                    'meeting_link': meeting_link,
+                    'meeting_password': meeting_password,
+                    'prerequisites': prerequisites,
+                    'materials': materials,
+                    'notes': notes,
+                }
+                result = Class.add_class(form_data)
+                if result:
+                    messages.success(request, 'Class scheduled successfully!')
+                    return redirect('admin_class_add')
+                else:
+                    messages.error(request, 'Failed to schedule class. Check server logs.')
+            except Exception as e:
+                messages.error(request, f'Error scheduling class: {str(e)}')
+
+    classes = Class.get_all_classes()
+    return render(request, 'admin-class-add.html', {'classes': classes})
+
 
 def admin_classes(request):
     return render(request, 'admin-classes.html')
@@ -195,7 +253,44 @@ def reg(request):
     return render(request, 'reg.html')
 
 def admin_announcements(request):
-    return render(request, 'admin-announcements.html')
+    if request.method == 'POST':
+        title = request.POST.get('title', '')
+        message = request.POST.get('message', '')
+        audience = request.POST.get('audience', '')
+        program = request.POST.get('program', '')
+        batch = request.POST.get('batch', '')
+        expiry_date = request.POST.get('expiryDate', '')
+        is_important = request.POST.get('isImportant') == 'on'
+        created_date = datetime.now().strftime('%Y-%m-%d')
+        created_by = "Admin"  # You can get this from the logged-in user
+
+        if not all([title, message, audience]):
+            messages.error(request, 'Please fill in all required fields.')
+        else:
+            try:
+                form_data = {
+                    'title': title,
+                    'message': message,
+                    'audience': audience,
+                    'program': program if audience == 'program' else '',
+                    'batch': batch if audience == 'batch' else '',
+                    'expiry_date': expiry_date,
+                    'is_important': is_important,
+                    'created_date': created_date,
+                    'created_by': created_by
+                }
+                result = announcementx.add_announcement(form_data)
+                if result:
+                    messages.success(request, 'Announcement published successfully!')
+                    return redirect('announcements')
+                else:
+                    messages.error(request, 'Failed to publish announcement. Check server logs.')
+            except Exception as e:
+                messages.error(request, f'Error publishing announcement: {str(e)}')
+
+    announcements_list = announcementx.get_all_announcements()
+    return render(request, 'admin-announcements.html', {'announcements': announcements_list})
+
 
 def success_stories(request):
     return render(request, 'success-stories.html')
@@ -275,10 +370,128 @@ def add_quiz(request):
     return render(request, 'admin-quizzes.html', {'personal_infos': personal_infos})
 
 def admin_trainer_add(request):
-    return render(request, 'admin-trainer-add.html')
+        if request.method == 'POST':
+        # Extract form data
+            print("POST data:", request.POST)
+            first_name = request.POST.get('first_name', '')
+            last_name = request.POST.get('last_name', '')
+            email = request.POST.get('email', '')
+            phone = request.POST.get('phone', '')
+            dob = request.POST.get('dob', '')
+            gender = request.POST.get('gender', '')
+            profile_picture_file = request.FILES.get('profile_picture')
+            address_line1 = request.POST.get('address_line1', '')
+            address_line2 = request.POST.get('address_line2', '')
+            city = request.POST.get('city', '')
+            state = request.POST.get('state', '')
+            postal_code = request.POST.get('postal_code', '')
+            country = request.POST.get('country', '')
+            designation = request.POST.get('designation', '')
+            experience_years = int(request.POST.get('experience_years', 0))
+            teaching_experience = int(request.POST.get('teaching_experience', 0))
+            expertise_areas = request.POST.getlist('expertise_areas[]')
+            certifications_raw = request.POST.get('certifications', '')
+            bio = request.POST.get('bio', '')
+            programs = request.POST.getlist('programs')
+            specific_modules_raw = request.POST.get('specific_modules', '')
+            hourly_rate = float(request.POST.get('hourly_rate', 0))
+            max_hours_weekly = int(request.POST.get('max_hours_weekly', 20))
+            create_account = request.POST.get('create_account') == 'on'
+            username = request.POST.get('username', '')
+            password = request.POST.get('password', '')
+            linkedin_profile = request.POST.get('linkedin_profile', '')
+            website = request.POST.get('website', '')
+            notes = request.POST.get('notes', '')
 
+        # Validate required fields
+        if not all([first_name, last_name, email, phone, designation, bio, username]):
+            messages.error(request, 'Please fill in all required fields.')
+        else:
+            try:
+                form_data = {
+                    'first_name': first_name,
+                    'last_name': last_name,
+                    'email': email,
+                    'phone': phone,
+                    'dob': dob,
+                    'gender': gender,
+                    'address_line1': address_line1,
+                    'address_line2': address_line2,
+                    'city': city,
+                    'state': state,
+                    'postal_code': postal_code,
+                    'country': country,
+                    'designation': designation,
+                    'experience_years': experience_years,
+                    'teaching_experience': teaching_experience,
+                    'expertise_areas': expertise_areas,
+                    'certifications': certifications_raw,
+                    'bio': bio,
+                    'programs': programs,
+                    'specific_modules': specific_modules_raw,
+                    'hourly_rate': hourly_rate,
+                    'max_hours_weekly': max_hours_weekly,
+                    'create_account': create_account,
+                    'username': username,
+                    'password': password,
+                    'linkedin_profile': linkedin_profile,
+                    'website': website,
+                    'notes': notes,
+                }
+                print("form_data:", form_data)
+                result = Trainer.add_trainer(form_data, profile_picture_file)
+                if result:
+                    messages.success(request, 'Trainer registered successfully!')
+                    return redirect('admin_trainer_add')
+                else:
+                    messages.error(request, 'Failed to register trainer. Check server logs.')
+            except Exception as e:
+                messages.error(request, f'Error registering trainer: {str(e)}')
+                trainers = Trainer.get_all_trainers()
+        return render(request, 'admin-trainer-add.html', {'trainers': trainers})
+    
 def admin_program_add(request):
-    return render(request, 'admin-program-add.html')
+    if request.method == 'POST':
+        title = request.POST.get('program_title', '')
+        duration_months = int(request.POST.get('duration_months', 0))
+        num_classes = int(request.POST.get('num_classes', 0))
+        students_enrolled = int(request.POST.get('students_enrolled', 0))
+        price = float(request.POST.get('program_price', 0))
+        revenue = request.POST.get('revenue', '')
+        rating = float(request.POST.get('rating', 0))
+        completion_percentage = int(request.POST.get('completion_percentage', 0))
+        description = request.POST.get('program_description', '')
+        status = request.POST.get('program_status', '')
+        is_featured = request.POST.get('is_featured') == 'true'
+        program_image_file = request.FILES.get('program_image')
+
+        if not all([title, duration_months, num_classes, price, rating, completion_percentage, description, status]):
+            messages.error(request, 'Please fill in all required fields.')
+        else:
+            try:
+                form_data = {
+                    'title': title,
+                    'duration_months': duration_months,
+                    'num_classes': num_classes,
+                    'students_enrolled': students_enrolled,
+                    'price': price,
+                    'revenue': revenue,
+                    'rating': rating,
+                    'completion_percentage': completion_percentage,
+                    'description': description,
+                    'status': status,
+                    'is_featured': is_featured,
+                }
+                result = Program.add_program(form_data, program_image_file)
+                if result:
+                    messages.success(request, 'Program added successfully!')
+                    return redirect('admin_program_add')
+                else:
+                    messages.error(request, 'Failed to add program. Check server logs.')
+            except Exception as e:
+                messages.error(request, f'Error adding program: {str(e)}')
+    programs = Program.get_all_programs()
+    return render(request, 'admin-program-add.html', {'programs': programs})
 
 def support_ticket(request):
     if request.method=="POST":
@@ -290,7 +503,7 @@ def support_ticket(request):
         attachment= request.POST.get('ticket_attachment', '')
 
         # Basic validation
-        if not all([subject, priority, category, message, attachment]):
+        if not all([subject, priority, category, message]):
             messages.error(request, 'All fields are required')
         else:
             try:
@@ -304,16 +517,20 @@ def support_ticket(request):
                 }
                 print("form_data:", form_data)
                 # Use the model's class method to save to MySQL
-                result = support_ticket.add_support_ticket(form_data)
+                result = support_ticketx.add_support_ticket(form_data)
                 # Redirect to the same page after submission
                 if result:
                     messages.success(request, 'ticket raised successfully!')
-                    return redirect('support_ticket.html')
+                    return redirect('support_ticket')
                 else:
                     messages.error(request, 'Failed to save data. Check server logs for details.')
             except Exception as e:
                 messages.error(request,f'Error saving data: {str(e)}')
-    return render(request, 'support-ticket.html')
+
+    # Fetch existing tickets to display
+    tickets = support_ticketx.get_all_tickets()
+
+    return render(request, 'support-ticket.html', {'tickets': tickets})
 
 def dashboard(request):
     return render(request, 'dashboard.html')
@@ -337,31 +554,264 @@ def admin_payments (request):
     return render(request, 'admin-payments.html')
 
 def admin_student_add(request):
-    return render(request, 'admin-student-add.html')
+    if request.method == 'POST':
+        print("POST data:", request.POST)
+        first_name = request.POST.get('first_name', '')
+        last_name = request.POST.get('last_name', '')
+        email = request.POST.get('email', '')
+        phone = request.POST.get('phone', '')
+        dob = request.POST.get('dob', '')
+        gender = request.POST.get('gender', '')
+        address_line1 = request.POST.get('address_line1', '')
+        address_line2 = request.POST.get('address_line2', '')
+        city = request.POST.get('city', '')
+        state = request.POST.get('state', '')   
+        postal_code = request.POST.get('postal_code', '')
+        country = request.POST.get('country', '')
+        program = request.POST.get('program', '')
+        batch = request.POST.get('batch', '')
+        referral_source = request.POST.get('referral_source', '')
+        notes = request.POST.get('notes', '')
+        payment_status = request.POST.get('payment_status', '')
+        payment_method = request.POST.get('payment_method', '')
+        amount_paid = float(request.POST.get('amount_paid', 0.0))
+        transaction_id = request.POST.get('transaction_id', '')
+        payment_date = request.POST.get('payment_date', '')
+        invoice_number = request.POST.get('invoice_number', '')
+        username = request.POST.get('username', '')
+        password = request.POST.get('password', '')
+        if not all([first_name, last_name, email, phone , dob ,]):
+            messages.error(request, 'All fields are required')
+        else:
+            try:
+                form_data = {
+                    'first_name': first_name,
+                    'last_name': last_name,
+                    'email': email,
+                    'phone': phone,
+                    'dob': dob,
+                    'gender': gender,
+                    'address_line1': address_line1,
+                    'address_line2': address_line2,
+                    'city': city,
+                    'state': state,
+                    'postal_code': postal_code,
+                    'country': country,
+                    'program': program,
+                    'batch': batch,
+                    'referral_source': referral_source,
+                    'notes': notes,
+                    'payment_status': payment_status,
+                    'payment_method': payment_method,
+                    'amount_paid': amount_paid,
+                    'transaction_id': transaction_id,
+                    'payment_date': payment_date,
+                    'invoice_number': invoice_number,
+                    'username': username,
+                    'password': password,
+                    }
+                print("form_data:", form_data)
+                result = Student.add_student(form_data)
+                client_id = "<TEST-M22UJB3M6UVJR_25051>"
+                client_secret = "<MzE3OGEwOWQtODhjMC00OGY0LWE5MDEtMzU1YWE3N2RjYzM2>"
+                client_version = 1  # Insert your client version here
+                env = Env.SANDBOX  # Change to Env.PRODUCTION when you go live   
+                client = StandardCheckoutClient.get_instance(client_id=client_id,
+                                                              client_secret=client_secret,
+                                                              client_version=client_version,
+                                                              env=env)         
+                unique_order_id = str(uuid4())
+                ui_redirect_url = "https://www.google.com/"
+                amount = 100
+                standard_pay_request = StandardCheckoutPayRequest.build_request(merchant_order_id=unique_order_id,
+                                                                                    amount=amount,
+                                                                                    redirect_url=ui_redirect_url)
+                standard_pay_response = client.pay(standard_pay_request)
+                checkout_page_url = standard_pay_response.redirect_url
+                print("Checkout Page URL:", checkout_page_url)
+                if result:
+                    messages.success(request, 'Student added successfully')
+                    # Redirect to the same page after submission   
+                    # Redirect to the checkout page
+                    return redirect('admin_student_add')
+                else:
+                    messages.error(request, 'Failed to add student. Check server logs.')
+            except Exception as e:
+                messages.error(request, f'Error adding student: {str(e)}')
+    # Fetch existing students to display
+    students = Student.get_all_students()
+    return render(request, 'admin-student-add.html' , {'students': students})
 
 def admin_resources(request):
     return render(request, 'admin-resourses.html')    
 
 def admin_batch(request):
-    return render(request, 'admin-batch-management-add-form.html')
+    if request.method == 'POST':
+        print("POST data:", request.POST)
+        batch_code = request.POST.get('batchCode', '')
+        batch_name = request.POST.get('batchName', '')
+        program = request.POST.get('program', '')
+        start_date = request.POST.get('startDate', '')
+        end_date = request.POST.get('endDate', '')
+        capacity = request.POST.get('capacity', '')
+        status = request.POST.get('status', '')
+        trainerassignment = request.POST.get('trainerAssignment', '')
+        description = request.POST.get('description', '')
+
+        if not all([batch_code, batch_name, program, start_date, end_date, capacity, status, trainerassignment, description]):
+            messages.error(request, 'Batch name, start date, and end date are required.')
+        else:
+            try:
+                form_data = {
+                    'batch_code': batch_code,
+                    'batch_name': batch_name,
+                    'program': program,
+                    'start_date': start_date,
+                    'end_date': end_date,
+                    'capacity': capacity,
+                    'status': status,
+                    'trainer': trainerassignment,
+                    'description': description,
+                }
+                result = Batch.add_batch(form_data)
+                if result:
+                    messages.success(request, 'Batch added successfully!')
+                    return redirect('admin_batch')
+                else:
+                    messages.error(request, 'Failed to add batch. Check server logs.')
+            except Exception as e:
+                messages.error(request, f'Error adding batch: {str(e)}')
+    batches = Batch.get_all_batches()
+    return render(request, 'admin-batch-management-add-form.html', {'batches': batches})
 
 def admin_class_recordings(request):
     return render(request, 'admin-class-recordings-add.html')
 
+
 def commissions(request):
-    return render(request, 'admin-commissions-add.html')
+    if request.method == 'POST':
+        print("POST data:", request.POST)
+        transaction_id = request.POST.get('transactionId', '')
+        partner = request.POST.get('partner', '')
+        referred_student = request.POST.get('referredStudent', '')
+        program = request.POST.get('program', '')
+        amount = float(request.POST.get('amount', 0))
+        processing_fee = float(request.POST.get('processingFee', 0))
+        date = request.POST.get('date', '')
+        status = request.POST.get('status', '')
+        notes = request.POST.get('notes', '')
+
+        if not all([partner, referred_student, program, amount, date, status]):
+            messages.error(request, 'Please fill in all required fields.')
+        else:
+            try:
+                form_data = {
+                    'transaction_id': transaction_id,
+                    'partner': partner,
+                    'referred_student': referred_student,
+                    'program': program,
+                    'amount': amount,
+                    'processing_fee': processing_fee,
+                    'date': date,
+                    'status': status,
+                    'notes': notes
+                }
+                result = commissionx.add_commission(form_data)
+                if result:
+                    messages.success(request, 'Commission added successfully!')
+                    return redirect('commissions')
+                else:
+                    messages.error(request, 'Failed to add commission. Check server logs.')
+            except Exception as e:
+                messages.error(request, f'Error adding commission: {str(e)}')
+
+    commissions_list = commissionx.get_all_commissions()
+    return render(request, 'admin-commissions-add.html', {'commissions': commissions_list})
 
 def exams(request):
     return render(request, 'admin-exams-add.html')
 
 def invoices(request):
-    return render(request, 'admin-invoices-add.html')
+    if request.method == 'POST':
+        print("POST data:", request.POST)
+        invoice_number = request.POST.get('invoiceNumber', '')
+        student = request.POST.get('student', '')
+        program = request.POST.get('program', '')
+        batch = request.POST.get('batch', '')
+        issue_date = request.POST.get('issueDate', '')
+        due_date = request.POST.get('dueDate', '')
+        amount = float(request.POST.get('amount', 0))
+        status = request.POST.get('status', '')
+        notes = request.POST.get('notes', '')
+
+        if not all([student, program, batch, issue_date, due_date, amount, status]):
+            messages.error(request, 'Please fill in all required fields.')
+        else:
+            try:
+                form_data = {
+                    'invoice_number': invoice_number,
+                    'student': student,
+                    'program': program,
+                    'batch': batch,
+                    'issue_date': issue_date,
+                    'due_date': due_date,
+                    'amount': amount,
+                    'status': status,
+                    'notes': notes
+                }
+                result = invoicex.add_invoice(form_data)
+                if result:
+                    messages.success(request, 'Invoice added successfully!')
+                    return redirect('invoices')
+                else:
+                    messages.error(request, 'Failed to add invoice. Check server logs.')
+            except Exception as e:
+                messages.error(request, f'Error adding invoice: {str(e)}')
+    invoices_list = invoicex.get_all_invoices()
+    return render(request, 'admin-invoices-add.html', {'invoices': invoices_list})
 
 def prog_cat(request):
     return render(request, 'admin-program-categories-add.html')
 
 def refunds(request):
-    return render(request, 'admin-refunds.html')
+    if request.method == 'POST':
+        print("POST data:", request.POST)
+        refund_number = request.POST.get('refundNumber', '')
+        student = request.POST.get('student', '')
+        program = request.POST.get('program', '')
+        enrollment_id = request.POST.get('enrollmentId', '')
+        request_date = request.POST.get('requestDate', '')
+        amount = float(request.POST.get('amount', 0))
+        reason = request.POST.get('reason', '')
+        status = request.POST.get('status', '')
+        notes = request.POST.get('notes', '')
+
+        if not all([student, program, enrollment_id, request_date, amount, reason, status]):
+            messages.error(request, 'Please fill in all required fields.')
+        else:
+            try:
+                form_data = {
+                    'refund_number': refund_number,
+                    'student': student,
+                    'program': program,
+                    'enrollment_id': enrollment_id,
+                    'request_date': request_date,
+                    'amount': amount,
+                    'reason': reason,
+                    'status': status,
+                    'notes': notes
+                }
+                result = refundx.add_refund(form_data)
+                if result:
+                    messages.success(request, 'Refund request added successfully!')
+                    return redirect('refunds')
+                else:
+                    messages.error(request, 'Failed to add refund request. Check server logs.')
+            except Exception as e:
+                messages.error(request, f'Error adding refund request: {str(e)}')
+
+    refunds_list = refundx.get_all_refunds()
+    return render(request, 'admin-refunds.html', {'refunds': refunds_list})
 
 def results(request):
     return render(request, 'admin-results.html') 
@@ -370,7 +820,46 @@ def revenue(request):
     return render(request, 'admin-revenue-report.html')
 
 def admin_trainer_schedule(request):
-    return render(request, 'admin-trainer-schedule-add.html')
+    if request.method == 'POST':
+        print("POST data:", request.POST)
+        program = request.POST.get('program', '')
+        batch = request.POST.get('batch', '')
+        topic = request.POST.get('topic', '')
+        description = request.POST.get('description', '')
+        class_date = request.POST.get('classDate', '')
+        trainer = request.POST.get('trainer', '')
+        start_time = request.POST.get('startTime', '')
+        end_time = request.POST.get('endTime', '')
+        meeting_link = request.POST.get('meetingLink', '')
+        meeting_password = request.POST.get('meetingPassword', '')
+
+        if not all([program, batch, topic, class_date, trainer, start_time, end_time]):
+            messages.error(request, 'Please fill in all required fields.')
+        else:
+            try:
+                form_data = {
+                    'program': program,
+                    'batch': batch,
+                    'topic': topic,
+                    'description': description,
+                    'class_date': class_date,
+                    'trainer': trainer,
+                    'start_time': start_time,
+                    'end_time': end_time,
+                    'meeting_link': meeting_link,
+                    'meeting_password': meeting_password,
+                }
+                result = TrainerSchedule.add_schedule(form_data)
+                if result:
+                    messages.success(request, 'Class scheduled successfully!')
+                    return redirect('admin_trainer_schedule')
+                else:
+                    messages.error(request, 'Failed to schedule class. Check server logs.')
+            except Exception as e:
+                messages.error(request, f'Error scheduling class: {str(e)}')
+    schedules = TrainerSchedule.get_all_schedules()
+    return render(request, 'admin-trainer-schedule-add.html', {'schedules': schedules})
+
 
 def admin_user( request):
     return render(request, 'admin-user-management.html')
@@ -383,3 +872,9 @@ def admin_exams(request):
 
 def admin_results(request):
     return render(request, 'admin-results.html')
+
+def admin_trnx(request):
+    return render(request, 'admin-trainer-add.html')
+
+def admin_btch(request):
+    return render(request , 'admin-batch-management-add-form.html')

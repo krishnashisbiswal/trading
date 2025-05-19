@@ -82,4 +82,6 @@ urlpatterns = [
     path("admin_program_categories/", views.admin_program_categories, name="admin_program_categories"),
     path("admin_exams/", views.admin_exams, name="admin_exams"),
     path("admin_results/", views.admin_results, name="admin_results"),
+    path("admin_trnx", views.admin_trnx, name="admin_trnx"),
+    path("admin_btch", views.admin_btch ,name="admin_btch"),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
