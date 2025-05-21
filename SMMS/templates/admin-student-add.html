@@ -439,11 +439,9 @@
                     <div class="form-group">
                         <label for="program">Program <span class="required">*</span></label>
                         <select id="program" name="program" class="form-control" required>
-                            <option value="">Select Program</option>
-                            <option value="ctp">Complete Trading Program (CTP)</option>
-                            <option value="amp">Arthavidya Mentorship Program (AMP)</option>
-                            <option value="gmp">Growth Mindset Program (GMP)</option>
-                            <option value="sip">Smart Income Program (SIP)</option>
+                            {% for program in programs %}
+                        <option value="{{ program.price }}">{{ program.description }}</option>
+                        {% endfor %}
                         </select>
                     </div>
                     <div class="form-group">

@@ -663,18 +663,38 @@
     <!-- JavaScript for Form Handling -->
     <script src="{% static 'js/admin.js' %}"></script>
     <script>
-        checkbox.checked = isChecked;
-        if (isChecked) checkedCount++;
+// JavaScript for Form Handling
+document.addEventListener('DOMContentLoaded', function() {
+    const addUser Btn = document.getElementById('addUser Btn');
+    const userForm = document.getElementById('userForm');
+    const closeForm = document.getElementById('closeForm');
+    const cancelForm = document.getElementById('cancelForm');
+
+    // Show the modal when the "Add New User" button is clicked
+    addUser Btn.addEventListener('click', function() {
+        userForm.classList.add('active');
     });
-    
-    // Update bulk actions visibility
-    if (checkedCount > 0) {
-        bulkActions.classList.add('show');
-        selectedCount.textContent = checkedCount;
-    } else {
-        bulkActions.classList.remove('show');
-    }
+
+    // Close the modal when the close button is clicked
+    closeForm.addEventListener('click', function() {
+        userForm.classList.remove('active');
+    });
+
+    // Close the modal when the cancel button is clicked
+    cancelForm.addEventListener('click', function() {
+        userForm.classList.remove('active');
+    });
+
+    // Close the modal when clicking outside of the modal
+    window.addEventListener('click', function(event) {
+        if (event.target === userForm) {
+            userForm.classList.remove('active');
+        }
+    });
+
+    // The rest of your existing JavaScript code...
 });
+
 
 // Individual checkbox functionality
 userCheckboxes.forEach(checkbox => {
@@ -892,6 +912,6 @@ function updateTableInfo() {
     startRange.textContent = ((currentPage - 1) * 5) + 1;
     endRange.textContent = Math.min(currentPage * 5, remainingRows);
 }
-});
+
 </script>
 {% endblock %}

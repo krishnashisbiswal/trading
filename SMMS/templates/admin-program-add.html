@@ -103,59 +103,59 @@
   <div class="color">
     <h1>Add New Program</h1></div>
 <div class="box">
-  <form id="add-program-form">
-
+  <form id="add-program-form" enctype="multipart/form-data" method="post" url="{% url 'admin_program_add' %}"> 
+    {% csrf_token %}
     <div class="form-group">
       <label>Program Title</label>
-      <input type="text" id="program_title" placeholder="e.g., Complete Trading Program (CTP)" required>
+      <input type="text" id="program_title" name="program_title" placeholder="e.g., Complete Trading Program (CTP)" required>
     </div>
 
     <div class="row">
       <div class="form-group">
         <label>Duration (Months)</label>
-        <input type="number" id="duration_months" placeholder="e.g., 3" required>
+        <input type="number" id="duration_months" name="duration_months" placeholder="e.g., 3" required>
       </div>
       <div class="form-group">
         <label>Number of Classes</label>
-        <input type="number" id="num_classes" placeholder="e.g., 24" required>
+        <input type="number" id="num_classes" name="num_classes" placeholder="e.g., 24" required>
       </div>
       <div class="form-group">
         <label>Students Enrolled</label>
-        <input type="number" id="students_enrolled" placeholder="e.g., 852">
+        <input type="number" id="students_enrolled" name="students_enrolled"placeholder="e.g., 852">
       </div>
     </div>
 
     <div class="row">
       <div class="form-group">
         <label>Program Price (₹)</label>
-        <input type="number" id="program_price" placeholder="e.g., 19999" required>
+        <input type="number" id="program_price" name="program_price" placeholder="e.g., 19999" required>
       </div>
       <div class="form-group">
         <label>Revenue Generated</label>
-        <input type="text" id="revenue" placeholder="e.g., 42.6L">
+        <input type="text" id="revenue" name="revenue" placeholder="e.g., 42.6L">
       </div>
     </div>
 
     <div class="row">
       <div class="form-group">
         <label>Rating</label>
-        <input type="number" step="0.1" id="rating" placeholder="e.g., 4.8" required>
+        <input type="number" step="0.1" id="rating" name="rating" placeholder="e.g., 4.8" required>
       </div>
       <div class="form-group">
         <label>Completion %</label>
-        <input type="number" id="completion_percentage" placeholder="e.g., 92" required>
+        <input type="number" id="completion_percentage" name"completion_percentage" placeholder="e.g., 92" required>
       </div>
     </div>
 
     <div class="form-group">
       <label>Program Description</label>
-      <textarea id="program_description" placeholder="e.g., Covers basics to advanced concepts with personalized mentorship..." required></textarea>
+      <textarea id="program_description" name="program_description"placeholder="e.g., Covers basics to advanced concepts with personalized mentorship..." required></textarea>
     </div>
 
     <div class="row">
       <div class="form-group">
         <label>Program Status</label>
-        <select id="program_status" required>
+        <select id="program_status" name="program_status" required>
           <option value="">Select Status</option>
           <option value="Active">Active</option>
           <option value="Inactive">Inactive</option>
@@ -164,7 +164,7 @@
       </div>
       <div class="form-group">
         <label>Featured Program?</label>
-        <select id="is_featured" required>
+        <select id="is_featured" name="is_featured" required>
           <option value="">Select</option>
           <option value="true">Yes</option>
           <option value="false">No</option>
@@ -178,7 +178,7 @@
     </div>
 
     <div class="actions">
-      <button type="button" onclick="submitProgram()">Save Program</button>
+      <button type="submit" class="submit-btn">Save Program</button>
     </div>
   </center>
   </form>
@@ -189,24 +189,75 @@
 {%endblock%}
 <script src="{% static 'js/admin.js' %}"></script>
 <script>
-function submitProgram() {
-  const programData = {
-    title: document.getElementById('program_title').value.trim(),
-    durationMonths: parseInt(document.getElementById('duration_months').value),
-    numClasses: parseInt(document.getElementById('num_classes').value),
-    studentsEnrolled: parseInt(document.getElementById('students_enrolled').value) || 0,
-    price: parseFloat(document.getElementById('program_price').value),
-    revenue: document.getElementById('revenue').value.trim(),
-    rating: parseFloat(document.getElementById('rating').value),
-    completionPercentage: parseInt(document.getElementById('completion_percentage').value),
-    description: document.getElementById('program_description').value.trim(),
-    status: document.getElementById('program_status').value,
-    isFeatured: document.getElementById('is_featured').value === "true",
-    image: document.getElementById('program_image').files[0] || null,
-  };
-
-  console.log('New Program Created:', programData);
-  // Optionally: you can send this programData to your server here using Fetch/AJAX.
-}
+document.getElementById('add-program-form').addEventListener('submit', function(event) {
+    event.preventDefault(); // Prevent default form submission
+    
+    // Create FormData object from the form
+    const formData = new FormData();
+    
+    // Manually add each field to ensure all are included
+    formData.append('program_title', document.getElementById('program_title').value);
+    formData.append('duration_months', document.getElementById('duration_months').value);
+    formData.append('num_classes', document.getElementById('num_classes').value);
+    formData.append('students_enrolled', document.getElementById('students_enrolled').value);
+    formData.append('program_price', document.getElementById('program_price').value);
+    formData.append('revenue', document.getElementById('revenue').value);
+    formData.append('rating', document.getElementById('rating').value);
+    formData.append('completion_percentage', document.getElementById('completion_percentage').value);
+    formData.append('program_description', document.getElementById('program_description').value);
+    formData.append('program_status', document.getElementById('program_status').value);
+    formData.append('is_featured', document.getElementById('is_featured').value);
+    
+    // Add CSRF token
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    formData.append('csrfmiddlewaretoken', csrfToken);
+    
+    // Handle file upload if present
+    const fileInput = document.getElementById('program_image');
+    if (fileInput.files.length > 0) {
+        formData.append('program_image', fileInput.files[0]);
+    }
+    
+    // Send the POST request
+    fetch('{% url "admin_program_add" %}', {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        // Don't set Content-Type header as FormData will set it with boundary
+    })
+    .then(response => {
+        if (response.redirected) {
+            // If server redirected, follow the redirect
+            window.location.href = response.url;
+            return;
+        }
+        
+        // Try to parse JSON, but handle non-JSON responses too
+        return response.text().then(text => {
+            try {
+                return JSON.parse(text);
+            } catch (e) {
+                // If response is not JSON, it might be a full HTML page
+                if (response.ok) {
+                    // If successful but not JSON, reload the page
+                    window.location.reload();
+                    return { success: true };
+                } else {
+                    console.error('Response was not JSON:', text);
+                    return { success: false, message: 'Server error' };
+                }
+            }
+        });
+    })
+    .then(data => {
+        if (data.success) {
+            alert('Program added successfully!');
+            // Optionally redirect or clear form
+            window.location.reload();
+        }
+    })
+});
 </script>
 {% endblock %}
