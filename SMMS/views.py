@@ -9,10 +9,10 @@ from datetime import datetime
 import json
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_protect
-from phonepe.sdk.pg.payments.v2.standard_checkout_client import StandardCheckoutClient
-from phonepe.sdk.pg.env import Env
+# from phonepe.sdk.pg.payments.v2.standard_checkout_client import StandardCheckoutClient
+# from phonepe.sdk.pg.env import Env
 from uuid import uuid4
-from phonepe.sdk.pg.payments.v2.models.request.standard_checkout_pay_request import StandardCheckoutPayRequest
+# from phonepe.sdk.pg.payments.v2.models.request.standard_checkout_pay_request import StandardCheckoutPayRequest
 
 def personal_info_view(request):
     print(f"Method: {request.method}")
@@ -83,6 +83,7 @@ def about(request):
     return render(request, 'about.html')
 
 def programs(request):
+
     return render(request, 'programs.html')
 
 def success_stories(request):
@@ -104,15 +105,6 @@ def studentfrom(request):
 
 def login_view(request):
     return render(request, 'login.html')
-
-def terms(request):
-    return render(request, 'terms.html')
-
-def privacy(request):
-    return render(request, 'privacy.html')
-
-def refund(request):
-    return render(request, 'refund.html')
 
 def assessment_view(request):
   #  assessments= Assessment.objects.create(user="krishna", quizzes=80, assignments=75, exams=90, overall=85)
@@ -452,6 +444,7 @@ def admin_trainer_add(request):
     
 def admin_program_add(request):
     if request.method == 'POST':
+        print("POST data:", request.POST)
         title = request.POST.get('program_title', '')
         duration_months = int(request.POST.get('duration_months', 0))
         num_classes = int(request.POST.get('num_classes', 0))
@@ -462,8 +455,7 @@ def admin_program_add(request):
         completion_percentage = int(request.POST.get('completion_percentage', 0))
         description = request.POST.get('program_description', '')
         status = request.POST.get('program_status', '')
-        is_featured = request.POST.get('is_featured') == 'true'
-        program_image_file = request.FILES.get('program_image')
+        is_featured = request.POST.get('is_featured','')
 
         if not all([title, duration_months, num_classes, price, rating, completion_percentage, description, status]):
             messages.error(request, 'Please fill in all required fields.')
@@ -482,7 +474,8 @@ def admin_program_add(request):
                     'status': status,
                     'is_featured': is_featured,
                 }
-                result = Program.add_program(form_data, program_image_file)
+                print("form_data:", form_data)
+                result = Program.add_program(form_data)
                 if result:
                     messages.success(request, 'Program added successfully!')
                     return redirect('admin_program_add')
@@ -612,15 +605,16 @@ def admin_student_add(request):
                     }
                 print("form_data:", form_data)
                 result = Student.add_student(form_data)
-                client_id = "<TEST-M22UJB3M6UVJR_25051>"
-                client_secret = "<MzE3OGEwOWQtODhjMC00OGY0LWE5MDEtMzU1YWE3N2RjYzM2>"
+                client_id = "<SU2505161610519785728289>"
+                client_secret = "<1716f4d2-d67d-4e4f-a0d6-7625965e92d3>"
                 client_version = 1  # Insert your client version here
-                env = Env.SANDBOX  # Change to Env.PRODUCTION when you go live   
+                env = Env.PRODUCTION  # Change to Env.PRODUCTION when you go live   
                 client = StandardCheckoutClient.get_instance(client_id=client_id,
                                                               client_secret=client_secret,
                                                               client_version=client_version,
                                                               env=env)         
                 unique_order_id = str(uuid4())
+                print("Unique Order ID:", unique_order_id)
                 ui_redirect_url = "https://www.google.com/"
                 amount = 100
                 standard_pay_request = StandardCheckoutPayRequest.build_request(merchant_order_id=unique_order_id,
@@ -640,7 +634,8 @@ def admin_student_add(request):
                 messages.error(request, f'Error adding student: {str(e)}')
     # Fetch existing students to display
     students = Student.get_all_students()
-    return render(request, 'admin-student-add.html' , {'students': students})
+    programs = Program.get_all_programs()
+    return render(request, 'admin-student-add.html' , {'students': students,'programs': programs})
 
 def admin_resources(request):
     return render(request, 'admin-resourses.html')    
@@ -767,8 +762,10 @@ def invoices(request):
                     messages.error(request, 'Failed to add invoice. Check server logs.')
             except Exception as e:
                 messages.error(request, f'Error adding invoice: {str(e)}')
-    invoices_list = invoicex.get_all_invoices()
-    return render(request, 'admin-invoices-add.html', {'invoices': invoices_list})
+    invoices = invoicex.get_all_invoices()
+    invno = invoicex.get_invno()
+    print("invno:", invno)
+    return render(request, 'admin-invoices-add.html', {'invoices': invoices,'invno': invno})
 
 def prog_cat(request):
     return render(request, 'admin-program-categories-add.html')
@@ -809,9 +806,10 @@ def refunds(request):
                     messages.error(request, 'Failed to add refund request. Check server logs.')
             except Exception as e:
                 messages.error(request, f'Error adding refund request: {str(e)}')
-
     refunds_list = refundx.get_all_refunds()
-    return render(request, 'admin-refunds.html', {'refunds': refunds_list})
+    refno = refundx.get_refno()
+    print("refno:", refno)
+    return render(request, 'admin-refunds.html', {'refunds': refunds_list , 'refno': refno})
 
 def results(request):
     return render(request, 'admin-results.html') 
@@ -862,7 +860,40 @@ def admin_trainer_schedule(request):
 
 
 def admin_user( request):
-    return render(request, 'admin-user-management.html')
+    # if request.method == 'POST':
+    #     print("POST data:", request.POST)
+    #     first_name = request.POST.get('first_name', '')
+    #     last_name = request.POST.get('last_name', '')
+    #     email = request.POST.get('email', '')
+    #     phone = request.POST.get('phone', '')
+    #     dob = request.POST.get('dob', '')
+    #     address = request.POST.get('address', '')
+    #     role = request.POST.get('role', '') 
+
+    #     if not all([first_name, last_name, email, phone, dob, address, role]):
+    #         messages.error(request, 'Please fill in all required fields.')
+    #     else:       
+    #         try:
+    #             form_data = {
+    #                 'first_name': first_name,
+    #                 'last_name': last_name,
+    #                 'email': email,
+    #                 'phone': phone,
+    #                 'dob': dob,
+    #                 'address': address,
+    #                 'role': role
+    #             }
+    #             print("form_data:", form_data)
+            #     result = User.add_user(form_data)
+            #     if result:
+            #         messages.success(request, 'User added successfully!')
+            #         return redirect('admin_user')
+            #     else:
+            #         messages.error(request, 'Failed to add user. Check server logs.')
+            # except Exception as e:
+            #     messages.error(request, f'Error adding user: {str(e)}')
+            #     users = User.get_all_users()      {'users': users}
+            return render(request, 'admin-user-management.html')
 
 def admin_program_categories(request):
     return render(request, 'admin-program-categories-add.html')
@@ -875,6 +906,3 @@ def admin_results(request):
 
 def admin_trnx(request):
     return render(request, 'admin-trainer-add.html')
-
-def admin_btch(request):
-    return render(request , 'admin-batch-management-add-form.html')

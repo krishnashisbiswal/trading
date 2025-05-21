@@ -341,7 +341,15 @@ class Batch(models.Model):
         print("Data to be inserted:")
         print(f"subject: {data.get('batch_code')}")
         print(f"priority: {data.get('batch_name')}")
-
+        print(f"program: {data.get('program')}")
+        print(f"capacity: {data.get('capacity')}")
+        print(f"trainer: {data.get('trainer')}")
+        print(f"status: {data.get('status')}")
+        print(f"start_date: {data.get('start_date')}")
+        print(f"end_date: {data.get('end_date')}")
+        print(f"description: {data.get('description')}")
+        """Save data directly to MySQL using raw SQL"""
+        # Connect to MySQL database
         db_settings = settings.DATABASES['default']
         db = MySQLdb.connect(
             host=db_settings['HOST'],
@@ -354,13 +362,13 @@ class Batch(models.Model):
         query = """
         INSERT INTO batch_management
         (batch_code, batch_name, program, capacity, trainer, status, start_date, end_date, description)
-        VALUES (%s, %s, %s, %s ,%s, %s, %s, %s , %s)
+        VALUES (%s, %s, %s, %s ,%s, %s, %s, %s, %s)
         """
         cursor.execute(query, (
             data.get('batch_code', ''),
             data.get('batch_name', ''),
             data.get('program', ''),
-            data.get('start_date', ''),
+            data.get('start_date',''),
             data.get('end_date', ''),
             data.get('capacity', ''),
             data.get('status', ''),
@@ -533,7 +541,7 @@ class TrainerSchedule(models.Model):
 
 class Program(models.Model):
     @classmethod
-    def add_program(cls, data, program_image_file=None):
+    def add_program(cls, data):
         print("Data to be inserted:")
         print(f"subject: {data.get('title')}")
         print(f"priority: {data.get('duration_months')}")
@@ -549,13 +557,13 @@ class Program(models.Model):
 
         # Handle program_image_file saving logic as needed (e.g., save to media folder)
         # For now, store filename or path as string
-        program_image_path = program_image_file.name if program_image_file else ''
+        # program_image_path = program_image_file.name if program_image_file else ''
 
         query = """
         INSERT INTO programs
         (title, duration_months, num_classes, students_enrolled, price, revenue, rating, completion_percentage,
-         description, status, is_featured, image)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        description, status, is_featured)  # Remove the trailing comma
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)  # Use 11 placeholders to match 11 columns
         """
 
         cursor.execute(query, (
@@ -569,8 +577,7 @@ class Program(models.Model):
             data.get('completion_percentage', 0),
             data.get('description', ''),
             data.get('status', ''),
-            int(data.get('is_featured', False)),
-            program_image_path,
+            data.get('is_featured', ''),
         ))
         db.commit()
         if cursor:
@@ -765,6 +772,23 @@ class invoicex(models.Model):
         db.close()
         return results
 
+
+    @classmethod
+    def get_invno(cls):
+        db_settings = settings.DATABASES['default']
+        db = MySQLdb.connect(
+            host=db_settings['HOST'],
+            user=db_settings['USER'],
+            passwd=db_settings['PASSWORD'],
+            db=db_settings['NAME'],
+            port=int(db_settings['PORT']),
+        )
+        cursor = db.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute("SELECT * FROM msksomim_.next_invoice_code_view")
+        results = cursor.fetchall()
+        db.close()
+        return results
+    
 class announcementx(models.Model):
     @classmethod
     def add_announcement(cls, data):
@@ -841,7 +865,7 @@ class refundx(models.Model):
         (refund_number, student, program, enrollment_id, request_date, amount, reason, status, notes)
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
         """
-        
+
         cursor.execute(query, (
             data.get('refund_number', 0),
             data.get('student', ''),
@@ -853,7 +877,6 @@ class refundx(models.Model):
             data.get('status', 'pending'),
             data.get('notes', '')
         ))
-        
         db.commit()
         cursor.close()
         db.close()
@@ -871,6 +894,22 @@ class refundx(models.Model):
         )
         cursor = db.cursor(MySQLdb.cursors.DictCursor)
         cursor.execute("SELECT * FROM refunds")
+        results = cursor.fetchall()
+        db.close()
+        return results
+    
+    @classmethod
+    def get_refno(cls):
+        db_settings = settings.DATABASES['default']
+        db = MySQLdb.connect(
+            host=db_settings['HOST'],
+            user=db_settings['USER'],
+            passwd=db_settings['PASSWORD'],
+            db=db_settings['NAME'],
+            port=int(db_settings['PORT']),
+        )
+        cursor = db.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute("SELECT * FROM msksomim_.next_refund_code_view")
         results = cursor.fetchall()
         db.close()
         return results

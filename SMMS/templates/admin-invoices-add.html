@@ -619,7 +619,7 @@
                     
                     <div class="form-row">
                         <label for="invoiceNumber">Invoice Number</label>
-                        <input type="text" id="invoiceNumber" name="invoiceNumber" readonly value="INV-2505xxxx">
+                        <input type="text" id="invoiceNumber" name="invoiceNumber" readonly value="{{ invno.0.next_invoice_code }}">
                         <small>Auto-generated on creation</small>
                     </div>
                     

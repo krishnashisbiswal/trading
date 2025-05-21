@@ -127,7 +127,7 @@
                             <li class="{% if request.resolver_match.url_name == 'admin_batch' %}active{% endif %}"><a href="{% url 'admin_batch' %}">Batch Management</a></li>
                         </ul>
                     </li>
-                    <li class="{% if request.resolver_match.url_name in 'admin_trainers admin_trainer_add admin_trainer_schedule' %}active{% endif %}">
+                    <li class="{% if request.resolver_match.url_name in 'admin_trainers admin_trnx admin_trainer_schedule' %}active{% endif %}">
                         <a href="#" class="submenu-toggle">
                             <i class="fas fa-chalkboard-teacher"></i>
                             <span>Trainers</span>
@@ -135,7 +135,7 @@
                         </a>
                         <ul class="submenu">
                             <li class="{% if request.resolver_match.url_name == 'admin_trainers' %}active{% endif %}"><a href="{% url 'admin_trainers' %}">All Trainers</a></li>
-                            <li class="{% if request.resolver_match.url_name == 'admin_trainer_add' %}active{% endif %}"><a href="{% url 'admin_trainer_add' %}">Add New Trainer</a></li>
+                            <li class="{% if request.resolver_match.url_name == 'admin_trnx' %}active{% endif %}"><a href="{% url 'admin_trnx' %}">Add New Trainer</a></li>
                             <li class="{% if request.resolver_match.url_name == 'admin_trainer_schedule' %}active{% endif %}"><a href="{% url 'admin_trainer_schedule' %}">Trainer Schedule</a></li>
                         </ul>
                     </li>
@@ -254,4 +254,44 @@
     </div>
 </footer>
 </body>
+<script>
+    // JavaScript for dropdown menus
+    document.querySelectorAll('.submenu-toggle').forEach(item => {
+        item.addEventListener('click', event => {
+            const submenu = item.nextElementSibling;
+            submenu.classList.toggle('active');
+            item.querySelector('.submenu-indicator').classList.toggle('rotate');
+        });
+    });
+
+    // JavaScript for notifications
+    document.querySelector('.notification-btn').addEventListener('click', () => {
+        document.querySelector('.notification-menu').classList.toggle('active');
+    });
+
+    // JavaScript for profile menu
+    document.querySelector('.profile-btn').addEventListener('click', () => {
+        document.querySelector('.profile-menu').classList.toggle('active');
+    });
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', event =>
+    {
+        const isClickInside = event.target.closest('.notification-btn') || event.target.closest('.profile-btn');
+        if (!isClickInside) {
+            document.querySelector('.notification-menu').classList.remove('active');
+            document.querySelector('.profile-menu').classList.remove('active');
+        }
+    });
+    // Close submenu when clicking outside
+    document.addEventListener('click', event =>
+    {
+        const isClickInside = event.target.closest('.submenu-toggle');
+        if (!isClickInside) {
+            document.querySelectorAll('.submenu').forEach(submenu => {
+                submenu.classList.remove('active');
+                submenu.previousElementSibling.querySelector('.submenu-indicator').classList.remove('rotate');
+            });
+        }
+    });
+</script>
 </html>

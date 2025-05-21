@@ -28,6 +28,7 @@
             max-width: 700px;
             box-shadow: var(--box-shadow-lg);
             overflow: hidden;
+            margin: 30px auto;
         }
         
         .form-header {
@@ -589,7 +590,7 @@
                 <span id="formTitle">Create Refund</span>
                 <i class="fas fa-times close-btn" id="closeForm"></i>
             </div>
-            <form id="refundDataForm" method="post" action="{% url "refund" %}"> 
+            <form id="refundDataForm" method="post" action="{% url "refunds" %}"> 
                 {% csrf_token %}
                 <div class="form-body">
                     <input type="hidden" id="refundId" name="refundId">
@@ -597,7 +598,7 @@
                     
                     <div class="form-row">
                         <label for="refundNumber">Refund ID</label>
-                        <input type="text" id="refundNumber" name="refundNumber" readonly value="REF-2505xxxx">
+                        <input type="text" id="refundNumber" name="refundNumber" readonly value="{{ refno.0.next_refund_code  }}">
                         <small>Auto-generated on creation</small>
                     </div>
                     
@@ -716,78 +717,349 @@ All refunds are processed within 7-10 business days after approval.</textarea>
     <script src="{% static 'js/admin-forms.js'%}"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Edit Policy Button Handler
-            const editPolicy = document.getElementById('editPolicy');
-            const policyForm = document.getElementById('policyForm');
-            const closePolicyForm = document.getElementById('closePolicyForm');
-            const cancelPolicyForm = document.getElementById('cancelPolicyForm');
-            const policyDataForm = document.getElementById('policyDataForm');
+    // DOM elements
+    const refundForm = document.getElementById('refundForm');
+    const refundDataForm = document.getElementById('refundDataForm');
+    const addRefundBtn = document.getElementById('addRefundBtn');
+    const closeForm = document.getElementById('closeForm');
+    const cancelForm = document.getElementById('cancelForm');
+    
+    // Open refund form modal
+    if (addRefundBtn) {
+        addRefundBtn.addEventListener('click', function() {
+            refundForm.classList.add('active');
+            document.getElementById('formTitle').textContent = 'Create Refund';
+            document.getElementById('formAction').value = 'add';
+            refundDataForm.reset();
+        });
+    }
+    
+    // Close refund form modal
+    if (closeForm) {
+        closeForm.addEventListener('click', function() {
+            refundForm.classList.remove('active');
+        });
+    }
+    
+    if (cancelForm) {
+        cancelForm.addEventListener('click', function() {
+            refundForm.classList.remove('active');
+        });
+    }
+    
+    // Edit policy modal handlers
+    const policyForm = document.getElementById('policyForm');
+    const editPolicy = document.getElementById('editPolicy');
+    const closePolicyForm = document.getElementById('closePolicyForm');
+    const cancelPolicyForm = document.getElementById('cancelPolicyForm');
+    
+    if (editPolicy) {
+        editPolicy.addEventListener('click', function() {
+            policyForm.classList.add('active');
+        });
+    }
+    
+    if (closePolicyForm) {
+        closePolicyForm.addEventListener('click', function() {
+            policyForm.classList.remove('active');
+        });
+    }
+    
+    if (cancelPolicyForm) {
+        cancelPolicyForm.addEventListener('click', function() {
+            policyForm.classList.remove('active');
+        });
+    }
+    
+    // Function to get CSRF token
+    function getCSRFToken() {
+        const cookieValue = document.cookie
+            .split('; ')
+            .find(row => row.startsWith('csrftoken='))
+            ?.split('=')[1];
             
-            editPolicy.addEventListener('click', function() {
-                policyForm.classList.add('active');
-            });
+        if (cookieValue) {
+            return cookieValue;
+        } else {
+            // Fallback to getting from the form input if cookie isn't available
+            const tokenInput = document.querySelector('[name=csrfmiddlewaretoken]');
+            return tokenInput ? tokenInput.value : '';
+        }
+    }
+    
+    // Handle refund form submission
+    if (refundDataForm) {
+        refundDataForm.addEventListener('submit', function(e) {
+            e.preventDefault();
             
-            closePolicyForm.addEventListener('click', function() {
-                policyForm.classList.remove('active');
-            });
+            // Show loading state
+            const submitBtn = refundDataForm.querySelector('.submit-btn');
+            const originalBtnText = submitBtn.textContent;
+            submitBtn.textContent = 'Saving...';
+            submitBtn.disabled = true;
             
-            cancelPolicyForm.addEventListener('click', function() {
-                policyForm.classList.remove('active');
-            });
+            // Get form data
+            const formData = new FormData(refundDataForm);
             
-            policyDataForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                // Here you would typically send the updated policy to your backend
-                alert('Policy updated successfully! In a real application, this would update the policy in the database.');
-                
-                // Close the form
-                policyForm.classList.remove('active');
-            });
+            // Create request
+            const request = new XMLHttpRequest();
+            request.open('POST', refundDataForm.action, true);
+            request.setRequestHeader('X-CSRFToken', getCSRFToken());
+            request.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
             
-            // Process refund button handler
-            const processButtons = document.querySelectorAll('.action-btn.process');
-            processButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const row = this.closest('tr');
-                    const refundId = row.cells[0].textContent;
-                    const studentName = row.querySelector('.user-details h4').textContent;
-                    const statusCell = row.cells[6].querySelector('.status-badge');
-                    const statusText = statusCell.textContent;
+            request.onreadystatechange = function() {
+                if (request.readyState === 4) {
+                    // Reset button state
+                    submitBtn.textContent = originalBtnText;
+                    submitBtn.disabled = false;
                     
-                    if (statusText === 'Pending') {
-                        if (confirm(`Are you sure you want to approve the refund request for ${studentName}?`)) {
-                            // Update status (for demonstration)
-                            statusCell.className = 'status-badge status-info';
-                            statusCell.textContent = 'Approved';
-                            alert(`Refund request ${refundId} has been approved. In a real application, this would update the status in the database.`);
-                        }
-                    } else if (statusText === 'Approved') {
-                        if (confirm(`Are you sure you want to process the refund payment for ${studentName}?`)) {
-                            // Update status (for demonstration)
-                            statusCell.className = 'status-badge status-success';
-                            statusCell.textContent = 'Completed';
-                            alert(`Refund payment for ${refundId} has been processed. In a real application, this would trigger the payment process.`);
-                        }
+                    if (request.status >= 200 && request.status < 300) {
+                        // Success
+                        alert('Refund saved successfully!');
+                        refundForm.classList.remove('active');
+                        
+                        // Reload to see changes
+                        window.location.reload();
+                    } else {
+                        // Error
+                        console.error('Server responded with:', request.status, request.statusText);
+                        console.error('Response:', request.responseText);
+                        alert('Error saving refund. Please try again or contact support.');
                     }
-                });
-            });
+                }
+            };
             
-            // Receipt button handler
-            const receiptButtons = document.querySelectorAll('.action-btn.receipt');
-            receiptButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const refundId = this.closest('tr').cells[0].textContent;
-                    alert(`Generating receipt for ${refundId}. In a real application, this would display or download the refund receipt.`);
-                });
-            });
+            request.onerror = function() {
+                submitBtn.textContent = originalBtnText;
+                submitBtn.disabled = false;
+                alert('Network error occurred. Please check your connection and try again.');
+            };
             
-            // Set current date in form
-            const requestDateInput = document.getElementById('requestDate');
-            if (requestDateInput) {
-                const today = new Date();
-                requestDateInput.value = today.toISOString().split('T')[0];
+            // Send request
+            request.send(formData);
+        });
+    }
+    
+    // Policy form submission
+    const policyDataForm = document.getElementById('policyDataForm');
+    if (policyDataForm) {
+        policyDataForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Show loading state
+            const submitBtn = policyDataForm.querySelector('.submit-btn');
+            const originalBtnText = submitBtn.textContent;
+            submitBtn.textContent = 'Updating...';
+            submitBtn.disabled = true;
+            
+            // Get form data
+            const formData = new FormData(policyDataForm);
+            
+            // Add CSRF token if missing
+            if (!formData.has('csrfmiddlewaretoken')) {
+                formData.append('csrfmiddlewaretoken', getCSRFToken());
+            }
+            
+            // Create request
+            const request = new XMLHttpRequest();
+            request.open('POST', window.location.href, true);
+            request.setRequestHeader('X-CSRFToken', getCSRFToken());
+            request.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+            
+            request.onreadystatechange = function() {
+                if (request.readyState === 4) {
+                    // Reset button state
+                    submitBtn.textContent = originalBtnText;
+                    submitBtn.disabled = false;
+                    
+                    if (request.status >= 200 && request.status < 300) {
+                        // Success
+                        alert('Policy updated successfully!');
+                        policyForm.classList.remove('active');
+                        
+                        // Update policy text without reload
+                        const policyContent = document.querySelector('.policy-content');
+                        if (policyContent) {
+                            const newContent = document.getElementById('policyContent').value;
+                            policyContent.innerHTML = `<p>${newContent.replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>')}</p>`;
+                        }
+                        
+                        // Update policy date
+                        const policyUpdated = document.querySelector('.policy-updated');
+                        if (policyUpdated) {
+                            const dateInput = document.getElementById('policyDate');
+                            if (dateInput) {
+                                const formattedDate = new Date(dateInput.value)
+                                    .toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+                                policyUpdated.textContent = `Last updated: ${formattedDate}`;
+                            }
+                        }
+                    } else {
+                        // Error
+                        console.error('Server responded with:', request.status, request.statusText);
+                        console.error('Response:', request.responseText);
+                        alert('Error updating policy. Please try again or contact support.');
+                    }
+                }
+            };
+            
+            request.onerror = function() {
+                submitBtn.textContent = originalBtnText;
+                submitBtn.disabled = false;
+                alert('Network error occurred. Please check your connection and try again.');
+            };
+            
+            // Send request
+            request.send(formData);
+        });
+    }
+    
+    // Table action buttons
+    const viewButtons = document.querySelectorAll('.action-btn.view');
+    const editButtons = document.querySelectorAll('.action-btn.edit');
+    const processButtons = document.querySelectorAll('.action-btn.process');
+    
+    viewButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const row = this.closest('tr');
+            const refundId = row.querySelector('td:first-child').textContent;
+            alert(`Viewing details for refund: ${refundId}`);
+            // Here you would typically load and show a details modal
+        });
+    });
+    
+    editButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const row = this.closest('tr');
+            const refundId = row.querySelector('td:first-child').textContent;
+            
+            // Open the form
+            refundForm.classList.add('active');
+            document.getElementById('formTitle').textContent = 'Edit Refund';
+            document.getElementById('formAction').value = 'edit';
+            
+            // Set form values
+            document.getElementById('refundId').value = refundId;
+            document.getElementById('refundNumber').value = refundId;
+            
+            // You would typically load the data from the server here
+            // and populate the form fields
+            
+            alert(`Editing refund: ${refundId}`);
+        });
+    });
+    
+    processButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const row = this.closest('tr');
+            const refundId = row.querySelector('td:first-child').textContent;
+            alert(`Processing refund: ${refundId}`);
+            // Here you would typically send an AJAX request to process the refund
+        });
+    });
+    
+    // Table search functionality
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.addEventListener('keyup', function() {
+            const searchText = this.value.toLowerCase();
+            const tableRows = document.querySelectorAll('#refundsTable tbody tr');
+            
+            tableRows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                if (text.includes(searchText)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+    }
+    
+    // Filter functionality
+    const filterBtn = document.getElementById('filterBtn');
+    const filterDropdown = document.getElementById('filterDropdown');
+    
+    if (filterBtn && filterDropdown) {
+        filterBtn.addEventListener('click', function() {
+            filterDropdown.classList.toggle('active');
+        });
+        
+        document.addEventListener('click', function(e) {
+            if (!filterBtn.contains(e.target) && !filterDropdown.contains(e.target)) {
+                filterDropdown.classList.remove('active');
             }
         });
+    }
+    
+    const applyFilterBtn = document.getElementById('applyFilterBtn');
+    if (applyFilterBtn) {
+        applyFilterBtn.addEventListener('click', function() {
+            const statusFilter = document.getElementById('statusFilter').value;
+            const programFilter = document.getElementById('programFilter').value;
+            const startDateFilter = document.getElementById('startDateFilter').value;
+            const endDateFilter = document.getElementById('endDateFilter').value;
+            
+            const tableRows = document.querySelectorAll('#refundsTable tbody tr');
+            
+            tableRows.forEach(row => {
+                let display = true;
+                
+                // Status filter
+                if (statusFilter) {
+                    const statusCell = row.querySelector('td:nth-child(7)');
+                    const statusText = statusCell.textContent.toLowerCase();
+                    if (!statusText.includes(statusFilter.toLowerCase())) {
+                        display = false;
+                    }
+                }
+                
+                // Program filter
+                if (display && programFilter) {
+                    const programCell = row.querySelector('td:nth-child(3)');
+                    const programText = programCell.textContent;
+                    if (!programText.includes(programFilter)) {
+                        display = false;
+                    }
+                }
+                
+                // Date filters
+                if (display && (startDateFilter || endDateFilter)) {
+                    const dateCell = row.querySelector('td:nth-child(4)');
+                    const dateText = dateCell.textContent;
+                    const rowDate = new Date(dateText);
+                    
+                    if (startDateFilter && new Date(startDateFilter) > rowDate) {
+                        display = false;
+                    }
+                    
+                    if (endDateFilter && new Date(endDateFilter) < rowDate) {
+                        display = false;
+                    }
+                }
+                
+                // Apply display property
+                row.style.display = display ? '' : 'none';
+            });
+            
+            filterDropdown.classList.remove('active');
+        });
+    }
+    
+    const resetFilterBtn = document.getElementById('resetFilterBtn');
+    if (resetFilterBtn) {
+        resetFilterBtn.addEventListener('click', function() {
+            document.getElementById('statusFilter').value = '';
+            document.getElementById('programFilter').value = '';
+            document.getElementById('startDateFilter').value = '';
+            document.getElementById('endDateFilter').value = '';
+            
+            const tableRows = document.querySelectorAll('#refundsTable tbody tr');
+            tableRows.forEach(row => {
+                row.style.display = '';
+            });
+        });
+    }
+});
     </script>
 {% endblock %}
