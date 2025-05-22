@@ -171,7 +171,6 @@ def admin_class_add(request):
                     messages.error(request, 'Failed to schedule class. Check server logs.')
             except Exception as e:
                 messages.error(request, f'Error scheduling class: {str(e)}')
-
     classes = Class.get_all_classes()
     return render(request, 'admin-class-add.html', {'classes': classes})
 
@@ -245,6 +244,7 @@ def reg(request):
     return render(request, 'reg.html')
 
 def admin_announcements(request):
+    print("POST data:", request.POST)
     if request.method == 'POST':
         title = request.POST.get('title', '')
         message = request.POST.get('message', '')
@@ -271,6 +271,7 @@ def admin_announcements(request):
                     'created_date': created_date,
                     'created_by': created_by
                 }
+                print("form_data:", form_data)
                 result = announcementx.add_announcement(form_data)
                 if result:
                     messages.success(request, 'Announcement published successfully!')
@@ -279,7 +280,6 @@ def admin_announcements(request):
                     messages.error(request, 'Failed to publish announcement. Check server logs.')
             except Exception as e:
                 messages.error(request, f'Error publishing announcement: {str(e)}')
-
     announcements_list = announcementx.get_all_announcements()
     return render(request, 'admin-announcements.html', {'announcements': announcements_list})
 
@@ -635,7 +635,8 @@ def admin_student_add(request):
     # Fetch existing students to display
     students = Student.get_all_students()
     programs = Program.get_all_programs()
-    return render(request, 'admin-student-add.html' , {'students': students,'programs': programs})
+    invno = invoicex.get_invno()
+    return render(request, 'admin-student-add.html' , {'students': students,'programs': programs, 'invno': invno})
 
 def admin_resources(request):
     return render(request, 'admin-resourses.html')    
@@ -860,42 +861,67 @@ def admin_trainer_schedule(request):
 
 
 def admin_user( request):
-    # if request.method == 'POST':
-    #     print("POST data:", request.POST)
-    #     first_name = request.POST.get('first_name', '')
-    #     last_name = request.POST.get('last_name', '')
-    #     email = request.POST.get('email', '')
-    #     phone = request.POST.get('phone', '')
-    #     dob = request.POST.get('dob', '')
-    #     address = request.POST.get('address', '')
-    #     role = request.POST.get('role', '') 
+    if request.method == 'POST':
+        print("POST data:", request.POST)
+        first_name = request.POST.get('firstName', '')
+        last_name = request.POST.get('lastName', '')
+        username = request.POST.get('username', '')
+        email = request.POST.get('email', '')
+        phone = request.POST.get('phone', '')
+        password = request.POST.get('confirmPassword', '')
+        bio = request.POST.get('bio', '')
+        role = request.POST.get('role', '') 
 
-    #     if not all([first_name, last_name, email, phone, dob, address, role]):
-    #         messages.error(request, 'Please fill in all required fields.')
-    #     else:       
-    #         try:
-    #             form_data = {
-    #                 'first_name': first_name,
-    #                 'last_name': last_name,
-    #                 'email': email,
-    #                 'phone': phone,
-    #                 'dob': dob,
-    #                 'address': address,
-    #                 'role': role
-    #             }
-    #             print("form_data:", form_data)
-            #     result = User.add_user(form_data)
-            #     if result:
-            #         messages.success(request, 'User added successfully!')
-            #         return redirect('admin_user')
-            #     else:
-            #         messages.error(request, 'Failed to add user. Check server logs.')
-            # except Exception as e:
-            #     messages.error(request, f'Error adding user: {str(e)}')
-            #     users = User.get_all_users()      {'users': users}
-            return render(request, 'admin-user-management.html')
+        if not all([first_name, last_name, email, phone, username, bio, role]):
+            messages.error(request, 'Please fill in all required fields.')
+        else:       
+            try:
+                form_data = {
+                    'first_name': first_name,
+                    'last_name': last_name,
+                    'username':username,
+                    'email': email,
+                    'phone': phone,
+                    'password': password,
+                    'bio': bio,
+                    'role': role
+                }
+                print("form_data:", form_data)
+                result = User.add_user(form_data)
+                if result:
+                    messages.success(request, 'User added successfully!')
+                    return redirect('admin_user')
+                else:
+                    messages.error(request, 'Failed to add user. Check server logs.')
+            except Exception as e:
+                messages.error(request, f'Error adding user: {str(e)}')
+                # users = User.get_all_users()
+    return render(request, 'admin-user-management.html')
 
 def admin_program_categories(request):
+    if request.method == 'POST':
+        print("POST data:", request.POST)
+        category_name = request.POST.get('categoryName', '')
+        description = request.POST.get('description', '')
+        icon = request.POST.get('icon', '')
+
+        if not all([category_name, description, icon]):
+            messages.error(request, 'Please fill in all required fields.')
+        else:
+            try:
+                form_data = {
+                    'category_name': category_name,
+                    'description': description,
+                    'icon': icon
+                }
+                result = ProgramCategory.add_category(form_data)
+                if result:
+                    messages.success(request, 'Program category added successfully!')
+                    return redirect('admin_program_categories')
+                else:
+                    messages.error(request, 'Failed to add program category. Check server logs.')
+            except Exception as e:
+                messages.error(request, f'Error adding program category: {str(e)}')
     return render(request, 'admin-program-categories-add.html')
 
 def admin_exams(request):

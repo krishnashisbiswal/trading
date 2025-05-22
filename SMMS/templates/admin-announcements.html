@@ -475,9 +475,8 @@
                 <span id="formTitle">Create Announcement</span>
                 <i class="fas fa-times close-btn" id="closeForm"></i>
             </div>
-            <form id="announcementDataForm" method="post">
+            <form id="announcementDataForm" method="post" action="{% url 'admin_announcements' %}">
                 {% csrf_token %}
-                <p>Token: {{ csrf_token }}</p>
                 <div class="form-body">
                     <input type="hidden" id="announcementId" name="announcementId">
                     <input type="hidden" id="formAction" name="formAction" value="add">

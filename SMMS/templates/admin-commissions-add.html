@@ -555,7 +555,6 @@
             </div>
             <form id="commissionDataForm" method="POST" action="{% url 'commissions' %}">
                 {% csrf_token %}
-                <p>Token: {{ csrf_token }}</p>
                 <div class="form-body">
                     <input type="hidden" id="commissionId" name="commissionId">
                     <input type="hidden" id="formAction" name="formAction" value="add">
@@ -646,41 +645,307 @@
     <script src="{% static 'js/admin.js' %}"></script>
     <script src="{% static 'js/admin-forms.js' %}"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Process commission button handler
-            const processButtons = document.querySelectorAll('.action-btn.process');
-            processButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const row = this.closest('tr');
-                    const transactionId = row.cells[1].textContent;
-                    const partnerName = row.querySelector('.user-details h4').textContent;
-                    
-                    if (confirm(`Are you sure you want to process the commission payment of ${row.cells[5].textContent} for ${partnerName}?`)) {
-                        // Here you would typically send a request to your backend
-                        alert(`Commission processing initiated for Transaction ID: ${transactionId}`);
-                        
-                        // Update status (for demonstration)
-                        const statusCell = row.cells[8];
-                        statusCell.innerHTML = '<span class="status-badge status-info">Processing</span>';
-                    }
-                });
-            });
-            
-            // Receipt button handler
-            const receiptButtons = document.querySelectorAll('.action-btn.receipt');
-            receiptButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const transactionId = this.closest('tr').cells[1].textContent;
-                    alert(`Generating receipt for Transaction ID: ${transactionId}. In a real application, this would download the receipt.`);
-                });
-            });
-            
-            // Set current date in form
-            const dateInput = document.getElementById('date');
-            if (dateInput) {
-                const today = new Date();
-                dateInput.value = today.toISOString().split('T')[0];
+     document.addEventListener('DOMContentLoaded', function() {
+    // Get elements
+    const modal = document.getElementById('commissionForm');
+    const form = document.getElementById('commissionDataForm');
+    const addBtn = document.getElementById('addCommissionBtn');
+    const closeBtn = document.getElementById('closeForm');
+    const cancelBtn = document.getElementById('cancelForm');
+
+    // Function to get CSRF token with debugging
+    function getCSRFToken() {
+        console.log('Looking for CSRF token...');
+        
+        // Method 1: Check global variable
+        if (window.csrfToken) {
+            console.log('CSRF token found in window:', window.csrfToken);
+            return window.csrfToken;
+        }
+        
+        // Method 2: Check meta tag
+        const metaTag = document.querySelector('meta[name="csrf-token"]');
+        if (metaTag && metaTag.getAttribute('content')) {
+            console.log('CSRF token found in meta tag:', metaTag.getAttribute('content'));
+            return metaTag.getAttribute('content');
+        }
+        
+        // Method 3: Look in the specific form
+        if (form) {
+            const csrfInput = form.querySelector('input[name="csrfmiddlewaretoken"]');
+            if (csrfInput && csrfInput.value) {
+                console.log('CSRF token found in form:', csrfInput.value);
+                return csrfInput.value;
+            }
+        }
+        
+        // Method 4: Look anywhere in the document
+        const allCsrfInputs = document.querySelectorAll('input[name="csrfmiddlewaretoken"]');
+        console.log('Found CSRF inputs:', allCsrfInputs.length);
+        
+        for (let input of allCsrfInputs) {
+            if (input.value) {
+                console.log('CSRF token found in document:', input.value);
+                return input.value;
+            }
+        }
+        
+        // Method 5: Try to get from cookie
+        const cookies = document.cookie.split(';');
+        for (let cookie of cookies) {
+            const [name, value] = cookie.trim().split('=');
+            if (name === 'csrftoken' && value) {
+                console.log('CSRF token found in cookie:', value);
+                return value;
+            }
+        }
+        
+        // Debug: Show form HTML to see what's missing
+        console.error('CSRF token not found anywhere!');
+        console.log('Available cookies:', document.cookie);
+        if (form) {
+            console.log('Form HTML snippet:', form.innerHTML.substring(0, 500));
+        }
+        
+        return null;
+    }
+
+    // Open modal
+    addBtn.addEventListener('click', function() {
+        modal.classList.add('active');
+        form.reset();
+        
+        // Set current date
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('date').value = today;
+        
+        // Generate transaction ID         
+    });
+
+    // Close modal
+    function closeModal() {
+        modal.classList.remove('active');
+    }
+
+    closeBtn.addEventListener('click', closeModal);
+    cancelBtn.addEventListener('click', closeModal);
+
+    // Close on outside click
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) closeModal();
+    });
+
+    // Form validation
+    function validateForm() {
+        const requiredFields = ['partner', 'referredStudent', 'program', 'amount', 'date', 'status'];
+        let isValid = true;
+
+        requiredFields.forEach(fieldName => {
+            const field = document.getElementById(fieldName);
+            if (!field.value.trim()) {
+                field.style.borderColor = '#dc3545';
+                isValid = false;
+            } else {
+                field.style.borderColor = '#ced4da';
             }
         });
+
+        return isValid;
+    }
+
+    // Handle form submission
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        // Validate form
+        if (!validateForm()) {
+            alert('Please fill in all required fields marked with *');
+            return;
+        }
+
+        // Get CSRF token
+        const csrfToken = getCSRFToken();
+        if (!csrfToken) {
+            alert('Security token not found. Please refresh the page.');
+            return;
+        }
+
+        // Show loading state
+        const submitBtn = form.querySelector('.submit-btn');
+        const originalText = submitBtn.textContent;
+        submitBtn.textContent = 'Saving...';
+        submitBtn.disabled = true;
+
+        // Prepare form data
+        const formData = new FormData(form);
+
+        // Debug log
+        console.log('Submitting form data:');
+        for (let [key, value] of formData.entries()) {
+            console.log(key + ':', value);
+        }
+
+        // Submit via AJAX
+        fetch(form.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': csrfToken,
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            credentials: 'same-origin'
+        })
+        .then(response => {
+            console.log('Response status:', response.status);
+            
+            if (response.status === 403) {
+                throw new Error('CSRF token validation failed. Please refresh the page.');
+            }
+            
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            
+            // Try to parse JSON response
+            const contentType = response.headers.get('content-type');
+            if (contentType && contentType.includes('application/json')) {
+                return response.json();
+            } else {
+                // If not JSON, assume success
+                return { success: true, message: 'Commission saved successfully!' };
+            }
+        })
+        .then(data => {
+            console.log('Response data:', data);
+            
+            if (data.success) {
+                alert(data.message || 'Commission saved successfully!');
+                closeModal();
+                window.location.reload(); // Reload to show new data
+            } else {
+                alert('Error: ' + (data.error || data.message || 'Unknown error'));
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error submitting form: ' + error.message);
+        })
+        .finally(() => {
+            // Reset button
+            submitBtn.textContent = originalText;
+            submitBtn.disabled = false;
+        });
+    });
+
+    // Process buttons
+    document.querySelectorAll('.action-btn.process').forEach(button => {
+        button.addEventListener('click', function() {
+            const row = this.closest('tr');
+            const transactionId = row.cells[1].textContent;
+            const partnerName = row.querySelector('.user-details h4').textContent;
+            const amount = row.cells[5].textContent;
+            
+            if (confirm(`Process commission payment of ${amount} for ${partnerName}?`)) {
+                // Update status
+                const statusCell = row.cells[8];
+                statusCell.innerHTML = '<span class="status-badge status-info">Processing</span>';
+                alert('Commission processing initiated!');
+            }
+        });
+    });
+
+    // View buttons
+    document.querySelectorAll('.action-btn.view').forEach(button => {
+        button.addEventListener('click', function() {
+            const row = this.closest('tr');
+            const transactionId = row.cells[1].textContent;
+            alert(`Viewing details for Transaction ID: ${transactionId}`);
+        });
+    });
+
+    // Receipt buttons
+    document.querySelectorAll('.action-btn.receipt').forEach(button => {
+        button.addEventListener('click', function() {
+            const row = this.closest('tr');
+            const transactionId = row.cells[1].textContent;
+            alert(`Generating receipt for Transaction ID: ${transactionId}`);
+        });
+    });
+
+    // Edit buttons
+    document.querySelectorAll('.action-btn.edit').forEach(button => {
+        button.addEventListener('click', function() {
+            const row = this.closest('tr');
+            const transactionId = row.cells[1].textContent;
+            
+            // Open modal for editing
+            document.getElementById('formTitle').textContent = 'Edit Commission';
+            document.getElementById('formAction').value = 'edit';
+            document.getElementById('transactionId').value = transactionId;
+            
+            modal.classList.add('active');
+        });
+    });
+
+    // Search functionality
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const rows = document.querySelectorAll('#commissionsTable tbody tr');
+            
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchTerm) ? '' : 'none';
+            });
+        });
+    }
+
+    // Bulk selection
+    const selectAllCheckbox = document.getElementById('selectAll');
+    const rowCheckboxes = document.querySelectorAll('.rowCheckbox');
+    const bulkActions = document.getElementById('bulkActions');
+    const selectedCount = document.getElementById('selectedCount');
+
+    function updateBulkActions() {
+        const checkedBoxes = document.querySelectorAll('.rowCheckbox:checked');
+        const count = checkedBoxes.length;
+        
+        selectedCount.textContent = count;
+        bulkActions.style.display = count > 0 ? 'flex' : 'none';
+    }
+
+    if (selectAllCheckbox) {
+        selectAllCheckbox.addEventListener('change', function() {
+            rowCheckboxes.forEach(checkbox => {
+                checkbox.checked = this.checked;
+            });
+            updateBulkActions();
+        });
+    }
+
+    rowCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', updateBulkActions);
+    });
+
+    // Filter dropdown
+    const filterBtn = document.getElementById('filterBtn');
+    const filterDropdown = document.getElementById('filterDropdown');
+    
+    if (filterBtn && filterDropdown) {
+        filterBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            filterDropdown.style.display = filterDropdown.style.display === 'block' ? 'none' : 'block';
+        });
+        
+        document.addEventListener('click', function() {
+            filterDropdown.style.display = 'none';
+        });
+        
+        filterDropdown.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+    }
+});
     </script>
 {% endblock %}

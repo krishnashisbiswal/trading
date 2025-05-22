@@ -1048,7 +1048,8 @@
                 <span id="formTitle">Add New Resource</span>
                 <i class="fas fa-times close-btn" id="closeForm"></i>
             </div>
-            <form id="resourceDataForm">
+            <form id="resourceDataForm" method="POST" enctype="multipart/form-data" action='{% url "admin_resources" %}'>
+                {% csrf_token %}
                 <div class="form-body">
                     <input type="hidden" id="resourceId" name="resourceId">
                     <input type="hidden" id="formAction" name="formAction" value="add">
