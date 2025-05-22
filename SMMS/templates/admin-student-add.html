@@ -533,7 +533,7 @@
                         </div>
                         <div class="form-group">
                             <label for="invoice_number">Invoice Number</label>
-                            <input type="text" id="invoice_number" name="invoice_number" class="form-control" placeholder="Auto-generated if left blank">
+                            <input type="text" id="invoice_number" name="invoice_number" class="form-control" readonly value="{{ invno.0.next_invoice_code }}" placeholder="Auto-generated if left blank">
                         </div>
                     </div>
                 </div>

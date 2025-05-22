@@ -913,3 +913,103 @@ class refundx(models.Model):
         results = cursor.fetchall()
         db.close()
         return results
+    
+class User(models.Model):
+    @classmethod
+    def add_user(cls, data):
+        print("Data to be inserted:")
+        print(f"subject: {data.get('refund_number')}")
+        print(f"priority: {data.get('student')}")
+        db_settings = settings.DATABASES['default']
+        db = MySQLdb.connect(
+            host=db_settings['HOST'],
+            user=db_settings['USER'],
+            passwd=db_settings['PASSWORD'],
+            db=db_settings['NAME'],
+            port=int(db_settings['PORT']),
+        )
+        cursor = db.cursor()
+        query = """
+        INSERT INTO users
+        (username, password, email, phone, first_name, last_name, address_line1, address_line2, city, state, postal_code, country)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
+
+        cursor.execute(query, (
+            data.get('refund_number', 0),
+            data.get('student', ''),
+            data.get('program', ''),
+            data.get('enrollment_id', ''),
+            data.get('request_date', ''),
+            data.get('amount', 0),
+            data.get('reason', ''),
+            data.get('status', 'pending'),
+            data.get('notes', '')
+        ))
+        db.commit()
+        cursor.close()
+        db.close()
+        return True
+    
+    def get_all_users(cls):
+        db_settings = settings.DATABASES['default']
+        db = MySQLdb.connect(
+            host=db_settings['HOST'],
+            user=db_settings['USER'],
+            passwd=db_settings['PASSWORD'],
+            db=db_settings['NAME'],
+            port=int(db_settings['PORT']),
+        )
+        cursor = db.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute("SELECT * FROM users")
+        results = cursor.fetchall()
+        db.close()
+        return results
+    
+class ProgramCategory(models.Model):
+    @classmethod
+    def add_program_category(cls, data):
+        print("Data to be inserted:")
+        print(f"subject: {data.get('category_name')}")
+        print(f"priority: {data.get('description')}")
+        db_settings = settings.DATABASES['default']
+        db = MySQLdb.connect(
+            host=db_settings['HOST'],
+            user=db_settings['USER'],
+            passwd=db_settings['PASSWORD'],
+            db=db_settings['NAME'],
+            port=int(db_settings['PORT']),
+        )
+        cursor = db.cursor()
+        
+        query = """
+        INSERT INTO program_categories
+        (category_name, description)
+        VALUES (%s, %s)
+        """
+        
+        cursor.execute(query, (
+            data.get('category_name', ''),
+            data.get('description', '')
+        ))
+        
+        db.commit()
+        cursor.close()
+        db.close()
+        return True
+
+    @classmethod
+    def get_all_program_categories(cls):
+        db_settings = settings.DATABASES['default']
+        db = MySQLdb.connect(
+            host=db_settings['HOST'],
+            user=db_settings['USER'],
+            passwd=db_settings['PASSWORD'],
+            db=db_settings['NAME'],
+            port=int(db_settings['PORT']),
+        )
+        cursor = db.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute("SELECT * FROM program_categories")
+        results = cursor.fetchall()
+        db.close()
+        return results

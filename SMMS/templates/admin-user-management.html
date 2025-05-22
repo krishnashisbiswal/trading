@@ -574,7 +574,8 @@
                 <span id="formTitle">Add New User</span>
                 <i class="fas fa-times close-btn" id="closeForm"></i>
             </div>
-            <form id="userDataForm">
+            <form id="userDataForm" method="POST" enctype="multipart/form-data" action="{% url 'admin_user' %}">
+                {% csrf_token %}
                 <div class="form-body">
                     <input type="hidden" id="userId" name="userId">
                     
@@ -665,13 +666,13 @@
     <script>
 // JavaScript for Form Handling
 document.addEventListener('DOMContentLoaded', function() {
-    const addUser Btn = document.getElementById('addUser Btn');
+    const addUserBtn = document.getElementById('addUserBtn');
     const userForm = document.getElementById('userForm');
     const closeForm = document.getElementById('closeForm');
     const cancelForm = document.getElementById('cancelForm');
 
     // Show the modal when the "Add New User" button is clicked
-    addUser Btn.addEventListener('click', function() {
+    addUserBtn.addEventListener('click', function() {
         userForm.classList.add('active');
     });
 
