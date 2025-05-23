@@ -478,10 +478,10 @@
                 <span id="formTitle">Add New Category</span>
                 <i class="fas fa-times close-btn" id="closeForm"></i>
             </div>
-            <form id="categoryDataForm">
+            <form id="categoryDataForm" method="POST" action="{% url "admin_program_categories" %}">
+                {% csrf_token %}
                 <div class="form-body">
-                    <input type="hidden" id="categoryId" name="categoryId">
-                    
+                    <input type="hidden" id="categoryId" name="categoryId">  
                     <div class="form-row">
                         <label for="categoryName">Category Name <span class="required">*</span></label>
                         <input type="text" id="categoryName" name="categoryName" required>
@@ -541,74 +541,107 @@
     <!-- Include the common form handling JavaScript -->
     <script src="{% static 'js/admin.js' %}"></script>
     <script src="{%static 'js/admin-forms.js' %}"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Get CSRF token from cookie
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    const csrftoken = getCookie('csrftoken');
     const categoryForm = document.getElementById('categoryForm');
     const categoryDataForm = document.getElementById('categoryDataForm');
-    const closeForm = document.getElementById('closeForm');
-    const cancelForm = document.getElementById('cancelForm');
+    const addCategoryBtn = document.getElementById('addCategoryBtn');
+    const closeFormBtn = document.getElementById('closeForm');
+    const cancelFormBtn = document.getElementById('cancelForm');
     const iconOptions = document.querySelectorAll('.icon-option');
-    let selectedIcon = '';
+    const selectedIconInput = document.getElementById('selectedIcon');
+    const formTitle = document.getElementById('formTitle');
 
-    // Show the modal when the "Add New Category" button is clicked
-    document.getElementById('addCategoryBtn').addEventListener('click', function() {
+    // Open modal
+    addCategoryBtn.addEventListener('click', function () {
+        formTitle.textContent = 'Add New Category';
+        categoryDataForm.reset();
+        selectedIconInput.value = '';
+        iconOptions.forEach(opt => opt.classList.remove('selected'));
         categoryForm.classList.add('active');
     });
 
-    // Close the modal when the close button is clicked
-    closeForm.addEventListener('click', function() {
+    // Close modal
+    function closeModal() {
         categoryForm.classList.remove('active');
-    });
+    }
 
-    // Close the modal when the cancel button is clicked
-    cancelForm.addEventListener('click', function() {
-        categoryForm.classList.remove('active');
-    });
+    closeFormBtn.addEventListener('click', closeModal);
+    cancelFormBtn.addEventListener('click', closeModal);
 
-    // Close the modal when clicking outside of the modal
-    window.addEventListener('click', function(event) {
+    window.addEventListener('click', function (event) {
         if (event.target === categoryForm) {
-            categoryForm.classList.remove('active');
+            closeModal();
         }
     });
 
-    // Icon selection logic
+    // Handle icon selection
     iconOptions.forEach(option => {
-        option.addEventListener('click', function() {
+        option.addEventListener('click', function () {
             iconOptions.forEach(opt => opt.classList.remove('selected'));
             this.classList.add('selected');
-            selectedIcon = this.getAttribute('data-icon');
-            document.getElementById('selectedIcon').value = selectedIcon; // Set the selected icon value
+            const icon = this.getAttribute('data-icon');
+            selectedIconInput.value = icon;
+
+            // Debug icon value
+            console.log("Icon selected:", icon);
         });
     });
 
-    // Form submission logic
-    categoryDataForm.addEventListener('submit', function(event) {
-        event.preventDefault(); // Prevent the default form submission
+    // Handle form submission
+    categoryDataForm.addEventListener('submit', function (e) {
+        e.preventDefault();
 
-        const formData = new FormData(categoryDataForm); // Create a FormData object
+        // Prevent submission if no icon selected
+        if (!selectedIconInput.value.trim()) {
+            alert("Please select an icon.");
+            return;
+        }
 
-        // Send the data to the backend
-        fetch('this.action', { // Adjust the URL to your backend endpoint
+        const formData = new FormData(categoryDataForm);
+
+        // Debug form values
+        console.log("Form values:");
+        for (const pair of formData.entries()) {
+            console.log(pair[0] + ': ' + pair[1]);
+        }
+
+        const submitUrl = categoryDataForm.getAttribute('action') ||{% url "admin_program_categories" %};
+        location.reload();
+        fetch(submitUrl, {
             method: 'POST',
+            headers: {
+                'X-CSRFToken': csrftoken,
+            },
             body: formData,
         })
         .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
+            if (!response.ok) throw new Error('Server error.');
             return response.json();
         })
         .then(data => {
-            console.log('Success:', data);
-            // Optionally, you can close the modal and refresh the category list here
-            categoryForm.classList.remove('active');
-            // You may want to refresh the category list or update the UI accordingly
+            alert('Category saved successfully!');
+            closeModal();
+            location.reload(); // Reload to reflect the new category
         })
-        .catch((error) => {
-            console.error('Error:', error);
-        });
     });
 });
-
+</script>
 {% endblock %}

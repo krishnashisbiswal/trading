@@ -552,97 +552,176 @@
     <script src="{% static 'js/admin.js' %}"></script>
     <script src="{% static 'js/admin-forms.js'%}"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Form open/close functionality
-            const addAnnouncementBtn = document.getElementById('addAnnouncementBtn');
-            const announcementForm = document.getElementById('announcementForm');
-            const closeForm = document.getElementById('closeForm');
-            const cancelForm = document.getElementById('cancelForm');
-            const announcementDataForm = document.getElementById('announcementDataForm');
-            
-            // Open form when Add button is clicked
-            addAnnouncementBtn.addEventListener('click', function() {
-                document.getElementById('formTitle').textContent = 'Create Announcement';
-                announcementDataForm.reset();
-                announcementForm.classList.add('active');
-            });
-            
-            // Close form when X button is clicked
-            closeForm.addEventListener('click', function() {
-                announcementForm.classList.remove('active');
-            });
-            
-            // Close form when Cancel button is clicked
-            cancelForm.addEventListener('click', function() {
-                announcementForm.classList.remove('active');
-            });
-            
-            // Submit form handler
-            announcementDataForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                // Close the form
-                announcementForm.classList.remove('active');
-            });
-            
-            // Audience selection change handler
-            const audienceSelect = document.getElementById('audience');
-            const programSelectRow = document.getElementById('programSelectRow');
-            const batchSelectRow = document.getElementById('batchSelectRow');
-            
-            audienceSelect.addEventListener('change', function() {
-                // Hide both select rows first
-                programSelectRow.style.display = 'none';
-                batchSelectRow.style.display = 'none';
-                
-                // Show relevant select row based on audience selection
-                if (this.value === 'program') {
-                    programSelectRow.style.display = 'block';
-                } else if (this.value === 'batch') {
-                    batchSelectRow.style.display = 'block';
+       document.addEventListener('DOMContentLoaded', function() {
+    // Elements
+    const addAnnouncementBtn = document.getElementById('addAnnouncementBtn');
+    const announcementForm = document.getElementById('announcementForm');
+    const closeFormBtn = document.getElementById('closeForm');
+    const cancelFormBtn = document.getElementById('cancelForm');
+    const announcementDataForm = document.getElementById('announcementDataForm');
+    const audienceSelect = document.getElementById('audience');
+    const programSelectRow = document.getElementById('programSelectRow');
+    const batchSelectRow = document.getElementById('batchSelectRow');
+    const expiryDateInput = document.getElementById('expiryDate');
+
+    // Function to get CSRF token from cookies (Django default)
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
                 }
-            });
+            }
+        }
+        return cookieValue;
+    }
+    const csrftoken = getCookie('csrftoken');
+
+    // Helper to show/hide dependent select rows based on audience
+    function updateAudienceSelection() {
+        programSelectRow.style.display = 'none';
+        batchSelectRow.style.display = 'none';
+
+        if (audienceSelect.value === 'program') {
+            programSelectRow.style.display = 'block';
+        } else if (audienceSelect.value === 'batch') {
+            batchSelectRow.style.display = 'block';
+        }
+    }
+
+    // Open the modal and reset form (for creating new announcement)
+    addAnnouncementBtn.addEventListener('click', function() {
+        document.getElementById('formTitle').textContent = 'Create Announcement';
+        announcementDataForm.reset();
+        // Reset hidden inputs for new form
+        document.getElementById('announcementId').value = '';
+        document.getElementById('formAction').value = 'add';
+        updateAudienceSelection();
+        announcementForm.classList.add('active');
+        // Reset expiry date to default (14 days from today)
+        const today = new Date();
+        const futureDate = new Date(today);
+        futureDate.setDate(today.getDate() + 14);
+        expiryDateInput.value = futureDate.toISOString().split('T')[0];
+    });
+
+    // Close modal functions
+    function closeForm() {
+        announcementForm.classList.remove('active');
+    }
+    closeFormBtn.addEventListener('click', closeForm);
+    cancelFormBtn.addEventListener('click', closeForm);
+
+    // Audience selection change event
+    audienceSelect.addEventListener('change', updateAudienceSelection);
+
+    // Edit announcement handlers
+    const editButtons = document.querySelectorAll('.action-btn.edit');
+    editButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const card = this.closest('.announcement-card');
+            const title = card.querySelector('.announcement-title').textContent;
+            let message = card.querySelector('.announcement-content').innerHTML;
+
+            // Because the message text uses HTML <p>, replace with line breaks for textarea
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = message;
+            message = tempDiv.textContent || tempDiv.innerText || '';
+
+            const isImportant = card.querySelector('.announcement-badge.important') !== null;
             
-            // Edit announcement handlers
-            const editButtons = document.querySelectorAll('.action-btn.edit');
-            editButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const card = this.closest('.announcement-card');
-                    const title = card.querySelector('.announcement-title').textContent;
-                    const content = card.querySelector('.announcement-content').innerHTML;
-                    const isImportant = card.querySelector('.announcement-badge.important') !== null;
-                    
-                    // Fill the form with the announcement data
-                    document.getElementById('formTitle').textContent = 'Edit Announcement';
-                    document.getElementById('title').value = title;
-                    document.getElementById('message').value = content;
-                    document.getElementById('isImportant').checked = isImportant;
-                    
-                    // Open the form
-                    announcementForm.classList.add('active');
-                });
-            });
-            
-            // Delete announcement handlers
-            const deleteButtons = document.querySelectorAll('.action-btn.delete');
-            deleteButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const card = this.closest('.announcement-card');
-                    const title = card.querySelector('.announcement-title').textContent;
-                    
-                    if (confirm(`Are you sure you want to delete the announcement "${title}"?`)) {
-                        // Here you would typically send a delete request to your backend
-                        card.remove();
-                        alert(`Announcement "${title}" deleted successfully!`);
-                    }
-                });
-            });
-            
-            // Set default expiry date (14 days from today)
-            const expiryDateInput = document.getElementById('expiryDate');
-            const today = new Date();
-            const futureDate = new Date(today);
-            futureDate.setDate(today.getDate() + 14);
-            expiryDateInput.value = futureDate.toISOString().split('T')[0];
+            // TODO: For real editing, you should populate audience, program, batch, expiryDate and hidden announcementId from backend or data attributes.
+
+            // Fill the form
+            document.getElementById('formTitle').textContent = 'Edit Announcement';
+            document.getElementById('title').value = title;
+            document.getElementById('message').value = message;
+            document.getElementById('isImportant').checked = isImportant;
+
+            // Set hidden fields for edit
+            document.getElementById('formAction').value = 'edit';
+            // If you have an announcementId, set it here, else empty for demo
+            document.getElementById('announcementId').value = '';
+
+            // For simplicity, hide dependent selects for now
+            audienceSelect.value = 'all';
+            updateAudienceSelection();
+
+            announcementForm.classList.add('active');
         });
+    });
+
+    // Delete announcement handlers
+    const deleteButtons = document.querySelectorAll('.action-btn.delete');
+    deleteButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const card = this.closest('.announcement-card');
+            const title = card.querySelector('.announcement-title').textContent;
+
+            if (confirm(`Are you sure you want to delete the announcement "${title}"?`)) {
+                // Implement your AJAX delete request here if backend supports it.
+                // For demo, just remove card and alert.
+                card.remove();
+                alert(`Announcement "${title}" deleted successfully!`);
+            }
+        });
+    });
+
+    // Submit form asynchronously
+    announcementDataForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        location.reload();
+        const formData = new FormData(announcementDataForm);
+
+        fetch(announcementDataForm.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': csrftoken,
+            },
+            credentials: 'same-origin'
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(data => {
+                    // If server returns JSON error message
+                    throw new Error(data.error || 'Failed to save announcement');
+                }).catch(() => {
+                    throw new Error('Failed to save announcement');
+                });
+            }
+            return response.json().catch(() => ({})); // Handle empty JSON gracefully
+        })
+        .then(data => {
+            // Success handler, you can update announcement list here dynamically if desired.
+
+            announcementForm.classList.remove('active');
+            alert('Announcement published successfully!');
+            // Optional: reload the page or refresh announcements list
+            location.reload();
+
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while publishing the announcement: ' + error.message);
+        });
+    });
+
+    // Initialize audience selection display
+    updateAudienceSelection();
+
+    // Set default expiry date (14 days from today) on load if empty
+    if (!expiryDateInput.value) {
+        const today = new Date();
+        const futureDate = new Date(today);
+        futureDate.setDate(today.getDate() + 14);
+        expiryDateInput.value = futureDate.toISOString().split('T')[0];
+    }
+});
     </script>
 {% endblock %}
