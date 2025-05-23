@@ -394,7 +394,6 @@ def admin_trainer_add(request):
             linkedin_profile = request.POST.get('linkedin_profile', '')
             website = request.POST.get('website', '')
             notes = request.POST.get('notes', '')
-
         # Validate required fields
         if not all([first_name, last_name, email, phone, designation, bio, username]):
             messages.error(request, 'Please fill in all required fields.')
@@ -903,18 +902,18 @@ def admin_program_categories(request):
         print("POST data:", request.POST)
         category_name = request.POST.get('categoryName', '')
         description = request.POST.get('description', '')
-        icon = request.POST.get('icon', '')
-
-        if not all([category_name, description, icon]):
+        icon = request.POST.get('selectedIcon', '')
+        if not all([category_name, description]):
             messages.error(request, 'Please fill in all required fields.')
         else:
             try:
                 form_data = {
                     'category_name': category_name,
                     'description': description,
-                    'icon': icon
+                    'icon': icon,
                 }
-                result = ProgramCategory.add_category(form_data)
+                print("form_data:", form_data)
+                result = ProgramCategory.add_program_category(form_data)
                 if result:
                     messages.success(request, 'Program category added successfully!')
                     return redirect('admin_program_categories')

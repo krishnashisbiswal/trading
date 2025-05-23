@@ -408,7 +408,7 @@
             <h2 class="form-title">Trainer Information</h2>
         </div>
         
-        <form id="trainer-registration-form" action="{% url 'admin_trnx' %}" method="post">
+        <form id="trainer-registration-form" action="{% url 'admin_trainer_add' %}" method="post">
             {% csrf_token %}
             <!-- Personal Information Section -->
             <div class="form-section">
@@ -458,6 +458,7 @@
                     <div class="file-upload-container">
                         <input type="file" id="profile_picture" name="profile_picture" class="file-input" accept="image/*">
                         <div class="file-upload-btn">
+                            <i class="fas fa-cloud-upload-alt"><input type="file" id="profile_pc"/></i>
                         </div>
                     </div>
                     <div class="form-text">Maximum file size: 2MB. Recommended dimensions: 300x300px</div>

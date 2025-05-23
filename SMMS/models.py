@@ -462,7 +462,6 @@ class Trainer(models.Model):
             data.get('website', ''),
             data.get('notes', ''),
         ))
-
         db.commit()
         if cursor:
             cursor.close()
@@ -918,8 +917,8 @@ class User(models.Model):
     @classmethod
     def add_user(cls, data):
         print("Data to be inserted:")
-        print(f"subject: {data.get('refund_number')}")
-        print(f"priority: {data.get('student')}")
+        print(f"subject: {data.get('username')}")
+        print(f"priority: {data.get('password')}")
         db_settings = settings.DATABASES['default']
         db = MySQLdb.connect(
             host=db_settings['HOST'],
@@ -972,6 +971,7 @@ class ProgramCategory(models.Model):
         print("Data to be inserted:")
         print(f"subject: {data.get('category_name')}")
         print(f"priority: {data.get('description')}")
+        print(f"priority: {data.get('icon')}")  
         db_settings = settings.DATABASES['default']
         db = MySQLdb.connect(
             host=db_settings['HOST'],
@@ -984,13 +984,14 @@ class ProgramCategory(models.Model):
         
         query = """
         INSERT INTO program_categories
-        (category_name, description)
-        VALUES (%s, %s)
+        (category_name, description,icon)
+        VALUES (%s, %s , %s)
         """
         
         cursor.execute(query, (
             data.get('category_name', ''),
-            data.get('description', '')
+            data.get('description', ''),
+            data.get('icon', ''),
         ))
         
         db.commit()
