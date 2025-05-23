@@ -431,7 +431,6 @@ class Trainer(models.Model):
          max_hours_weekly, create_account, username, password, linkedin_profile, website, notes)
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         """
-
         cursor.execute(query, (
             data.get('first_name', ''),
             data.get('last_name', ''),
@@ -931,24 +930,28 @@ class User(models.Model):
         query = """
         INSERT INTO users
         (username, password, email, phone, first_name, last_name, address_line1, address_line2, city, state, postal_code, country)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         """
 
         cursor.execute(query, (
-            data.get('refund_number', 0),
-            data.get('student', ''),
-            data.get('program', ''),
-            data.get('enrollment_id', ''),
-            data.get('request_date', ''),
-            data.get('amount', 0),
-            data.get('reason', ''),
-            data.get('status', 'pending'),
-            data.get('notes', '')
+            data.get('username', ''),
+            data.get('password', ''),
+            data.get('email', ''),
+            data.get('phone', ''),
+            data.get('first_name', ''),
+            data.get('last_name', ''),
+            data.get('address_line1', ''),
+            data.get('address_line2', ''),
+            data.get('city', ''),
+            data.get('state', ''),
+            data.get('postal_code', ''),
+            data.get('country', '')
         ))
         db.commit()
         cursor.close()
         db.close()
         return True
+
     
     def get_all_users(cls):
         db_settings = settings.DATABASES['default']
@@ -1014,3 +1017,4 @@ class ProgramCategory(models.Model):
         results = cursor.fetchall()
         db.close()
         return results
+    

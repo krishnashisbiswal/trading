@@ -362,38 +362,38 @@ def add_quiz(request):
     return render(request, 'admin-quizzes.html', {'personal_infos': personal_infos})
 
 def admin_trainer_add(request):
-        if request.method == 'POST':
+    if request.method == 'POST':
         # Extract form data
-            print("POST data:", request.POST)
-            first_name = request.POST.get('first_name', '')
-            last_name = request.POST.get('last_name', '')
-            email = request.POST.get('email', '')
-            phone = request.POST.get('phone', '')
-            dob = request.POST.get('dob', '')
-            gender = request.POST.get('gender', '')
-            profile_picture_file = request.FILES.get('profile_picture')
-            address_line1 = request.POST.get('address_line1', '')
-            address_line2 = request.POST.get('address_line2', '')
-            city = request.POST.get('city', '')
-            state = request.POST.get('state', '')
-            postal_code = request.POST.get('postal_code', '')
-            country = request.POST.get('country', '')
-            designation = request.POST.get('designation', '')
-            experience_years = int(request.POST.get('experience_years', 0))
-            teaching_experience = int(request.POST.get('teaching_experience', 0))
-            expertise_areas = request.POST.getlist('expertise_areas[]')
-            certifications_raw = request.POST.get('certifications', '')
-            bio = request.POST.get('bio', '')
-            programs = request.POST.getlist('programs')
-            specific_modules_raw = request.POST.get('specific_modules', '')
-            hourly_rate = float(request.POST.get('hourly_rate', 0))
-            max_hours_weekly = int(request.POST.get('max_hours_weekly', 20))
-            create_account = request.POST.get('create_account') == 'on'
-            username = request.POST.get('username', '')
-            password = request.POST.get('password', '')
-            linkedin_profile = request.POST.get('linkedin_profile', '')
-            website = request.POST.get('website', '')
-            notes = request.POST.get('notes', '')
+        print("POST data:", request.POST)
+        first_name = request.POST.get('first_name', '')
+        last_name = request.POST.get('last_name', '')
+        email = request.POST.get('email', '')
+        phone = request.POST.get('phone', '')
+        dob = request.POST.get('dob', '')
+        gender = request.POST.get('gender', '')
+        profile_picture_file = request.FILES.get('profile_picture')
+        address_line1 = request.POST.get('address_line1', '')
+        address_line2 = request.POST.get('address_line2', '')
+        city = request.POST.get('city', '')
+        state = request.POST.get('state', '')
+        postal_code = request.POST.get('postal_code', '')
+        country = request.POST.get('country', '')
+        designation = request.POST.get('designation', '')
+        experience_years = int(request.POST.get('experience_years', ''))
+        teaching_experience = int(request.POST.get('teaching_experience', ''))
+        expertise_areas = request.POST.getlist('expertise_areas[]')
+        certifications_raw = request.POST.get('certifications', '')
+        bio = request.POST.get('bio', '')
+        programs = request.POST.getlist('programs')
+        specific_modules_raw = request.POST.get('specific_modules', '')
+        hourly_rate = float(request.POST.get('hourly_rate', ''))
+        max_hours_weekly = int(request.POST.get('max_hours_weekly', 20))
+        create_account = request.POST.get('create_account') == 'on'
+        username = request.POST.get('username', '')
+        password = request.POST.get('password', '')
+        linkedin_profile = request.POST.get('linkedin_profile', '')            
+        website = request.POST.get('website', '')
+        notes = request.POST.get('notes', '')
         # Validate required fields
         if not all([first_name, last_name, email, phone, designation, bio, username]):
             messages.error(request, 'Please fill in all required fields.')
@@ -430,16 +430,16 @@ def admin_trainer_add(request):
                     'notes': notes,
                 }
                 print("form_data:", form_data)
-                result = Trainer.add_trainer(form_data, profile_picture_file)
+                result = Trainer.add_trainer(form_data)
                 if result:
                     messages.success(request, 'Trainer registered successfully!')
-                    return redirect('admin_trainer_add')
+                    return redirect('admin_trainers')
                 else:
                     messages.error(request, 'Failed to register trainer. Check server logs.')
             except Exception as e:
                 messages.error(request, f'Error registering trainer: {str(e)}')
-                trainers = Trainer.get_all_trainers()
-        return render(request, 'admin-trainer-add.html', {'trainers': trainers})
+        trainers = Trainer.get_all_trainers()
+    return render(request, 'admin-trainer-add.html', {'trainers': trainers})
     
 def admin_program_add(request):
     if request.method == 'POST':
