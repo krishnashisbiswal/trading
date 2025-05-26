@@ -20,55 +20,57 @@ class Student(models.Model):
             db=db_settings['NAME'],
             port=int(db_settings['PORT']),
         )
-
         cursor = db.cursor()
 
         # Create SQL query for insertion
         query = """
         INSERT INTO students 
-        (first_name, last_name, email, phone, dob, address_line1 , address_line2 , city , state , postal_code , country , program, batch, referral_source, notes, payment_status, payment_method, amount_paid, transaction_id , invoice_number, payment_date, username , password)  
-        VALUES (%s, %s, %s, %s, %s, %s , %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s , %s, %s , %s) 
+        (first_name, last_name, email, phone, dob, gender, address_line1 , address_line2 , city , state , postal_code , country , program, batch, referral_source, notes, payment_status, payment_method, amount_paid, transaction_id , invoice_number, payment_date, username , password)  
+        VALUES (%s, %s, %s, %s, %s, %s , %s, %s, %s, %s,%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s , %s, %s , %s) 
         """
+        try:
         # Execute the query with data
-        cursor.execute(query, (
-                data.get('first_name', ''),
-                data.get('last_name', ''),
-                data.get('email', ''),
-                data.get('phone', ''),
-                data.get('dob', ''),
-                data.get('address_line1', ''),
-                data.get('address_line2', ''),
-                data.get('city', ''),
-                data.get('state', ''),
-                data.get('postal_code', ''),
-                data.get('country', ''),
-                data.get('program', ''),
-                data.get('batch', ''),
-                data.get('referral_source', ''),
-                data.get('notes', ''),
-                data.get('payment_status', ''),
-                data.get('payment_method', ''),
-                data.get('amount_paid', ''),
-                data.get('transaction_id', ''),
-                data.get('invoice_number', ''),
-                data.get('payment_date', ''),
-                data.get('username', ''),
-                data.get('password', '')
-            ))
-            # Commit the transaction
-        db.commit()
-        if cursor:
-            cursor.close()
+            cursor.execute(query, (
+                    data.get('first_name', ''),
+                    data.get('last_name', ''),
+                    data.get('email', ''),
+                    data.get('phone', ''),
+                    data.get('dob', ''),
+                    data.get('gender', ''),
+                    data.get('address_line1', ''),
+                    data.get('address_line2', ''),
+                    data.get('city', ''),
+                    data.get('state', ''),
+                    data.get('postal_code', ''),
+                    data.get('country', ''),
+                    data.get('program', ''),
+                    data.get('batch', ''),
+                    data.get('referral_source', ''),
+                    data.get('notes', ''),
+                    data.get('payment_status', ''),
+                    data.get('payment_method', ''),
+                    data.get('amount_paid', ''),
+                    data.get('transaction_id', ''),
+                    data.get('invoice_number', ''),
+                    data.get('payment_date', ''),
+                    data.get('username', ''),
+                    data.get('password', '')
+                ))
+                # Commit the transaction
+            db.commit()
+        except Exception as e:
+            print(f"An error occurred: {e}")
+            db.rollback()  # Rollback in case of error
+        finally:
+            if cursor:
+                cursor.close()
             # Close the connection
         db.close()
-
         return True 
 
     @classmethod
     def get_all_students(cls):
-
         db_settings = settings.DATABASES['default']
-
         db = MySQLdb.connect(
             host=db_settings['HOST'],
             user=db_settings['USER'],
@@ -76,10 +78,25 @@ class Student(models.Model):
             db=db_settings['NAME'],
             port=int(db_settings['PORT']),
         )
-
         cursor = db.cursor(MySQLdb.cursors.DictCursor)
         cursor.execute("SELECT * FROM students")
         # Fetch all results
+        results = cursor.fetchall()
+        db.close()
+        return results
+    
+    @classmethod
+    def studntno(cls):
+        db_settings = settings.DATABASES['default']
+        db = MySQLdb.connect(
+            host=db_settings['HOST'],
+            user=db_settings['USER'],
+            passwd=db_settings['PASSWORD'],
+            db=db_settings['NAME'],
+            port=int(db_settings['PORT']),
+        )
+        cursor = db.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute("select count(*) as stdnts from students")
         results = cursor.fetchall()
         db.close()
         return results

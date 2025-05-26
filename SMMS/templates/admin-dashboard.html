@@ -32,7 +32,7 @@
                         <div class="stats-info">
                             <h3>Total Students</h3>
                             <div class="stats-numbers">
-                                <span class="stats-value">2,845</span>
+                                <span class="stats-value">{{no.0.stdnts}}</span>
                                 <span class="stats-change positive">
                                     <i class="fas fa-arrow-up"></i> 12%
                                 </span>
@@ -62,7 +62,7 @@
                         <div class="stats-info">
                             <h3>Active Programs</h3>
                             <div class="stats-numbers">
-                                <span class="stats-value">16</span>
+                                <span class="stats-value">4</span>
                                 <span class="stats-change neutral">
                                     <i class="fas fa-minus"></i> 0%
                                 </span>
@@ -88,7 +88,7 @@
                 </div>
             </section>
 
-            <!-- Revenue & Enrollments Chart -->
+            {% comment %} <!-- Revenue & Enrollments Chart -->
             <section class="chart-section">
                 <div class="card revenue-chart-card">
                     <div class="card-header">
@@ -114,9 +114,9 @@
                         </div>
                     </div>
                 </div>
-            </section>
+            </section> {% endcomment %}
 
-            <!-- Recent Activities & Program Performance -->
+            {% comment %} <!-- Recent Activities & Program Performance -->
             <section class="dual-section">
                 <div class="row">
                     <!-- Recent Activities -->
@@ -181,9 +181,9 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div> {% endcomment %}
 
-                    <!-- Program Performance -->
+                    {% comment %} <!-- Program Performance -->
                     <div class="card program-performance-card">
                         <div class="card-header">
                             <h2>Program Performance</h2>
@@ -269,7 +269,7 @@
                         </div>
                     </div>
                 </div>
-            </section>
+            </section> {% endcomment %}
 
             <!-- Upcoming Classes & Latest Support Tickets -->
             <section class="dual-section">
@@ -284,62 +284,25 @@
                         </div>
                         <div class="card-body">
                             <div class="classes-list">
+                                {% for class in classes %}
                                 <div class="class-item">
                                     <div class="class-time">
-                                        <span class="time">10:00 AM</span>
-                                        <span class="duration">2 hrs</span>
+                                        <span class="time">{{class.start_time}}</span>
+                                        <span class="duration">{{class.duration}} mins</span>
                                     </div>
                                     <div class="class-details">
-                                        <h4>GMP Class 5 - Emotional Intelligence in Trading</h4>
-                                        <p>Trainer: Prashanta Kumar Palei | Batch: April 2025</p>
+                                        <h4>{{class.class_title}}</h4>
+                                        <p>Trainer: {{class.trainer}} | Batch: {{Class.batch}}</p>
                                     </div>
                                     <div class="class-status ongoing">
                                         <span>Ongoing</span>
                                     </div>
                                 </div>
-                                <div class="class-item">
-                                    <div class="class-time">
-                                        <span class="time">02:00 PM</span>
-                                        <span class="duration">1.5 hrs</span>
-                                    </div>
-                                    <div class="class-details">
-                                        <h4>SIP Class 3 - Asset Allocation Strategies</h4>
-                                        <p>Trainer: Andaz Aaron | Batch: March 2025</p>
-                                    </div>
-                                    <div class="class-status upcoming">
-                                        <span>Upcoming</span>
-                                    </div>
-                                </div>
-                                <div class="class-item">
-                                    <div class="class-time">
-                                        <span class="time">05:00 PM</span>
-                                        <span class="duration">2 hrs</span>
-                                    </div>
-                                    <div class="class-details">
-                                        <h4>CTP Class 13 - Price Action Trading</h4>
-                                        <p>Trainer: Andaz Aaron | Batch: February 2025</p>
-                                    </div>
-                                    <div class="class-status upcoming">
-                                        <span>Upcoming</span>
-                                    </div>
-                                </div>
-                                <div class="class-item">
-                                    <div class="class-time">
-                                        <span class="time">08:00 PM</span>
-                                        <span class="duration">2 hrs</span>
-                                    </div>
-                                    <div class="class-details">
-                                        <h4>AMP Class 6 - Advanced Risk Management</h4>
-                                        <p>Trainer: Prashanta Kumar Palei | Batch: April 2025</p>
-                                    </div>
-                                    <div class="class-status upcoming">
-                                        <span>Upcoming</span>
-                                    </div>
-                                </div>
+                                {% endfor %}
                             </div>
                         </div>
                     </div>
-
+                
                     <!-- Latest Support Tickets -->
                     <div class="card support-tickets-card">
                         <div class="card-header">
@@ -348,9 +311,9 @@
                                 <button class="btn-text">View All</button>
                             </div>
                         </div>
-                        {% for ticket in ticketsx %}
                         <div class="card-body">
                             <div class="tickets-list">
+                                {% for ticket in tickets %}
                                 <div class="ticket-item">
                                     <div class="ticket-priority high"></div>
                                     <div class="ticket-content">
@@ -398,7 +361,8 @@
                 </div>
             </section>
 
-            <!-- Recent Enrollments & Top Performing Partners -->
+            <main class="admin-main">
+                            <!-- Recent Enrollments & Top Performing Partners -->
             <section class="dual-section">
                 <div class="row">
                     <!-- Recent Enrollments -->
@@ -599,7 +563,7 @@
                 </div>
             </section>
 
-            <!-- Student Demographics & Regional Distribution -->
+            {% comment %} <!-- Student Demographics & Regional Distribution -->
             <section class="chart-section">
                 <div class="row">
                     <!-- Student Demographics Chart -->
@@ -642,7 +606,7 @@
                         </div>
                     </div>
                 </div>
-            </section>
+            </section> {% endcomment %}
 
             <!-- Quick Actions -->
             <section class="quick-actions-section">
@@ -681,8 +645,8 @@
                     </div>
                 </div>
             </section>
+            </main>
         </main>
-    </div>
         <!-- Scripts -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.1/chart.min.js"></script>
         <script src="{% static 'js/admin.js' %}"></script>    

@@ -117,7 +117,11 @@ def assessment_view(request):
     return render(request, 'assessment.html', {'assessments': assessments})
 
 def admin_dashboard(request):
-    return render(request, 'admin-dashboard.html')
+    student = Student.get_all_students()
+    tickets = support_ticketx.get_all_tickets()
+    classes = Class.get_all_classes()
+    no = Student.studntno()
+    return render(request, 'admin-dashboard.html',{'student': student,'tickets': tickets, 'classes': classes , 'no': no})
 
 def admin_class_add(request):
     if request.method == 'POST':
