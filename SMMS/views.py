@@ -721,7 +721,8 @@ def commissions(request):
                 messages.error(request, f'Error adding commission: {str(e)}')
 
     commissions_list = commissionx.get_all_commissions()
-    return render(request, 'admin-commissions-add.html', {'commissions': commissions_list})
+    comno = commissionx.get_comno()
+    return render(request, 'admin-commissions-add.html', {'commissions': commissions_list , 'comno': comno})
 
 def exams(request):
     return render(request, 'admin-exams-add.html')
