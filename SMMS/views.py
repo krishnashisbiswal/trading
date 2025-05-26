@@ -495,6 +495,7 @@ def support_ticket(request):
         subject = request.POST.get('ticket_subject', '')
         priority = request.POST.get('ticket_priority', '')
         category = request.POST.get('ticket_category', '')
+        status = request.POST.get('ticket_status', '')
         message = request.POST.get('ticket_message', '')
         attachment= request.POST.get('ticket_attachment', '')
 

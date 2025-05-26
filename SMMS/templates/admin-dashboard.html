@@ -321,48 +321,18 @@
                                         <p>Submitted by: Amit Kumar | {{ ticket.created_at }}</p>
                                     </div>
                                     <div class="ticket-status new">
-                                        <span>{{ ticket.status }}</span>
+                                        <span>In-progress</span>
                                     </div>
                                 </div>
                                 {% endfor %}
-                                <div class="ticket-item">
-                                    <div class="ticket-priority medium"></div>
-                                    <div class="ticket-content">
-                                        <h4>Payment confirmation not received</h4>
-                                        <p>Submitted by: Priya Patel | 3 hours ago</p>
-                                    </div>
-                                    <div class="ticket-status in-progress">
-                                        <span>In Progress</span>
-                                    </div>
-                                </div>
-                                <div class="ticket-item">
-                                    <div class="ticket-priority low"></div>
-                                    <div class="ticket-content">
-                                        <h4>Request for assignment extension</h4>
-                                        <p>Submitted by: Rahul Sharma | 5 hours ago</p>
-                                    </div>
-                                    <div class="ticket-status in-progress">
-                                        <span>In Progress</span>
-                                    </div>
-                                </div>
-                                <div class="ticket-item">
-                                    <div class="ticket-priority medium"></div>
-                                    <div class="ticket-content">
-                                        <h4>Issue with quiz submission</h4>
-                                        <p>Submitted by: Neha Singh | Yesterday</p>
-                                    </div>
-                                    <div class="ticket-status resolved">
-                                        <span>Resolved</span>
-                                    </div>
-                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <main class="admin-main">
-                            <!-- Recent Enrollments & Top Performing Partners -->
+            
+        <!-- Recent Enrollments & Top Performing Partners -->
             <section class="dual-section">
                 <div class="row">
                     <!-- Recent Enrollments -->
@@ -386,81 +356,23 @@
                                         </tr>
                                     </thead>
                                     <tbody>
+                                        {%for students in student %}
                                         <tr>
                                             <td>
                                                 <div class="user-info">
                                                     <img src="{% static 'images/student-avatar-1.jpg' %}" alt="Student" class="user-avatar">
                                                     <div class="user-details">
-                                                        <h4>Rahul Sharma</h4>
-                                                        <p>rahul.s@gmail.com</p>
+                                                        <h4>{{students.first_name}} {{students.last_name}}</h4>
+                                                        <p>{{students.email}}</p>
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td>Complete Trading Program (CTP)</td>
-                                            <td>April 8, 2025</td>
-                                            <td>₹19,999</td>
+                                            <td>{{students.program}}</td>
+                                            <td>{{students.payment_date}}</td>
+                                            <td>{{students.amount_paid}}</td>
                                             <td><span class="status-badge status-success">Paid</span></td>
                                         </tr>
-                                        <tr>
-                                            <td>
-                                                <div class="user-info">
-                                                    <img src="{% static 'images/student-avatar-2.jpg' %}" alt="Student" class="user-avatar">
-                                                    <div class="user-details">
-                                                        <h4>Priya Patel</h4>
-                                                        <p>priya.p@gmail.com</p>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td>Arthavidya Mentorship Program (AMP)</td>
-                                            <td>April 7, 2025</td>
-                                            <td>₹39,999</td>
-                                            <td><span class="status-badge status-success">Paid</span></td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <div class="user-info">
-                                                    <img src="{% static 'images/student-avatar-3.jpg' %}" alt="Student" class="user-avatar">
-                                                    <div class="user-details">
-                                                        <h4>Amit Kumar</h4>
-                                                        <p>amit.k@gmail.com</p>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td>Growth Mindset Program (GMP)</td>
-                                            <td>April 7, 2025</td>
-                                            <td>₹7,999</td>
-                                            <td><span class="status-badge status-warning">Pending</span></td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <div class="user-info">
-                                                    <img src="{% static 'images/student-avatar-4.jpg' %}" alt="Student" class="user-avatar">
-                                                    <div class="user-details">
-                                                        <h4>Neha Singh</h4>
-                                                        <p>neha.s@gmail.com</p>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td>Smart Income Program (SIP)</td>
-                                            <td>April 6, 2025</td>
-                                            <td>₹11,999</td>
-                                            <td><span class="status-badge status-success">Paid</span></td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <div class="user-info">
-                                                    <img src="{% static 'images/student-avatar-5.jpg' %}" alt="Student" class="user-avatar">
-                                                    <div class="user-details">
-                                                        <h4>Rajesh Verma</h4>
-                                                        <p>rajesh.v@gmail.com</p>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td>Complete Trading Program (CTP)</td>
-                                            <td>April 5, 2025</td>
-                                            <td>₹19,999</td>
-                                            <td><span class="status-badge status-danger">Failed</span></td>
-                                        </tr>
+                                        {% endfor %}
                                     </tbody>
                                 </table>
                             </div>
@@ -646,7 +558,6 @@
                 </div>
             </section>
             </main>
-        </main>
         <!-- Scripts -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.1/chart.min.js"></script>
         <script src="{% static 'js/admin.js' %}"></script>    
