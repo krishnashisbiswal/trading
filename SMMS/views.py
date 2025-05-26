@@ -867,11 +867,13 @@ def admin_user( request):
         username = request.POST.get('username', '')
         email = request.POST.get('email', '')
         phone = request.POST.get('phone', '')
-        password = request.POST.get('confirmPassword', '')
-        bio = request.POST.get('bio', '')
         role = request.POST.get('role', '') 
+        password = request.POST.get('password', '')
+        status = request.POST.get('status', '')
+        confirm_password = request.POST.get('confirmPassword', '')
+        bio = request.POST.get('bio', '')
 
-        if not all([first_name, last_name, email, phone, username, bio, role]):
+        if not all([first_name, last_name, email, phone, username, status,password,bio, role]):
             messages.error(request, 'Please fill in all required fields.')
         else:       
             try:
@@ -881,9 +883,11 @@ def admin_user( request):
                     'username':username,
                     'email': email,
                     'phone': phone,
+                    'role': role,
                     'password': password,
-                    'bio': bio,
-                    'role': role
+                    'status': status,
+                    'confirm_password': confirm_password,
+                    'bio': bio
                 }
                 print("form_data:", form_data)
                 result = User.add_user(form_data)
