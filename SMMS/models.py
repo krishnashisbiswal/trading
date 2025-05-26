@@ -680,25 +680,28 @@ class commissionx(models.Model):
         
         query = """
         INSERT INTO commissions
-        (transaction_id, partner, referred_student, program, amount, processing_fee, status, notes)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+        (transaction_id, partner, referred_student, program, amount, processing_fee, date, status, notes)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
         """
-        
-        cursor.execute(query, (
-            data.get('transaction_id', ''),
-            data.get('partner', ''),
-            data.get('referred_student', ''),
-            data.get('program', ''),
-            data.get('amount', 0),
-            data.get('processing_fee', 0),
-            data.get('date', ''),
-            data.get('status', 'pending'),
-            data.get('notes', '')
-        ))
-        
-        db.commit()
-        cursor.close()
-        db.close()
+        try:
+            cursor.execute(query, (
+                data.get('transaction_id', ''),
+                data.get('partner', ''),
+                data.get('referred_student', ''),
+                data.get('program', ''),
+                data.get('amount', 0),
+                data.get('processing_fee', 0),
+                data.get('date', ''),
+                data.get('status', 'pending'),
+                data.get('notes', '')
+            ))
+        except Exception as e:
+            print(f"An error occurred: {e}")
+            db.rollback()  # Rollback in case of error
+        finally:
+            db.commit()
+            cursor.close()
+            db.close()
         return True
 
     @classmethod
@@ -713,6 +716,22 @@ class commissionx(models.Model):
         )
         cursor = db.cursor(MySQLdb.cursors.DictCursor)
         cursor.execute("SELECT * FROM commissions")
+        results = cursor.fetchall()
+        db.close()
+        return results
+    
+    @classmethod
+    def get_comno(cls):
+        db_settings = settings.DATABASES['default']
+        db = MySQLdb.connect(
+            host=db_settings['HOST'],
+            user=db_settings['USER'],
+            passwd=db_settings['PASSWORD'],
+            db=db_settings['NAME'],
+            port=int(db_settings['PORT']),
+        )
+        cursor = db.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute("SELECT * FROM msksomim_.next_commission_view")
         results = cursor.fetchall()
         db.close()
         return results
@@ -772,7 +791,6 @@ class invoicex(models.Model):
         results = cursor.fetchall()
         db.close()
         return results
-
 
     @classmethod
     def get_invno(cls):
