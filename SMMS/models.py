@@ -975,6 +975,7 @@ class ProgramCategory(models.Model):
         print(f"subject: {data.get('category_name')}")
         print(f"priority: {data.get('description')}")
         print(f"priority: {data.get('icon')}")  
+        
         db_settings = settings.DATABASES['default']
         db = MySQLdb.connect(
             host=db_settings['HOST'],
@@ -987,20 +988,25 @@ class ProgramCategory(models.Model):
         
         query = """
         INSERT INTO program_categories
-        (category_name, description,icon)
-        VALUES (%s, %s , %s)
+        (category_name, description, icon)
+        VALUES (%s, %s, %s)
         """
         
-        cursor.execute(query, (
-            data.get('category_name', ''),
-            data.get('description', ''),
-            data.get('icon', ''),
-        ))
-        
-        db.commit()
-        cursor.close()
-        db.close()
+        try:
+            cursor.execute(query, (
+                data.get('category_name', ''),
+                data.get('description', ''),
+                data.get('icon', ''),
+            ))
+            db.commit()
+        except Exception as e:
+            print(f"An error occurred: {e}")
+            db.rollback()  # Rollback in case of error
+        finally:
+            cursor.close()
+            db.close()
         return True
+
 
     @classmethod
     def get_all_program_categories(cls):
@@ -1017,4 +1023,3 @@ class ProgramCategory(models.Model):
         results = cursor.fetchall()
         db.close()
         return results
-    
