@@ -399,7 +399,7 @@ class Batch(models.Model):
 
 class Trainer(models.Model):
     @classmethod
-    def add_trainer(cls, data, ):
+    def add_trainer(cls, data):
         print("Data to be inserted:")
         print(f"subject: {data.get('first_name')}")
         print(f"priority: {data.get('last_name')}")
@@ -412,8 +412,6 @@ class Trainer(models.Model):
             port=int(db_settings['PORT']),
         )
         cursor = db.cursor()
-
-        # Convert list fields to JSON strings
         # expertise_areas_json = json.dumps(data.get('expertise_areas', []))
         # certifications_json = json.dumps(data.get('certifications', []))
         # programs_json = json.dumps(data.get('programs', []))
@@ -429,43 +427,48 @@ class Trainer(models.Model):
          address_line1, address_line2, city, state, postal_code, country,
          designation, experience_years, teaching_experience, bio, hourly_rate,
          max_hours_weekly, create_account, username, password, linkedin_profile, website, notes)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         """
-        cursor.execute(query, (
-            data.get('first_name', ''),
-            data.get('last_name', ''),
-            data.get('email', ''),
-            data.get('phone', ''),
-            data.get('dob', ''),
-            data.get('gender', ''),
-            data.get('address_line1', ''),
-            data.get('address_line2', ''),
-            data.get('city', ''),
-            data.get('state', ''),
-            data.get('postal_code', ''),
-            data.get('country', ''),
-            data.get('designation', ''),
-            data.get('experience_years', 0),
-            data.get('teaching_experience', 0),
-            # expertise_areas_json,
-            # certifications_json,
-            data.get('bio', ''),
-            # programs_json,
-            # specific_modules_json,
-            data.get('hourly_rate', 0),
-            data.get('max_hours_weekly', 20),
-            int(data.get('create_account', False)),
-            data.get('username', ''),
-            data.get('password', ''),
-            data.get('linkedin_profile', ''),
-            data.get('website', ''),
-            data.get('notes', ''),
-        ))
-        db.commit()
-        if cursor:
-            cursor.close()
-        db.close()
-        return True
+        try:
+            cursor.execute(query, (
+                data.get('first_name', ''),
+                data.get('last_name', ''),
+                data.get('email', ''),
+                data.get('phone', ''),
+                data.get('dob', ''),
+                data.get('gender', ''),
+                data.get('address_line1', ''),
+                data.get('address_line2', ''),
+                data.get('city', ''),
+                data.get('state', ''),
+                data.get('postal_code', ''),
+                data.get('country', ''),
+                data.get('designation', ''),
+                data.get('experience_years', 0),
+                data.get('teaching_experience', 0),
+                # expertise_areas_json,
+                # certifications_json,
+                data.get('bio', ''),
+                # programs_json,
+                # specific_modules_json,
+                data.get('hourly_rate', 0),
+                data.get('max_hours_weekly', 20),
+                int(data.get('create_account', False)),
+                data.get('username', ''),
+                data.get('password', ''),
+                data.get('linkedin_profile', ''),
+                data.get('website', ''),
+                data.get('notes', ''),
+            ))
+            db.commit()
+        except Exception as e:
+            print(f"An error occurred: {e}")
+            db.rollback()  # Rollback in case of error 
+        finally:
+            if cursor:
+                cursor.close()
+            db.close()
+            return True
 
     @classmethod
     def get_all_trainers(cls):
@@ -918,6 +921,8 @@ class User(models.Model):
         print("Data to be inserted:")
         print(f"subject: {data.get('username')}")
         print(f"priority: {data.get('password')}")
+        print(data.get('role_id'))
+
         db_settings = settings.DATABASES['default']
         db = MySQLdb.connect(
             host=db_settings['HOST'],
@@ -929,29 +934,30 @@ class User(models.Model):
         cursor = db.cursor()
         query = """
         INSERT INTO users
-        (username, password, email, phone, first_name, last_name, address_line1, address_line2, city, state, postal_code, country)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        (first_name,last_name,username, password, confirm_password,email, phone,role, status, bio)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         """
-
-        cursor.execute(query, (
-            data.get('username', ''),
-            data.get('password', ''),
-            data.get('email', ''),
-            data.get('phone', ''),
-            data.get('first_name', ''),
-            data.get('last_name', ''),
-            data.get('address_line1', ''),
-            data.get('address_line2', ''),
-            data.get('city', ''),
-            data.get('state', ''),
-            data.get('postal_code', ''),
-            data.get('country', '')
-        ))
-        db.commit()
-        cursor.close()
-        db.close()
+        try:
+            cursor.execute(query, (
+                data.get('first_name', ''),
+                data.get('last_name', ''),
+                data.get('username', ''),
+                data.get('password', ''),
+                data.get('confirm_password', ''),
+                data.get('email', ''),
+                data.get('phone', ''),
+                data.get('role', ''),
+                data.get('status', ''),
+                data.get('bio', '')
+            ))
+            db.commit()
+        except Exception as e:
+            print(f"An error occurred: {e}")
+            db.rollback()  # Rollback in case of error
+        finally:
+            cursor.close()
+            db.close()
         return True
-
     
     def get_all_users(cls):
         db_settings = settings.DATABASES['default']
