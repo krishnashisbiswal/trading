@@ -294,7 +294,7 @@
             </section>
             
             <!-- Calendar View -->
-            <section class="calendar-view">
+            {% comment %} <section class="calendar-view">
                 <div class="calendar-header">
                     <div class="calendar-title">April 2025</div>
                     <div class="calendar-nav">
@@ -389,7 +389,7 @@
                     
                     <!-- Additional weeks would continue here -->
                 </div>
-            </section>
+            </section> {% endcomment %}
             
             <!-- Table View -->
             <section class="table-section">
@@ -421,13 +421,14 @@
                             </thead>
                             <tbody>
                                 <!-- Sample data rows -->
+                                {%for schedules in schedules %}
                                 <tr>
-                                    <td>Apr 1, 2025</td>
-                                    <td>10:00 AM - 12:00 PM</td>
-                                    <td>Complete Trading Program</td>
-                                    <td>CTP-APR-2025</td>
-                                    <td>Market Structure</td>
-                                    <td>Andaz Aaron</td>
+                                    <td>{{schedules.class_date}}</td>
+                                    <td>{{schedules.start_time}} - {{schedules.end_time}}</td>
+                                    <td>{{schedules.program}}</td>
+                                    <td>{{schedules.batch}}</td>
+                                    <td>{{schedules.topic}}</td>
+                                    <td>{{schedules.trainer}}</td>
                                     <td><span class="status-badge status-success">Scheduled</span></td>
                                     <td>
                                         <div class="row-actions">
@@ -443,7 +444,8 @@
                                         </div>
                                     </td>
                                 </tr>
-                                <tr>
+                                {% endfor %}
+                                {% comment %} <tr>
                                     <td>Apr 2, 2025</td>
                                     <td>2:00 PM - 4:00 PM</td>
                                     <td>Arthavidya Mentorship Program</td>
@@ -486,7 +488,7 @@
                                             </button>
                                         </div>
                                     </td>
-                                </tr>
+                                </tr> {% endcomment %}
                             </tbody>
                         </table>
                     </div>

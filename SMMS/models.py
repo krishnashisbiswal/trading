@@ -359,11 +359,11 @@ class Batch(models.Model):
         print(f"subject: {data.get('batch_code')}")
         print(f"priority: {data.get('batch_name')}")
         print(f"program: {data.get('program')}")
-        print(f"capacity: {data.get('capacity')}")
-        print(f"trainer: {data.get('trainer')}")
-        print(f"status: {data.get('status')}")
         print(f"start_date: {data.get('start_date')}")
         print(f"end_date: {data.get('end_date')}")
+        print(f"capacity: {data.get('capacity')}")
+        print(f"status: {data.get('status')}")
+        print(f"trainer: {data.get('trainer')}")
         print(f"description: {data.get('description')}")
         """Save data directly to MySQL using raw SQL"""
         # Connect to MySQL database
@@ -378,8 +378,8 @@ class Batch(models.Model):
         cursor = db.cursor()
         query = """
         INSERT INTO batch_management
-        (batch_code, batch_name, program, capacity, trainer, status, start_date, end_date, description)
-        VALUES (%s, %s, %s, %s ,%s, %s, %s, %s, %s)
+        (batch_code, batch_name, program, start_date, end_date, capacity, trainer, status, description)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
         """
         cursor.execute(query, (
             data.get('batch_code', ''),
@@ -418,8 +418,13 @@ class Trainer(models.Model):
     @classmethod
     def add_trainer(cls, data):
         print("Data to be inserted:")
-        print(f"subject: {data.get('first_name')}")
-        print(f"priority: {data.get('last_name')}")
+        print(f"first_name: {data.get('first_name')}")
+        print(f"last_name: {data.get('last_name')}")
+        print(f"email: {data.get('email')}")
+        print(f"phone: {data.get('phone')}")
+        print(f"dob: {data.get('dob')}")
+        print(f"gender: {data.get('gender')}")
+        # Connect to MySQL database
         db_settings = settings.DATABASES['default']
         db = MySQLdb.connect(
             host=db_settings['HOST'],
@@ -463,8 +468,8 @@ class Trainer(models.Model):
                 data.get('designation', ''),
                 data.get('experience_years', 0),
                 data.get('teaching_experience', 0),
-                # expertise_areas_json,
-                # certifications_json,
+                # data.get('expertise_areas_json', '')
+                # data.get(certifications_json,''),
                 data.get('bio', ''),
                 # programs_json,
                 # specific_modules_json,
@@ -615,6 +620,21 @@ class Program(models.Model):
         )
         cursor = db.cursor(MySQLdb.cursors.DictCursor)
         cursor.execute("SELECT * FROM programs")
+        results = cursor.fetchall()
+        db.close()
+        return results
+    @classmethod
+    def prgno(cls):
+        db_settings = settings.DATABASES['default']
+        db = MySQLdb.connect(
+            host=db_settings['HOST'],
+            user=db_settings['USER'],
+            passwd=db_settings['PASSWORD'],
+            db=db_settings['NAME'],
+            port=int(db_settings['PORT']),
+        )
+        cursor = db.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute("select count(*) as prg from programs")
         results = cursor.fetchall()
         db.close()
         return results

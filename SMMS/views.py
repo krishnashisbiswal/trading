@@ -121,7 +121,8 @@ def admin_dashboard(request):
     tickets = support_ticketx.get_all_tickets()
     classes = Class.get_all_classes()
     no = Student.studntno()
-    return render(request, 'admin-dashboard.html',{'student': student,'tickets': tickets, 'classes': classes , 'no': no})
+    prg = Program.prgno()
+    return render(request, 'admin-dashboard.html',{'student': student,'tickets': tickets, 'classes': classes , 'no': no, 'prg': prg})
 
 def admin_class_add(request):
     if request.method == 'POST':
@@ -186,7 +187,8 @@ def admin_program(request):
     return render(request, 'admin-programs.html')
 
 def admin_trainers(request):
-    return render(request, 'admin-trainers.html')
+    Trainers = Trainer.get_all_trainers()
+    return render(request, 'admin-trainers.html',{ 'trainers': Trainers})
 
 def amp_enrollment(request):
     return render(request, 'amp-enrollment.html')
@@ -296,7 +298,7 @@ def admin_quiz(request):
 
 def add_quiz(request):
     if request.method == 'POST':
-       # print("POST data:", request.POST)
+       print("POST data:", request.POST)
        questions_json_raw = request.POST.get('questions_json', '')
 
        try:
@@ -375,7 +377,7 @@ def admin_trainer_add(request):
         phone = request.POST.get('phone', '')
         dob = request.POST.get('dob', '')
         gender = request.POST.get('gender', '')
-        profile_picture_file = request.FILES.get('profile_picture')
+        # profile_picture_file = request.FILES.get('profile_picture')
         address_line1 = request.POST.get('address_line1', '')
         address_line2 = request.POST.get('address_line2', '')
         city = request.POST.get('city', '')
@@ -445,6 +447,7 @@ def admin_trainer_add(request):
         trainers = Trainer.get_all_trainers()
     return render(request, 'admin-trainer-add.html', {'trainers': trainers})
     
+
 def admin_program_add(request):
     if request.method == 'POST':
         print("POST data:", request.POST)
@@ -488,6 +491,7 @@ def admin_program_add(request):
                 messages.error(request, f'Error adding program: {str(e)}')
     programs = Program.get_all_programs()
     return render(request, 'admin-program-add.html', {'programs': programs})
+
 
 def support_ticket(request):
     if request.method=="POST":

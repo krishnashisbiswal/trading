@@ -228,15 +228,16 @@
                             </thead>
                             <tbody>
                                 <!-- Sample data row -->
+                                {% for batch in batches %}
                                 <tr>
-                                    <td>CTP-APR-2025</td>
-                                    <td>CTP April 2025 Batch</td>
-                                    <td>Complete Trading Program</td>
-                                    <td>Apr 1, 2025</td>
-                                    <td>Jun 30, 2025</td>
-                                    <td>30</td>
+                                    <td>{{batch.batch_code}}</td>
+                                    <td>{{batch.batch_name}}</td>
+                                    <td>{{batch.program}}</td>
+                                    <td>{{batch.start_date}}</td>
+                                    <td>{{batch.end_date}}</td>
+                                    <td>{{batch.capacity}}</td>
                                     <td>18</td>
-                                    <td><span class="status-badge status-success">Active</span></td>
+                                    <td><span class="status-badge status-success">{{batch.status}}</span></td>
                                     <td>
                                         <div class="row-actions">
                                             <button class="action-btn view" title="View Details">
@@ -251,7 +252,8 @@
                                         </div>
                                     </td>
                                 </tr>
-                                <!-- More sample data rows -->
+                                {% endfor %}
+                                {% comment %} <!-- More sample data rows -->
                                 <tr>
                                     <td>CTP-JUL-2025</td>
                                     <td>CTP July 2025 Batch</td>
@@ -297,7 +299,7 @@
                                             </button>
                                         </div>
                                     </td>
-                                </tr>
+                                </tr> {% endcomment %}
                             </tbody>
                         </table>
                     </div>
