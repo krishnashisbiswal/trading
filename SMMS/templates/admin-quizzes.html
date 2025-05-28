@@ -4,6 +4,10 @@
 {% block content %}
 <style>
         /* Additional styles specific to quizzes page */
+        .submenu{
+            max-height:auto !important;
+            overflow: hidden !important;
+        } 
         .quiz-type-badge {
             display: inline-block;
             padding: 4px 10px;
@@ -577,7 +581,8 @@
             font-size: 16px;
             margin-left: auto;
         }
-    </style>
+
+</style>
 </head>
 <body class="admin-body">
         <!-- Main Content Area -->
@@ -631,7 +636,7 @@
                     <h3>Create New Quiz</h3>
                     <button class="form-close" id="close-form"><i class="fas fa-times"></i></button>
                 </div>
-                <form method="POST" id="quiz-form" >
+                <form method="POST" id="quiz-form" action="{% url 'add_quiz' %}">
                     {% csrf_token %}
                     <div class="form-row">
                         <div class="form-group">

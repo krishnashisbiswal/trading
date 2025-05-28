@@ -140,14 +140,12 @@ class PersonalInformation(models.Model):
             data.get('dob', ''),
             data.get('gender', '')
         ))
-
         # Commit the transaction
         db.commit()
         if cursor:
             cursor.close()
         # Close the connection
         db.close()
-
         return True
 
     GENDER_CHOICES = [
