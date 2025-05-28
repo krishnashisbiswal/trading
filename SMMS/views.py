@@ -181,10 +181,12 @@ def admin_class_add(request):
 
 
 def admin_classes(request):
-    return render(request, 'admin-classes.html')
+    classes = Class.get_all_classes()
+    return render(request, 'admin-classes.html', {'classes': classes})
 
 def admin_program(request):
-    return render(request, 'admin-programs.html')
+    programs = Program.get_all_programs()
+    return render(request, 'admin-programs.html', {'programs': programs})
 
 def admin_trainers(request):
     Trainers = Trainer.get_all_trainers()

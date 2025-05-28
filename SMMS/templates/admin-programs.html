@@ -258,13 +258,14 @@
                 <!-- Programs Card View (Default) -->
                 <div class="card-view active" id="card-view">
                     <!-- Program 1 -->
+                    {% for program in programs %}
                     <div class="program-card">
                         <div class="program-image">
                             <img src="{% static 'images/ctp-program.jpg' %}" alt="Complete Trading Program">
                         </div>
                         <div class="program-info">
                             <div class="program-title-row">
-                                <h3 class="program-name">Complete Trading Program (CTP)</h3>
+                                <h3 class="program-name">{{program.title}}</h3>
                                 <div class="program-actions">
                                     <button class="action-btn edit" title="Edit">
                                         <i class="fas fa-edit"></i>
@@ -276,23 +277,23 @@
                             </div>
                             <div class="program-meta">
                                 <span class="program-badge featured"><i class="fas fa-star"></i> Featured</span>
-                                <span class="meta-item"><i class="fas fa-clock"></i> 3 Months</span>
-                                <span class="meta-item"><i class="fas fa-calendar-alt"></i> 24 Classes</span>
-                                <span class="meta-item"><i class="fas fa-users"></i> 852 Students</span>
-                                <span class="price-tag">₹19,999</span>
+                                <span class="meta-item"><i class="fas fa-clock"></i>{{program.duration_months}}</span>
+                                <span class="meta-item"><i class="fas fa-calendar-alt"></i>{{program.num_classes}}</span>
+                                <span class="meta-item"><i class="fas fa-users"></i>{{program.students_enrolled}}</span>
+                                <span class="price-tag">₹{{program.price}}</span>
                             </div>
                             <p class="program-description">The Ultimate Trading Program to Make You Profitable. Covers basics to advanced concepts with personalized mentorship.</p>
                             <div class="program-stats">
                                 <div class="stat-item">
-                                    <span class="stat-value">4.8</span>
+                                    <span class="stat-value">{{program.rating}}</span>
                                     <span class="stat-label">Rating</span>
                                 </div>
                                 <div class="stat-item">
-                                    <span class="stat-value">92%</span>
+                                    <span class="stat-value">{{program.completion_percentage}}%</span>
                                     <span class="stat-label">Completion</span>
                                 </div>
                                 <div class="stat-item">
-                                    <span class="stat-value">₹42.6L</span>
+                                    <span class="stat-value">₹{{program.revenue}}</span>
                                     <span class="stat-label">Revenue</span>
                                 </div>
                                 <div class="stat-item">
@@ -301,8 +302,8 @@
                             </div>
                         </div>
                     </div>
-                    
-                    <!-- Program 2 -->
+                    {% endfor %}
+                    {% comment %} <!-- Program 2 -->
                     <div class="program-card">
                         <div class="program-image">
                             <img src="{% static 'images/amp-program.jpg' %}" alt="Arthavidya Mentorship Program">
@@ -433,8 +434,8 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </div>
+                    </div> {% endcomment %}
+                </div> 
                 
                 <!-- Programs Table View (Hidden by default) -->
                 <div class="table-view" id="table-view">
@@ -459,6 +460,7 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                {% for program in programs %}
                                 <tr>
                                     <td class="checkbox-cell">
                                         <label class="custom-checkbox">
@@ -470,17 +472,17 @@
                                         <div class="user-info">
                                             <img src="{% static 'images/ctp-program.jpg'%}" alt="Program" class="user-avatar">
                                             <div class="user-details">
-                                                <h4>Complete Trading Program (CTP)</h4>
+                                                <h4>{{program.title}}</h4>
                                                 <p>Trading</p>
                                             </div>
                                         </div>
                                     </td>
-                                    <td>₹19,999</td>
-                                    <td>3 Months</td>
-                                    <td>852</td>
-                                    <td>₹42.6L</td>
-                                    <td>4.8/5</td>
-                                    <td><span class="status-badge status-success">Active</span></td>
+                                    <td>{{program.price}}</td>
+                                    <td>{{program.duration_months}}</td>
+                                    <td>{{program.students_enrolled}}</td>
+                                    <td>₹{{program.revenue}}</td>
+                                    <td>{{program.rating}}</td>
+                                    <td><span class="status-badge status-success">{{program.status}}</span></td>
                                     <td>
                                         <div class="row-actions">
                                             <button class="action-btn view" title="View Details">
@@ -495,7 +497,8 @@
                                         </div>
                                     </td>
                                 </tr>
-                                <tr>
+                                {% endfor %}
+                                {% comment %} <tr>
                                     <td class="checkbox-cell">
                                         <label class="custom-checkbox">
                                             <input type="checkbox" class="row-checkbox">
@@ -602,7 +605,7 @@
                                             </button>
                                         </div>
                                     </td>
-                                </tr>
+                                </tr> {% endcomment %}
                             </tbody>
                         </table>
                     </div>
